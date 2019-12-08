@@ -7,6 +7,19 @@ void Machine::color(color_t color)
   _state.penColor = color;
 }
 
+void Machine::cls(color_t color)
+{
+  color = _memory.paletteAt(gfx::DRAW_PALETTE_INDEX)->get(color);
+  gfx::color_byte_t value = gfx::color_byte_t(color, color);
+  
+  auto* data = _memory.screenData();
+  memset(data, value.value, gfx::SCREEN_WIDTH*gfx::SCREEN_HEIGHT / 2);
+
+  const auto& rc = gfx::ColorTable[color];
+  std::fill(static_cast<uint32_t*>(_surface->pixels), static_cast<uint32_t*>(_surface->pixels) + _surface->w * _surface->h, (rc.r << 16) | (rc.g << 8) | (rc.b) | 0xff000000);
+
+}
+
 void Machine::pset(coord_t x, coord_t y, color_t color)
 {
   color = _memory.paletteAt(gfx::DRAW_PALETTE_INDEX)->get(color);
@@ -77,7 +90,12 @@ void Machine::spr(index_t idx, coord_t x, coord_t y)
 
   for (coord_t ty = 0; ty < gfx::SPRITE_HEIGHT; ++ty)
     for (coord_t tx = 0; tx < gfx::SPRITE_WIDTH; ++tx)
-      pset(x + tx, y + ty, sprite->get(tx, ty));
+    {
+      color_t color = sprite->get(tx, ty);
+      if (color != 0) //TODO: manage real transparency through flags
+        pset(x + tx, y + ty, sprite->get(tx, ty));
+    }
+      
 }
 
 void Machine::pal(color_t c0, color_t c1)

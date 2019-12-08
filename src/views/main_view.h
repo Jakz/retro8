@@ -75,26 +75,89 @@ namespace lua
 
     return 0;
   }
+
+  int cls(lua_State* L)
+  {
+    int c = lua_gettop(L) == 1 ? lua_tointeger(L, -1) : 0;
+
+    machine.cls(static_cast<retro8::color_t>(c));
+
+    return 0;
+  }
+
+  int spr(lua_State* L)
+  {
+    assert(lua_isnumber(L, 2) && lua_isnumber(L, 3));
+    
+    int idx = lua_tointeger(L, 1);
+    int x = lua_tonumber(L, 2);
+    int y = lua_tonumber(L, 3);
+    
+    machine.spr(idx, x, y);
+
+    return 0;
+  }
+
+  int pal(lua_State* L)
+  {
+    int c0 = lua_tonumber(L, 1);
+    int c1 = lua_tonumber(L, 2);
+
+    machine.pal(static_cast<retro8::color_t>(c0), static_cast<retro8::color_t>(c1));
+
+    return 0;
+  }
+
+  static constexpr float PI = 3.14159265358979323846;
+
+
+  int cos(lua_State* L)
+  {
+    assert(lua_isnumber(L, 1));
+
+    float angle = lua_tonumber(L, 1);
+    float value = std::cosf(angle * 2 * PI);
+    lua_pushnumber(L, value);
+
+    return 1;
+  }
   
-  class Script
+  class Code
   {
   private:
     lua_State* L;
 
   public:
-    Script(const std::string& code) : L(nullptr)
+    Code() : L(nullptr)
+    {
+
+    }
+
+    ~Code()
+    {
+      if (L)
+        lua_close(L);
+    }
+
+    void initFromSource(const std::string& code)
     {
       L = luaL_newstate();
 
       lua_register(L, "pset", pset);
       lua_register(L, "pget", pget);
+      lua_register(L, "pal", pal);
       lua_register(L, "color", color);
       lua_register(L, "line", line);
       lua_register(L, "rect", rect);
+      lua_register(L, "cls", cls);
+      lua_register(L, "spr", spr);
+      
+      lua_register(L, "cos", cos);
 
-      if (!luaL_loadstring(L, code.c_str()))
+      if (luaL_loadstring(L, code.c_str()))
       {
-        std::cout << "Error: on loadstring" << std::endl;
+        const char* message = lua_tostring(L, -1);
+        std::cout << "Error: on loadstring: " << message << std::endl;
       }
 
       int error = lua_pcall(L, 0, 0, 0);
@@ -107,10 +170,17 @@ namespace lua
       }
     }
 
-    ~Script()
+    void callVoidFunction(const char* name)
     {
-      if (L)
-        lua_close(L);
+      lua_getglobal(L, name);
+      int error = lua_pcall(L, 0, 0, 0);
+
+      if (error)
+      {
+        const char* message = lua_tostring(L, -1);
+
+        std::cout << "Error in _draw function: " << message << std::endl;
+      }
     }
   };
 }
@@ -124,10 +194,14 @@ namespace ui
   private:
     ViewManager* manager;
 
+    lua::Code code;
+
+    void render();
+    void update();
+
   public:
     GameView(ViewManager* manager);
 
-    void render();
     void handleKeyboardEvent(const SDL_Event& event);
     void handleMouseEvent(const SDL_Event& event);
 
@@ -135,54 +209,81 @@ namespace ui
 
   GameView::GameView(ViewManager* manager) : manager(manager)
   { 
-    namespace r8 = retro8;
-    
-    SDL_Surface* surface = IMG_Load("hello_p8_gfx.png");
-    assert(surface);
-
-    for (size_t s = 0; s < 16; ++s)
-    {
-      retro8::gfx::sprite_t* sprite = machine.memory().spriteAt(s);
-
-      for (retro8::coord_t y = 0; y < retro8::gfx::SPRITE_HEIGHT; ++y)
-        for (retro8::coord_t x = 0; x < retro8::gfx::SPRITE_WIDTH; ++x)
-        {
-          SDL_Color color;
-
-          if (SDL_ISPIXELFORMAT_INDEXED(surface->format->format))
-          {
-            color = surface->format->palette->colors[((uint8_t*)surface->pixels)[(y*surface->w) + s*8 + x]];
-          }
-
-          
-          retro8::color_t r8color = retro8::gfx::colorForRGB((color.r << 16 | color.g << 8 | color.b));
-          sprite->set(x, y, r8color);
-        }
-    }
-
-
-    
-    /*lua::Script script = lua::Script(
-      "pset(10, 10, 11)\n"
-      "color(8)\n"
-      "pset(20, 20)\n"
-      "pset(15, 15, pget(10, 10))\n"
-      "color(3)\n"
-      "rect(50, 50, 65, 78, 2)"
-    );*/
-
-    for (size_t i = 0; i < 16; ++i)
-      machine.spr(1, 0 * 16, 90);
-
   }
 
+  void GameView::update()
+  {
+    code.callVoidFunction("_draw");
+  }
+
+  bool init = false;
   void GameView::render()
   {
+    if (!init)
+    {
+      namespace r8 = retro8;
+
+      machine.init();
+
+      SDL_Surface* surface = IMG_Load("hello_p8_gfx.png");
+      assert(surface);
+
+      static constexpr size_t SPRITES_PER_ROW = 16;
+
+      for (size_t s = 0; s < 32; ++s)
+      {
+        retro8::gfx::sprite_t* sprite = machine.memory().spriteAt(s);
+
+        r8::coord_t bx = (s % SPRITES_PER_ROW) * r8::gfx::SPRITE_WIDTH;
+        r8::coord_t by = (s / SPRITES_PER_ROW) * r8::gfx::SPRITE_HEIGHT;
+
+        for (retro8::coord_t y = 0; y < retro8::gfx::SPRITE_HEIGHT; ++y)
+          for (retro8::coord_t x = 0; x < retro8::gfx::SPRITE_WIDTH; ++x)
+          {
+            SDL_Color color;
+
+            if (SDL_ISPIXELFORMAT_INDEXED(surface->format->format))
+            {
+              color = surface->format->palette->colors[((uint8_t*)surface->pixels)[((y + by) * surface->w) + bx + x]];
+            }
+
+
+            retro8::color_t r8color = retro8::gfx::colorForRGB((color.r << 16 | color.g << 8 | color.b));
+            sprite->set(x, y, r8color);
+          }
+      }
+
+      const char* source =
+        "t = 0\n"
+        "\n"
+        "function _draw()\n"
+        "  cls(3)\n"
+        "  for i=1,11 do\n"
+        "    for j0=0,7 do\n"
+        "      j = 7-j0\n"
+        "      col = 7+j\n"
+        "      t1 = t + i*4 - j*2\n"
+        "      y = 38 + j + cos(t1/50)*5\n"
+        "      pal(7,col)\n"
+        "      spr(16+i, 8+i*8, y)\n"
+        "    end\n"
+        "  end\n"
+        "  t = t + 1\n"
+        "  spr(1, 64-4, 90)\n"
+        "end\n"
+      ;
+
+      code.initFromSource(source);
+
+      init = true;
+    }
+    
     auto* renderer = manager->getRenderer();
 
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
 
+    update();
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, machine.screen());
     SDL_Rect dest = { (640 - 384) / 2, (480 - 384) / 2, 384, 384 };
     SDL_RenderCopy(renderer, texture, nullptr, &dest);

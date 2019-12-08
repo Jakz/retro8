@@ -46,6 +46,9 @@ namespace retro8
     static constexpr size_t SPRITE_BYTES_PER_ROW = 4;
     static constexpr size_t PALETTE_SIZE = 16;
 
+    static constexpr size_t SCREEN_WIDTH = 128;
+    static constexpr size_t SCREEN_HEIGHT = 128;
+
     static constexpr size_t DRAW_PALETTE_INDEX = 0;
 
     struct color_byte_t
@@ -53,6 +56,7 @@ namespace retro8
       uint8_t value;
 
     public:
+      color_byte_t(color_t low, color_t high) : value(low | (high << 4)) { }
       inline color_t low() const { return static_cast<color_t>(value & 0x0F); }
       inline color_t high() const { return static_cast<color_t>((value >> 4) & 0x0F); }
       inline color_t get(coord_t mod) const { return (mod % 2) == 0 ? low() : high(); }

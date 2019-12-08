@@ -2,8 +2,6 @@
 
 #include "sdl_helper.h"
 
-#include "label_cache.h"
-
 #include <array>
 
 namespace ui

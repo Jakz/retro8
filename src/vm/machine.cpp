@@ -9,7 +9,7 @@ void Machine::color(color_t color)
 
 void Machine::pset(coord_t x, coord_t y, color_t color)
 {
-  const auto& c = ColorTable[color];
+  const auto& c = gfx::ColorTable[color];
   _memory.setScreenData(x, y, color);
   static_cast<uint32_t*>(_surface->pixels)[y*_surface->w + x] = (c.r << 16) | (c.g << 8) | (c.b) | 0xff000000;
 }

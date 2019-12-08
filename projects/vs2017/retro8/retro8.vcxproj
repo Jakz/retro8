@@ -138,6 +138,8 @@
     <ClInclude Include="..\..\..\src\sdl_helper.h" />
     <ClInclude Include="..\..\..\src\views\main_view.h" />
     <ClInclude Include="..\..\..\src\views\view_manager.h" />
+    <ClInclude Include="..\..\..\src\vm\defines.h" />
+    <ClInclude Include="..\..\..\src\vm\gfx.h" />
     <ClInclude Include="..\..\..\src\vm\machine.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

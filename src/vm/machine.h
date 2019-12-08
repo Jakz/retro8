@@ -1,29 +1,13 @@
 #pragma once
 
-#include <SDL.h>
+#include "defines.h"
+#include "gfx.h"
 
+#include <SDL.h>
 #include <array>
 
 namespace retro8
 {
-  enum color_t
-  {
-    BLACK, DARK_BLUE, DARK_PURPLE, DARK_GREEN,
-    BROWN, DARK_GREY, LIGHT_GREY, WHITE,
-    RED, ORANGE, YELLOW, GREEN,
-    BLUE, INDIGO, PINK, PEACH
-  };
-
-  static constexpr std::array<SDL_Color, 16> ColorTable = {
-    SDL_Color{  0,   0,   0}, SDL_Color{ 29,  43,  83}, SDL_Color{126,  37,  83}, SDL_Color{  0, 135,  81},
-    SDL_Color{171,  82,  54}, SDL_Color{ 95,  87,  79}, SDL_Color{194, 195, 199}, SDL_Color{255, 241, 232},
-    SDL_Color{255,   0,  77}, SDL_Color{255, 163,   0}, SDL_Color{255, 236,  39}, SDL_Color{  0, 228,  54},
-    SDL_Color{ 41, 173, 255}, SDL_Color{131, 118, 156}, SDL_Color{255, 119, 168}, SDL_Color{255, 204, 170}
-  };
-
-  using coord_t = uint32_t;
-  struct point_t { coord_t x, y; };
-
   class State
   {
   public:
@@ -36,15 +20,19 @@ namespace retro8
   private:
     uint8_t memory[1024 * 32];
 
-    static constexpr size_t SCREEN_DATA = 0x6000;
+    static constexpr size_t ADDRESS_SCREEN_DATA = 0x6000;
+    static constexpr size_t ADDRESS_SPRITE_SHEET = 0x0000;
 
     static constexpr size_t BYTES_PER_SCREEN_ROW = 128;
-  public:
+    static constexpr size_t BYTES_PER_SPRITE = 32;
 
+    sprite_t* spriteAt(size_t index) { return reinterpret_cast<sprite_t*>(&memory[ADDRESS_SCREEN_DATA + index * BYTES_PER_SPRITE]); }
+
+  public:
 
     void setScreenData(coord_t x, coord_t y, color_t c)
     {
-      uint8_t* address = &memory[SCREEN_DATA + y * BYTES_PER_SCREEN_ROW + x / 2];
+      uint8_t* address = &memory[ADDRESS_SCREEN_DATA + y * BYTES_PER_SCREEN_ROW + x / 2];
 
       if (x % 2 == 0)
         *address = (*address & 0xf0) | c;
@@ -54,7 +42,7 @@ namespace retro8
 
     color_t screenData(coord_t x, coord_t y) const
     {
-      const uint8_t* address = &memory[SCREEN_DATA + y * BYTES_PER_SCREEN_ROW + x / 2];
+      const uint8_t* address = &memory[ADDRESS_SCREEN_DATA + y * BYTES_PER_SCREEN_ROW + x / 2];
 
       if (x % 2 == 0)
         return static_cast<color_t>(*address & 0x0f);

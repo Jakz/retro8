@@ -27,8 +27,6 @@ namespace ui
     static const size_t VIEW_COUNT = 1;
 
   private:
-    SDL_Texture* textureUI;
-
     std::array<view_t*, 2> views;
     view_t* view;
 

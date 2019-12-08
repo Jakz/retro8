@@ -9,6 +9,7 @@ void Machine::color(color_t color)
 
 void Machine::pset(coord_t x, coord_t y, color_t color)
 {
+  color = _memory.paletteAt(gfx::DRAW_PALETTE_INDEX)->get(color);
   const auto& c = gfx::ColorTable[color];
   _memory.setScreenData(x, y, color);
   static_cast<uint32_t*>(_surface->pixels)[y*_surface->w + x] = (c.r << 16) | (c.g << 8) | (c.b) | 0xff000000;
@@ -68,4 +69,19 @@ void Machine::rect(coord_t x0, coord_t y0, coord_t x1, coord_t y1, color_t color
   line(x1, y0, x1, y1, color);
   line(x0, y1, x1, y1, color);
   line(x0, y1, x0, y0, color);
+}
+
+void Machine::spr(index_t idx, coord_t x, coord_t y)
+{
+  const gfx::sprite_t* sprite = _memory.spriteAt(idx);
+
+  for (coord_t ty = 0; ty < gfx::SPRITE_HEIGHT; ++ty)
+    for (coord_t tx = 0; tx < gfx::SPRITE_WIDTH; ++tx)
+      pset(x + tx, y + ty, sprite->get(tx, ty));
+}
+
+void Machine::pal(color_t c0, color_t c1)
+{
+  gfx::palette_t* palette = _memory.paletteAt(gfx::DRAW_PALETTE_INDEX);
+  palette->set(c0, c1);
 }

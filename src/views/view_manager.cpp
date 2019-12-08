@@ -8,7 +8,7 @@
 #define PREFIX ""
 #endif
 
-ui::ViewManager::ViewManager() : SDL<ui::ViewManager, ui::ViewManager>(*this, *this), textureUI(nullptr)
+ui::ViewManager::ViewManager() : SDL<ui::ViewManager, ui::ViewManager>(*this, *this)
 {
   views[0] = new GameView(this);
   view = views[0];
@@ -16,23 +16,11 @@ ui::ViewManager::ViewManager() : SDL<ui::ViewManager, ui::ViewManager>(*this, *t
 
 void ui::ViewManager::deinit()
 {
-  SDL_DestroyTexture(textureUI);
   SDL::deinit();
 }
 
 bool ui::ViewManager::loadData()
 {
-  SDL_Surface* surfaceUI = IMG_Load(PREFIX "data/ui.png");
-
-  if (!surfaceUI)
-  {
-    printf("Error while loading ui.png: %s\n", IMG_GetError());
-    return false;
-  }
-
-  textureUI = SDL_CreateTextureFromSurface(renderer, surfaceUI);
-  SDL_FreeSurface(surfaceUI);
-
   return true;
 }
 

@@ -135,14 +135,45 @@ namespace ui
 
   GameView::GameView(ViewManager* manager) : manager(manager)
   { 
-    lua::Script script = lua::Script(
+    namespace r8 = retro8;
+    
+    SDL_Surface* surface = IMG_Load("hello_p8_gfx.png");
+    assert(surface);
+
+    for (size_t s = 0; s < 16; ++s)
+    {
+      retro8::gfx::sprite_t* sprite = machine.memory().spriteAt(s);
+
+      for (retro8::coord_t y = 0; y < retro8::gfx::SPRITE_HEIGHT; ++y)
+        for (retro8::coord_t x = 0; x < retro8::gfx::SPRITE_WIDTH; ++x)
+        {
+          SDL_Color color;
+
+          if (SDL_ISPIXELFORMAT_INDEXED(surface->format->format))
+          {
+            color = surface->format->palette->colors[((uint8_t*)surface->pixels)[(y*surface->w) + s*8 + x]];
+          }
+
+          
+          retro8::color_t r8color = retro8::gfx::colorForRGB((color.r << 16 | color.g << 8 | color.b));
+          sprite->set(x, y, r8color);
+        }
+    }
+
+
+    
+    /*lua::Script script = lua::Script(
       "pset(10, 10, 11)\n"
       "color(8)\n"
       "pset(20, 20)\n"
       "pset(15, 15, pget(10, 10))\n"
       "color(3)\n"
       "rect(50, 50, 65, 78, 2)"
-    );
+    );*/
+
+    for (size_t i = 0; i < 16; ++i)
+      machine.spr(1, 0 * 16, 90);
+
   }
 
   void GameView::render()

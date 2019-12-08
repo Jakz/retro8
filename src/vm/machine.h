@@ -20,15 +20,23 @@ namespace retro8
   private:
     uint8_t memory[1024 * 32];
 
-    static constexpr size_t ADDRESS_SCREEN_DATA = 0x6000;
     static constexpr size_t ADDRESS_SPRITE_SHEET = 0x0000;
+    static constexpr size_t ADDRESS_PALETTES = 0x5f10;
+    static constexpr size_t ADDRESS_SCREEN_DATA = 0x6000;
 
     static constexpr size_t BYTES_PER_SCREEN_ROW = 128;
-    static constexpr size_t BYTES_PER_SPRITE = 32;
+    static constexpr size_t BYTES_PER_PALETTE = sizeof(retro8::gfx::palette_t);
+    static constexpr size_t BYTES_PER_SPRITE = sizeof(retro8::gfx::sprite_t);
 
-    sprite_t* spriteAt(size_t index) { return reinterpret_cast<sprite_t*>(&memory[ADDRESS_SCREEN_DATA + index * BYTES_PER_SPRITE]); }
 
   public:
+    Memory()
+    {
+      paletteAt(gfx::DRAW_PALETTE_INDEX)->reset();
+    }
+
+    gfx::sprite_t* spriteAt(size_t index) { return reinterpret_cast<gfx::sprite_t*>(&memory[ADDRESS_SCREEN_DATA + index * BYTES_PER_SPRITE]); }
+    gfx::palette_t* paletteAt(size_t index) { return reinterpret_cast<gfx::palette_t*>(&memory[ADDRESS_PALETTES + index * BYTES_PER_PALETTE]); }
 
     void setScreenData(coord_t x, coord_t y, color_t c)
     {
@@ -73,7 +81,12 @@ namespace retro8
     void line(coord_t x0, coord_t y0, coord_t x1, coord_t y1, color_t color);
     void rect(coord_t x0, coord_t y0, coord_t x1, coord_t y1, color_t color);
 
+    void pal(color_t c0, color_t c1);
+
+    void spr(index_t idx, coord_t x, coord_t y);
+
     const State& state() const { return _state; }
     SDL_Surface* screen() const { return _surface; }
+    Memory& memory() { return _memory; }
   };
 }

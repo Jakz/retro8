@@ -11,7 +11,6 @@ namespace retro8
   class State
   {
   public:
-    color_t penColor;
     point_t lastLineEnd;
   };
 
@@ -21,7 +20,11 @@ namespace retro8
     uint8_t memory[1024 * 32];
 
     static constexpr size_t ADDRESS_SPRITE_SHEET = 0x0000;
+    
+    
     static constexpr size_t ADDRESS_PALETTES = 0x5f10;
+    static constexpr size_t ADDRESS_PEN_COLOR = 0x5f25;
+
     static constexpr size_t ADDRESS_SCREEN_DATA = 0x6000;
 
     static constexpr size_t BYTES_PER_SCREEN_ROW = 128;
@@ -34,6 +37,8 @@ namespace retro8
     {
       paletteAt(gfx::DRAW_PALETTE_INDEX)->reset();
     }
+
+    gfx::color_byte_t* penColor() { return reinterpret_cast<gfx::color_byte_t*>(&memory[ADDRESS_PEN_COLOR]); }
 
     gfx::color_byte_t* screenData() { return reinterpret_cast<gfx::color_byte_t*>(&memory[ADDRESS_SCREEN_DATA]); }
     gfx::sprite_t* spriteAt(size_t index) { return reinterpret_cast<gfx::sprite_t*>(&memory[ADDRESS_SPRITE_SHEET + index * BYTES_PER_SPRITE]); }
@@ -67,6 +72,7 @@ namespace retro8
     State _state;
     Memory _memory;
     SDL_Surface* _surface;
+    gfx::Font _font;
 
   public:
     Machine()
@@ -91,9 +97,11 @@ namespace retro8
     void pal(color_t c0, color_t c1);
 
     void spr(index_t idx, coord_t x, coord_t y);
+    void print(const std::string& string, coord_t x, coord_t y, color_t color);
 
     const State& state() const { return _state; }
     SDL_Surface* screen() const { return _surface; }
     Memory& memory() { return _memory; }
+    gfx::Font& font() { return _font; }
   };
 }

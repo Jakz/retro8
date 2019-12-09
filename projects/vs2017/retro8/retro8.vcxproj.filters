@@ -44,5 +44,8 @@
     <ClCompile Include="..\..\..\src\vm\machine.cpp">
       <Filter>src\vm</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\vm\gfx.cpp">
+      <Filter>src\vm</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

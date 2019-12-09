@@ -22,7 +22,7 @@ namespace lua
     if (args == 3)
       c = lua_tointeger(L, 3);
     else
-      c = machine.state().penColor;
+      c = machine.memory().penColor()->low();
 
     machine.pset(x, y, static_cast<retro8::color_t>(c));
 
@@ -55,7 +55,7 @@ namespace lua
     int x1 = lua_tointeger(L, 3);
     int y1 = lua_tointeger(L, 4);
 
-    int c = lua_gettop(L) == 5 ? lua_tointeger(L, 5) : machine.state().penColor;
+    int c = lua_gettop(L) == 5 ? lua_tointeger(L, 5) : machine.memory().penColor()->low();
 
     machine.line(x0, y0, x1, y1, static_cast<retro8::color_t>(c));
 
@@ -69,7 +69,7 @@ namespace lua
     int x1 = lua_tointeger(L, 3);
     int y1 = lua_tointeger(L, 4);
 
-    int c = lua_gettop(L) == 5 ? lua_tointeger(L, 5) : machine.state().penColor;
+    int c = lua_gettop(L) == 5 ? lua_tointeger(L, 5) : machine.memory().penColor()->low();
 
     machine.rect(x0, y0, x1, y1, static_cast<retro8::color_t>(c));
 
@@ -122,6 +122,19 @@ namespace lua
     return 1;
   }
 
+  int print(lua_State* L)
+  {
+    //TODO: optimize and use const char*?
+    std::string text = lua_tostring(L, 1);
+    int x = lua_tonumber(L, 2); //TODO: these are optional
+    int y = lua_tonumber(L, 3);
+    int c = lua_gettop(L) == 4 ? lua_tointeger(L, 4) : machine.memory().penColor()->low();
+
+    machine.print(text, x, y, static_cast<retro8::color_t>(c));
+
+    return 0;
+  }
+
   class Code
   {
   private:
@@ -151,8 +164,9 @@ namespace lua
       lua_register(L, "rect", rect);
       lua_register(L, "cls", cls);
       lua_register(L, "spr", spr);
-
       lua_register(L, "cos", cos);
+      lua_register(L, "print", print);
+
 
       if (luaL_loadstring(L, code.c_str()))
       {
@@ -225,6 +239,10 @@ namespace ui
 
       machine.init();
 
+      SDL_Surface* font = IMG_Load("pico8_font.png");
+      machine.font().load(font);
+      SDL_FreeSurface(font);
+
       SDL_Surface* surface = IMG_Load("hello_p8_gfx.png");
       assert(surface);
 
@@ -253,11 +271,13 @@ namespace ui
           }
       }
 
+      SDL_FreeSurface(surface);
+
       const char* source =
         "t = 0\n"
         "\n"
         "function _draw()\n"
-        "  cls()\n"
+        "  cls(2)\n"
         "  for i=1,11 do\n"
         "    for j0=0,7 do\n"
         "      j = 7-j0\n"
@@ -265,10 +285,12 @@ namespace ui
         "      t1 = t + i*4 - j*2\n"
         "      y = 38 + j + cos(t1/50)*5\n"
         "      pal(7,col)\n"
-        "      spr(16+i, 8+i*8, y)\n"
+        "      spr(16+i, 8+i*8 + 5, y)\n"
         "    end\n"
         "  end\n"
         "  t = t + 1.0\n"
+        "  print(\"this is pico-8\", 37, 70, 14)\n"
+        "  print(\"nice to meet you\", 34, 80, 12)\n"
         "  spr(1, 64-4, 90)\n"
         "end\n"
       ;
@@ -285,8 +307,8 @@ namespace ui
 
     update();
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, machine.screen());
-    //SDL_Rect dest = { (640 - 384) / 2, (480 - 384) / 2, 384, 384 };
-    SDL_Rect dest = { (320 - 128) / 2, (240 - 128) / 2, 128, 128 };
+    SDL_Rect dest = { (640 - 384) / 2, (480 - 384) / 2, 384, 384 };
+    //SDL_Rect dest = { (320 - 128) / 2, (240 - 128) / 2, 128, 128 };
     SDL_RenderCopy(renderer, texture, nullptr, &dest);
     SDL_DestroyTexture(texture);
 

@@ -131,6 +131,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\src\main.cpp" />
     <ClCompile Include="..\..\..\src\views\view_manager.cpp" />
+    <ClCompile Include="..\..\..\src\vm\gfx.cpp" />
     <ClCompile Include="..\..\..\src\vm\machine.cpp" />
   </ItemGroup>
   <ItemGroup>

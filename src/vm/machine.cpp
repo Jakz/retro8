@@ -4,7 +4,8 @@ using namespace retro8;
 
 void Machine::color(color_t color)
 {
-  _state.penColor = color;
+  gfx::color_byte_t* penColor = _memory.penColor();
+  penColor->low(color);
 }
 
 void Machine::cls(color_t color)
@@ -96,6 +97,25 @@ void Machine::spr(index_t idx, coord_t x, coord_t y)
         pset(x + tx, y + ty, sprite->get(tx, ty));
     }
 
+}
+
+void Machine::print(const std::string& string, coord_t x, coord_t y, color_t color)
+{
+  for (const auto c : string)
+  {
+    const auto sprite = _font.glyph(c);
+
+    for (coord_t ty = 0; ty < gfx::GLYPH_HEIGHT; ++ty)
+      for (coord_t tx = 0; tx < gfx::GLYPH_WIDTH; ++tx)
+      {
+        //TODO: check if print is using pal override or not
+        color_t fcolor = sprite->get(tx, ty);
+        if (fcolor != 0)
+          pset(x + tx, y + ty, color);
+      }
+
+    x += 4;
+  }
 }
 
 void Machine::pal(color_t c0, color_t c1)

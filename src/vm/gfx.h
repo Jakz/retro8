@@ -43,11 +43,18 @@ namespace retro8
 
     static constexpr size_t SPRITE_WIDTH = 8;
     static constexpr size_t SPRITE_HEIGHT = 8;
+    
+    static constexpr size_t GLYPH_WIDTH = 4;
+    static constexpr size_t GLYPH_HEIGHT = 6;
+
     static constexpr size_t SPRITE_BYTES_PER_ROW = 4;
     static constexpr size_t PALETTE_SIZE = 16;
 
     static constexpr size_t SCREEN_WIDTH = 128;
     static constexpr size_t SCREEN_HEIGHT = 128;
+
+    static constexpr size_t FONT_GLYPHS_COLUMNS = 16;
+    static constexpr size_t FONT_GLYPHS_ROWS = 10;
 
     static constexpr size_t DRAW_PALETTE_INDEX = 0;
 
@@ -56,9 +63,12 @@ namespace retro8
       uint8_t value;
 
     public:
+      color_byte_t() = default;
       color_byte_t(color_t low, color_t high) : value(low | (high << 4)) { }
       inline color_t low() const { return static_cast<color_t>(value & 0x0F); }
       inline color_t high() const { return static_cast<color_t>((value >> 4) & 0x0F); }
+      inline void low(color_t color) { value = ((value & 0xf0) | color); }
+      inline void high(color_t color) { value = ((value & 0x0f) | color << 4); }
       inline color_t get(coord_t mod) const { return (mod % 2) == 0 ? low() : high(); }
       inline void set(coord_t mod, color_t color) { value = (mod % 2) == 0 ? ((value & 0xf0) | color) : ((value & 0x0f) | color << 4); }
     };
@@ -89,6 +99,17 @@ namespace retro8
       color_t get(color_t i) const { return colors[i]; }
       color_t set(color_t i, color_t color) { return colors[i] = color; }
       color_t& operator[](color_t i) { return colors[i]; }
+    };
+
+    class Font
+    {
+      sprite_t glyphs[FONT_GLYPHS_ROWS*FONT_GLYPHS_COLUMNS];
+
+    public:
+      Font() { }
+      inline const sprite_t* glyph(char c) const { return &glyphs[c]; }
+
+      void load(SDL_Surface* surface);
     };
 
   };

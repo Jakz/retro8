@@ -306,6 +306,7 @@ namespace ui
     SDL_RenderClear(renderer);
 
     update();
+    machine.flip();
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, machine.screen());
     SDL_Rect dest = { (640 - 384) / 2, (480 - 384) / 2, 384, 384 };
     //SDL_Rect dest = { (320 - 128) / 2, (240 - 128) / 2, 128, 128 };

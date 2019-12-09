@@ -88,11 +88,11 @@ namespace lua
   int spr(lua_State* L)
   {
     assert(lua_isnumber(L, 2) && lua_isnumber(L, 3));
-    
+
     int idx = lua_tointeger(L, 1);
     int x = lua_tonumber(L, 2);
     int y = lua_tonumber(L, 3);
-    
+
     machine.spr(idx, x, y);
 
     return 0;
@@ -116,12 +116,12 @@ namespace lua
     assert(lua_isnumber(L, 1));
 
     float angle = lua_tonumber(L, 1);
-    float value = std::cosf(angle * 2 * PI);
+    float value = cosf(angle * 2 * PI);
     lua_pushnumber(L, value);
 
     return 1;
   }
-  
+
   class Code
   {
   private:
@@ -151,7 +151,7 @@ namespace lua
       lua_register(L, "rect", rect);
       lua_register(L, "cls", cls);
       lua_register(L, "spr", spr);
-      
+
       lua_register(L, "cos", cos);
 
       if (luaL_loadstring(L, code.c_str()))
@@ -208,7 +208,7 @@ namespace ui
   };
 
   GameView::GameView(ViewManager* manager) : manager(manager)
-  { 
+  {
   }
 
   void GameView::update()
@@ -257,7 +257,7 @@ namespace ui
         "t = 0\n"
         "\n"
         "function _draw()\n"
-        "  cls(3)\n"
+        "  cls()\n"
         "  for i=1,11 do\n"
         "    for j0=0,7 do\n"
         "      j = 7-j0\n"
@@ -268,7 +268,7 @@ namespace ui
         "      spr(16+i, 8+i*8, y)\n"
         "    end\n"
         "  end\n"
-        "  t = t + 1\n"
+        "  t = t + 1.0\n"
         "  spr(1, 64-4, 90)\n"
         "end\n"
       ;
@@ -277,7 +277,7 @@ namespace ui
 
       init = true;
     }
-    
+
     auto* renderer = manager->getRenderer();
 
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -285,7 +285,8 @@ namespace ui
 
     update();
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, machine.screen());
-    SDL_Rect dest = { (640 - 384) / 2, (480 - 384) / 2, 384, 384 };
+    //SDL_Rect dest = { (640 - 384) / 2, (480 - 384) / 2, 384, 384 };
+    SDL_Rect dest = { (320 - 128) / 2, (240 - 128) / 2, 128, 128 };
     SDL_RenderCopy(renderer, texture, nullptr, &dest);
     SDL_DestroyTexture(texture);
 
@@ -293,7 +294,15 @@ namespace ui
 
   void GameView::handleKeyboardEvent(const SDL_Event& event)
   {
-
+    if (event.type == SDL_KEYDOWN)
+    {
+      switch (event.key.keysym.sym)
+      {
+        case SDLK_ESCAPE:
+          manager->exit();
+          break;
+      }
+    }
   }
 
   void GameView::handleMouseEvent(const SDL_Event& event)

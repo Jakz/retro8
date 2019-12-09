@@ -11,7 +11,7 @@ void Machine::cls(color_t color)
 {
   color = _memory.paletteAt(gfx::DRAW_PALETTE_INDEX)->get(color);
   gfx::color_byte_t value = gfx::color_byte_t(color, color);
-  
+
   auto* data = _memory.screenData();
   memset(data, value.value, gfx::SCREEN_WIDTH*gfx::SCREEN_HEIGHT / 2);
 
@@ -39,7 +39,7 @@ void Machine::line(coord_t x0, coord_t y0, coord_t x1, coord_t y1, color_t color
   if (y0 == y1)
   {
     if (x0 > x1) std::swap(x0, x1);
-    
+
     for (coord_t x = x0; x <= x1; ++x)
       pset(x, y0, color);
   }
@@ -47,7 +47,7 @@ void Machine::line(coord_t x0, coord_t y0, coord_t x1, coord_t y1, color_t color
   else if (x0 == x1)
   {
     if (y0 > y1) std::swap(y0, y1);
-    
+
     for (coord_t y = y0; y <= y1; ++y)
       pset(x0, y, color);
   }
@@ -55,7 +55,7 @@ void Machine::line(coord_t x0, coord_t y0, coord_t x1, coord_t y1, color_t color
   {
     float dx = x1 - (float)x0;
     float dy = y1 - y0;
-    float derror = std::abs(dy / dx);
+    float derror = abs(dy / dx);
     float error = 0.0f;
 
     coord_t y = y0;
@@ -65,7 +65,7 @@ void Machine::line(coord_t x0, coord_t y0, coord_t x1, coord_t y1, color_t color
       error += derror;
       if (error >= 0.5f)
       {
-        y += std::copysignf(1, dy);
+        y += copysignf(1, dy);
         error -= 1.0f;
       }
     }
@@ -95,7 +95,7 @@ void Machine::spr(index_t idx, coord_t x, coord_t y)
       if (color != 0) //TODO: manage real transparency through flags
         pset(x + tx, y + ty, sprite->get(tx, ty));
     }
-      
+
 }
 
 void Machine::pal(color_t c0, color_t c1)

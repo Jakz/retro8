@@ -14,12 +14,12 @@ int pset(lua_State* L)
   int args = lua_gettop(L);
   //TODO: check validity of arguments
 
-  int x = lua_tointeger(L, 1);
-  int y = lua_tointeger(L, 2);
+  int x = lua_tonumber(L, 1);
+  int y = lua_tonumber(L, 2);
   int c;
 
   if (args == 3)
-    c = lua_tointeger(L, 3);
+    c = lua_tonumber(L, 3);
   else
     c = machine.memory().penColor()->low();
 
@@ -30,8 +30,8 @@ int pset(lua_State* L)
 
 int pget(lua_State* L)
 {
-  int x = lua_tointeger(L, 1);
-  int y = lua_tointeger(L, 2);
+  int x = lua_tonumber(L, 1);
+  int y = lua_tonumber(L, 2);
 
   lua_pushinteger(L, machine.pget(x, y));
 
@@ -40,7 +40,7 @@ int pget(lua_State* L)
 
 int color(lua_State* L)
 {
-  int c = lua_tointeger(L, 1);
+  int c = lua_tonumber(L, 1);
 
   machine.color(static_cast<retro8::color_t>(c));
 

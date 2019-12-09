@@ -106,7 +106,7 @@ namespace ui
         "end\n"
       ;*/
 
-      std::ifstream i("drippy.p8");
+      std::ifstream i("butterfly.p8");
       std::string str((std::istreambuf_iterator<char>(i)), std::istreambuf_iterator<char>());
 
       code.initFromSource(str.c_str());

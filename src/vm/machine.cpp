@@ -39,9 +39,12 @@ void Machine::cls(color_t color)
 
 void Machine::pset(coord_t x, coord_t y, color_t color)
 {
-  color = _memory.paletteAt(gfx::DRAW_PALETTE_INDEX)->get(color);
-  const auto& c = gfx::ColorTable[color];
-  _memory.screenData(x, y)->set(x, color);
+  if (x >= 0 && x < gfx::SCREEN_WIDTH && y >= 0 && y < gfx::SCREEN_HEIGHT)
+  {
+    color = _memory.paletteAt(gfx::DRAW_PALETTE_INDEX)->get(color);
+    const auto& c = gfx::ColorTable[color];
+    _memory.screenData(x, y)->set(x, color);
+  }
 }
 
 color_t Machine::pget(coord_t x, coord_t y)

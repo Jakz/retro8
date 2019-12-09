@@ -14,6 +14,16 @@ namespace retro8
     BLUE, INDIGO, PINK, PEACH
   };
 
+  enum class button_t
+  {
+    LEFT    = 0x0001,
+    RIGHT   = 0x0002,
+    UP      = 0x0004,
+    DOWN    = 0x0008,
+    ACTION1 = 0x0010,
+    ACTION2 = 0x0020,
+  };
+
   using coord_t = uint32_t;
   using index_t = uint32_t;
   using color_index_t = uint8_t;

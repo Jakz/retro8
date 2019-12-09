@@ -1,17 +1,21 @@
 #pragma once
 
+#include "common.h"
 #include "defines.h"
 #include "gfx.h"
 
 #include <SDL.h>
 #include <array>
+#include <random>
 
 namespace retro8
 {
   class State
   {
   public:
+    std::mt19937 rnd;
     point_t lastLineEnd;
+    bit_mask<button_t> buttons;
   };
 
   class Memory
@@ -79,13 +83,14 @@ namespace retro8
 
     void line(coord_t x0, coord_t y0, coord_t x1, coord_t y1, color_t color);
     void rect(coord_t x0, coord_t y0, coord_t x1, coord_t y1, color_t color);
+    void rectfill(coord_t x0, coord_t y0, coord_t x1, coord_t y1, color_t color);
 
     void pal(color_t c0, color_t c1);
 
     void spr(index_t idx, coord_t x, coord_t y);
     void print(const std::string& string, coord_t x, coord_t y, color_t color);
 
-    const State& state() const { return _state; }
+    State& state() { return _state; }
     SDL_Surface* screen() const { return _surface; }
     Memory& memory() { return _memory; }
     gfx::Font& font() { return _font; }

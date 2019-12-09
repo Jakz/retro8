@@ -100,6 +100,13 @@ void Machine::rect(coord_t x0, coord_t y0, coord_t x1, coord_t y1, color_t color
   line(x0, y1, x0, y0, color);
 }
 
+void Machine::rectfill(coord_t x0, coord_t y0, coord_t x1, coord_t y1, color_t color)
+{
+  for (coord_t y = y0; y <= y1; ++y)
+    for (coord_t x = x0; x < x1; ++x)
+      pset(x, y, color);
+}
+
 void Machine::spr(index_t idx, coord_t x, coord_t y)
 {
   const gfx::sprite_t* sprite = _memory.spriteAt(idx);

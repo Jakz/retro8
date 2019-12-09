@@ -3,6 +3,8 @@
 
 #include <lua.hpp>
 #include <iostream>
+#include <fstream>
+#include <streambuf>
 
 #include "vm/machine.h"
 #include "vm/lua_bridge.h"
@@ -35,6 +37,7 @@ namespace ui
 
   void GameView::update()
   {
+    code.callVoidFunction("_update");
     code.callVoidFunction("_draw");
   }
 
@@ -81,7 +84,7 @@ namespace ui
 
       SDL_FreeSurface(surface);
 
-      const char* source =
+      /*const char* source =
         "t = 0\n"
         "\n"
         "function _draw()\n"
@@ -101,9 +104,12 @@ namespace ui
         "  print(\"nice to meet you\", 34, 80, 12)\n"
         "  spr(1, 64-4, 90)\n"
         "end\n"
-      ;
+      ;*/
 
-      code.initFromSource(source);
+      std::ifstream i("drippy.p8");
+      std::string str((std::istreambuf_iterator<char>(i)), std::istreambuf_iterator<char>());
+
+      code.initFromSource(str.c_str());
 
       init = true;
     }
@@ -125,14 +131,28 @@ namespace ui
 
   void GameView::handleKeyboardEvent(const SDL_Event& event)
   {
-    if (event.type == SDL_KEYDOWN)
+    switch (event.key.keysym.sym)
     {
-      switch (event.key.keysym.sym)
-      {
-        case SDLK_ESCAPE:
-          manager->exit();
-          break;
-      }
+    case SDLK_LEFT:
+      machine.state().buttons.set(retro8::button_t::LEFT, event.type == SDL_KEYDOWN);
+      break;
+    case SDLK_RIGHT:
+      machine.state().buttons.set(retro8::button_t::RIGHT, event.type == SDL_KEYDOWN);
+      break;
+    case SDLK_UP:
+      machine.state().buttons.set(retro8::button_t::UP, event.type == SDL_KEYDOWN);
+      break;
+    case SDLK_DOWN:
+      machine.state().buttons.set(retro8::button_t::DOWN, event.type == SDL_KEYDOWN);
+      break;
+    
+      //TODO: missing action buttons
+
+    case SDLK_ESCAPE:
+      if (event.type == SDL_KEYDOWN)
+        manager->exit();
+      break;
+ 
     }
   }
 

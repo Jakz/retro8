@@ -220,8 +220,9 @@ namespace platform
     /* we're asking for a specific button*/
     if (lua_gettop(L) >= 1)
     {
-      retro8::button_t button = static_cast<retro8::button_t>((int)lua_tonumber(L, 1));
-      lua_pushboolean(L, machine.state().buttons.isSet(button));
+      using bt_t = retro8::button_t;
+      static constexpr std::array<bt_t, 6> buttons = { bt_t::LEFT, bt_t::RIGHT, bt_t::UP, bt_t::DOWN, bt_t::ACTION1, bt_t::ACTION2 };
+      lua_pushboolean(L, machine.state().buttons.isSet(buttons[(int)lua_tonumber(L, 1)]));
     }
     /* push whole bitmask*/
     else

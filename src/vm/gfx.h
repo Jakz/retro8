@@ -99,7 +99,8 @@ namespace retro8
           colors[i] = (color_t)i;
       }
 
-      color_t get(color_t i) const { return colors[i]; }
+      //TODO: %16 to make it wrap around, is it intended behavior? mandel.
+      color_t get(color_t i) const { return colors[i%16]; }
       color_t set(color_t i, color_t color) { return colors[i] = color; }
       color_t& operator[](color_t i) { return colors[i]; }
     };

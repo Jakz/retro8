@@ -2,6 +2,26 @@
 
 using namespace retro8;
 
+void Machine::flip()
+{
+  auto* data = _memory.screenData();
+  auto* screenPalette = _memory.paletteAt(gfx::SCREEN_PALETTE_INDEX);
+  auto* dest = static_cast<uint32_t*>(_surface->pixels);
+
+  for (size_t i = 0; i < gfx::BYTES_PER_SCREEN; ++i)
+  {
+    const gfx::color_byte_t* pixels = data + i;
+    
+    const auto& rc1 = gfx::ColorTable[screenPalette->get(pixels->low())];
+    const auto& rc2 = gfx::ColorTable[screenPalette->get(pixels->high())];
+
+    *dest = (rc1.r << 16) | (rc1.g << 8) | (rc1.b) | 0xff000000;
+    *(dest + 1) = (rc2.r << 16) | (rc2.g << 8) | (rc2.b) | 0xff000000;
+
+    dest += 2;
+  }
+}
+
 void Machine::color(color_t color)
 {
   gfx::color_byte_t* penColor = _memory.penColor();
@@ -14,24 +34,19 @@ void Machine::cls(color_t color)
   gfx::color_byte_t value = gfx::color_byte_t(color, color);
 
   auto* data = _memory.screenData();
-  memset(data, value.value, gfx::SCREEN_WIDTH*gfx::SCREEN_HEIGHT / 2);
-
-  const auto& rc = gfx::ColorTable[color];
-  std::fill(static_cast<uint32_t*>(_surface->pixels), static_cast<uint32_t*>(_surface->pixels) + _surface->w * _surface->h, (rc.r << 16) | (rc.g << 8) | (rc.b) | 0xff000000);
-
+  memset(data, value.value, gfx::BYTES_PER_SCREEN);
 }
 
 void Machine::pset(coord_t x, coord_t y, color_t color)
 {
   color = _memory.paletteAt(gfx::DRAW_PALETTE_INDEX)->get(color);
   const auto& c = gfx::ColorTable[color];
-  _memory.setScreenData(x, y, color);
-  static_cast<uint32_t*>(_surface->pixels)[y*_surface->w + x] = (c.r << 16) | (c.g << 8) | (c.b) | 0xff000000;
+  _memory.screenData(x, y)->set(x, color);
 }
 
 color_t Machine::pget(coord_t x, coord_t y)
 {
-  return _memory.screenData(x, y);
+  return _memory.screenData(x, y)->get(x);
 }
 
 void Machine::line(coord_t x0, coord_t y0, coord_t x1, coord_t y1, color_t color)

@@ -10,6 +10,7 @@ namespace retro8
 {
   namespace gfx
   {
+    //TODO: optimize by generating it the same format as the destination surface
     static constexpr std::array<SDL_Color, 16> ColorTable = {
       SDL_Color{  0,   0,   0}, SDL_Color{ 29,  43,  83}, SDL_Color{126,  37,  83}, SDL_Color{  0, 135,  81},
       SDL_Color{171,  82,  54}, SDL_Color{ 95,  87,  79}, SDL_Color{194, 195, 199}, SDL_Color{255, 241, 232},
@@ -52,11 +53,13 @@ namespace retro8
 
     static constexpr size_t SCREEN_WIDTH = 128;
     static constexpr size_t SCREEN_HEIGHT = 128;
+    static constexpr size_t BYTES_PER_SCREEN = SCREEN_WIDTH * SCREEN_HEIGHT / 2;
 
     static constexpr size_t FONT_GLYPHS_COLUMNS = 16;
     static constexpr size_t FONT_GLYPHS_ROWS = 10;
 
     static constexpr size_t DRAW_PALETTE_INDEX = 0;
+    static constexpr size_t SCREEN_PALETTE_INDEX = 1;
 
     struct color_byte_t
     {

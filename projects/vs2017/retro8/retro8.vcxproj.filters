@@ -33,6 +33,9 @@
     <ClInclude Include="..\..\..\src\vm\defines.h">
       <Filter>src\vm</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\vm\lua_bridge.h">
+      <Filter>src\vm</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\main.cpp">
@@ -45,6 +48,9 @@
       <Filter>src\vm</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\vm\gfx.cpp">
+      <Filter>src\vm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\vm\lua_bridge.cpp">
       <Filter>src\vm</Filter>
     </ClCompile>
   </ItemGroup>

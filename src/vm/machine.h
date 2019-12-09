@@ -36,33 +36,17 @@ namespace retro8
     Memory()
     {
       paletteAt(gfx::DRAW_PALETTE_INDEX)->reset();
+      paletteAt(gfx::SCREEN_PALETTE_INDEX)->reset();
     }
 
     gfx::color_byte_t* penColor() { return reinterpret_cast<gfx::color_byte_t*>(&memory[ADDRESS_PEN_COLOR]); }
 
     gfx::color_byte_t* screenData() { return reinterpret_cast<gfx::color_byte_t*>(&memory[ADDRESS_SCREEN_DATA]); }
+    gfx::color_byte_t* screenData(coord_t x, coord_t y) { return screenData() + (y * BYTES_PER_SCREEN_ROW + x) / 2; }
+
     gfx::sprite_t* spriteAt(size_t index) { return reinterpret_cast<gfx::sprite_t*>(&memory[ADDRESS_SPRITE_SHEET + index * BYTES_PER_SPRITE]); }
     gfx::palette_t* paletteAt(size_t index) { return reinterpret_cast<gfx::palette_t*>(&memory[ADDRESS_PALETTES + index * BYTES_PER_PALETTE]); }
 
-    void setScreenData(coord_t x, coord_t y, color_t c)
-    {
-      uint8_t* address = &memory[ADDRESS_SCREEN_DATA + (y * BYTES_PER_SCREEN_ROW + x) / 2];
-
-      if (x % 2 == 0)
-        *address = (*address & 0xf0) | c;
-      else
-        *address = (*address & 0x0f) | (c << 4);
-    }
-
-    color_t screenData(coord_t x, coord_t y) const
-    {
-      const uint8_t* address = &memory[ADDRESS_SCREEN_DATA + (y * BYTES_PER_SCREEN_ROW + x) / 2];
-
-      if (x % 2 == 0)
-        return static_cast<color_t>(*address & 0x0f);
-      else
-        return static_cast<color_t>((*address >> 4) & 0x0f);
-    }
 
   };
 
@@ -83,6 +67,8 @@ namespace retro8
     {
       _surface = SDL_CreateRGBSurface(0, 128, 128, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
     }
+
+    void flip();
 
     void color(color_t color);
 

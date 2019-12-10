@@ -162,8 +162,11 @@ int map(lua_State* L)
 
 int mget(lua_State* L)
 {
-  //TODO: implement
-  lua_pushinteger(L, 0);
+  int x = lua_tonumber(L, 1); //TODO: these are optional
+  int y = lua_tonumber(L, 2);
+
+  lua_pushinteger(L, *machine.memory().spriteInTileMap(x, y));
+
   return 1;
 }
 
@@ -256,6 +259,37 @@ namespace math
 
     return 1;
   }
+
+  int max(lua_State* L)
+  {
+    assert(lua_isnumber(L, 1));
+    assert(lua_isnumber(L, 2));
+
+    real_t v1 = lua_tonumber(L, 1), v2 = lua_tonumber(L, 2);
+    lua_pushnumber(L, std::max(v1, v2));
+
+    return 1;
+  }
+
+  int abs(lua_State* L)
+  {
+    assert(lua_isnumber(L, 1));
+
+    real_t v = lua_tonumber(L, 1);
+    lua_pushnumber(L, std::abs(v));
+
+    return 1;
+  }
+
+  int sgn(lua_State* L)
+  {
+    assert(lua_isnumber(L, 1));
+
+    real_t v = lua_tonumber(L, 1);
+    lua_pushnumber(L, v > 0 ? 1.0 : -1.0);
+
+    return 1;
+  }
 }
 
 namespace sound
@@ -344,6 +378,9 @@ void lua::registerFunctions(lua_State* L)
   lua_register(L, "rnd", math::rnd);
   lua_register(L, "flr", math::flr);
   lua_register(L, "min", math::min);
+  lua_register(L, "max", math::max);
+  lua_register(L, "abs", math::abs);
+  lua_register(L, "sgn", math::sgn);
 
   lua_register(L, "music", sound::music);
   lua_register(L, "sfx", sound::music);

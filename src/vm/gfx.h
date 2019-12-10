@@ -57,6 +57,8 @@ namespace retro8
     static constexpr size_t SCREEN_HEIGHT = 128;
     static constexpr size_t BYTES_PER_SCREEN = SCREEN_WIDTH * SCREEN_HEIGHT / PIXEL_TO_BYTE_RATIO;
 
+    static constexpr size_t TILE_MAP_WIDTH = 128;
+    static constexpr size_t TILE_MAP_HEIGHT = 64;
 
 
     static constexpr size_t SPRITE_SHEET_WIDTH = 128;

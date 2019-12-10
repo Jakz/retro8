@@ -17,6 +17,13 @@ color_t LoaderP8::colorFromDigit(char d)
   else assert(false);
 }
 
+sprite_index_t LoaderP8::spriteIndexFromString(const char* c)
+{
+  int h = (c[0] >= 'A') ? (c[0] >= 'a') ? (c[0] - 'a' + 10) : (c[0] - 'A' + 10) : (c[0] - '0');
+  int l = (c[1] >= 'A') ? (c[1] >= 'a') ? (c[1] - 'a' + 10) : (c[1] - 'A' + 10) : (c[1] - '0');
+  return (h << 4) | l;
+}
+
 //TODO: worst hacky solution ever, it's just a quick fix
 void LoaderP8::fixOperators(std::string& line)
 {
@@ -88,10 +95,12 @@ void LoaderP8::load(const std::string& path, Machine& m)
   //TODO: not efficient but for now it's fine
   std::stringstream code;
 
-  coord_t sy = 0;
+  coord_t sy = 0, my = 0;
 
   static constexpr size_t DIGITS_PER_PIXEL_ROW = 128;
   static constexpr size_t BYTES_PER_GFX_ROW = DIGITS_PER_PIXEL_ROW / 2;
+
+  static constexpr size_t DIGITS_PER_MAP_ROW = 256;
 
   std::ifstream apiFile("api.lua");
   std::string api((std::istreambuf_iterator<char>(apiFile)), std::istreambuf_iterator<char>());
@@ -136,6 +145,18 @@ void LoaderP8::load(const std::string& path, Machine& m)
 
         ++sy;
         break;
+
+      case State::MAP:
+      {
+        assert(line.length() == DIGITS_PER_MAP_ROW);
+        for (size_t x = 0; x < gfx::TILE_MAP_WIDTH; ++x)
+        {
+          const char* index = line.c_str() + x * 2;
+          sprite_index_t sindex = spriteIndexFromString(index);
+          *m.memory().spriteInTileMap(x, my) = sindex;
+        }
+        ++my;
+      }
       }
     }
   }

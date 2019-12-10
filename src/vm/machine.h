@@ -22,12 +22,15 @@ namespace retro8
 
   namespace address
   {
-    static constexpr size_t SPRITE_SHEET = 0x0000;
+    static constexpr address_t SPRITE_SHEET = 0x0000;
 
-    static constexpr size_t PALETTES = 0x5f10;
-    static constexpr size_t PEN_COLOR = 0x5f25;
+    static constexpr address_t PALETTES = 0x5f10;
+    static constexpr address_t PEN_COLOR = 0x5f25;
 
-    static constexpr size_t SCREEN_DATA = 0x6000;
+    static constexpr address_t SCREEN_DATA = 0x6000;
+
+    static constexpr address_t TILE_MAP_LOWER = 0x1000;
+    static constexpr address_t TILE_MAP_HIGH = 0x2000;
   };
 
   class Memory
@@ -41,6 +44,8 @@ namespace retro8
     static constexpr size_t BYTES_PER_PALETTE = sizeof(retro8::gfx::palette_t);
     static constexpr size_t BYTES_PER_SPRITE = sizeof(retro8::gfx::sprite_t);
 
+    static constexpr size_t ROWS_PER_TILE_MAP_HALF = 32;
+
 
   public:
     Memory()
@@ -53,6 +58,14 @@ namespace retro8
 
     gfx::color_byte_t* screenData() { return reinterpret_cast<gfx::color_byte_t*>(&memory[address::SCREEN_DATA]); }
     gfx::color_byte_t* screenData(coord_t x, coord_t y) { return screenData() + (y * BYTES_PER_SCREEN_ROW + x) / 2; }
+
+    sprite_index_t* spriteInTileMap(coord_t x, coord_t y)
+    {
+      if (y < ROWS_PER_TILE_MAP_HALF)
+        return as<sprite_index_t>(address::TILE_MAP_HIGH) + x + y * gfx::TILE_MAP_WIDTH * sizeof(sprite_index_t);
+      else
+        return as<sprite_index_t>(address::TILE_MAP_HIGH) + x + (y - ROWS_PER_TILE_MAP_HALF) * gfx::TILE_MAP_WIDTH * sizeof(sprite_index_t);
+    }
 
     gfx::sprite_t* spriteAt(size_t index) { 
       return reinterpret_cast<gfx::sprite_t*>(&memory[address::SPRITE_SHEET 

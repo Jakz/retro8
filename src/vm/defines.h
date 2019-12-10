@@ -25,6 +25,7 @@ namespace retro8
   };
 
   using coord_t = int32_t;
+  using amount_t = int32_t;
   using index_t = uint32_t;
   using color_index_t = uint8_t;
   struct point_t { coord_t x, y; };

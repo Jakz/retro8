@@ -22,19 +22,31 @@ struct bit_mask
   inline void reset(T flag) { value &= ~static_cast<utype>(flag); }
   inline void set(T flag, bool value) { if (value) set(flag); else reset(flag); }
 
-  bit_mask<T> operator&(T flag) const
+  inline bit_mask<T> operator~() const
   {
-    bit_mask<T> mask;
-    mask.value = this->value & static_cast<utype>(flag);
-    return mask;
+    return bit_mask<T>(~value);
   }
 
-  bit_mask<T> operator|(T flag) const
+  inline bit_mask<T> operator&(T flag) const
   {
-    bit_mask<T> mask;
-    mask.value = this->value | static_cast<utype>(flag);
-    return mask;
+    return bit_mask<T>(value & static_cast<utype>(flag));
+
   }
+
+  inline bit_mask<T> operator|(T flag) const
+  {
+    return bit_mask<T>(value | static_cast<utype>(flag));
+  }
+
+  inline bit_mask<T> operator&(const bit_mask<T>& other) const
+  {
+    return bit_mask<T>(value & other.value);
+  }
+
+  bit_mask<T>() : value(0) { }
+
+private:
+  bit_mask<T>(utype value) : value(value) { }
 };
 
 

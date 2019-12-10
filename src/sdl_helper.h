@@ -9,9 +9,6 @@
 #include <cstdio>
 #include <cassert>
 
-static const u32 FRAME_RATE = 60;
-static constexpr float TICKS_PER_FRAME = 1000 / (float)FRAME_RATE;
-
 enum class Align { LEFT, CENTER, RIGHT };
 
 template<typename EventHandler, typename Renderer>
@@ -31,12 +28,21 @@ protected:
   bool willQuit;
   u32 ticks;
 
+  u32 frameRate;
+  float ticksPerFrame;
+
 
 public:
   SDL(EventHandler& eventHandler, Renderer& loopRenderer) : eventHandler(eventHandler), loopRenderer(loopRenderer), 
     window(nullptr), renderer(nullptr), willQuit(false), ticks(0)
   {
+    setFrameRate(60);
+  }
 
+  void setFrameRate(u32 frameRate)
+  {
+    this->frameRate = frameRate;
+    this->ticksPerFrame = 1000 / (float)frameRate;
   }
 
   bool init();
@@ -120,10 +126,10 @@ void SDL<EventHandler, Renderer>::capFPS()
 
   u32 frameTime = elapsed;
 
-  if (elapsed < TICKS_PER_FRAME)
+  if (elapsed < ticksPerFrame)
   {
-    SDL_Delay(TICKS_PER_FRAME - elapsed);
-    frameTime = TICKS_PER_FRAME;
+    SDL_Delay(ticksPerFrame - elapsed);
+    frameTime = ticksPerFrame;
   }
 
   SDL::ticks = SDL_GetTicks();

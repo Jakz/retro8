@@ -16,6 +16,7 @@ namespace retro8
     std::mt19937 rnd;
     point_t lastLineEnd;
     bit_mask<button_t> buttons;
+    bit_mask<button_t> previousButtons;
   };
 
   class Memory
@@ -61,6 +62,9 @@ namespace retro8
     Memory _memory;
     SDL_Surface* _surface;
     gfx::Font _font;
+    
+  private:
+    void circHelper(coord_t xc, coord_t yc, coord_t x, coord_t y, color_t col);
 
   public:
     Machine()
@@ -84,6 +88,8 @@ namespace retro8
     void line(coord_t x0, coord_t y0, coord_t x1, coord_t y1, color_t color);
     void rect(coord_t x0, coord_t y0, coord_t x1, coord_t y1, color_t color);
     void rectfill(coord_t x0, coord_t y0, coord_t x1, coord_t y1, color_t color);
+    void circ(coord_t x, coord_t y, amount_t r, color_t color);
+    void circfill(coord_t x, coord_t y, amount_t r, color_t color);
 
     void pal(color_t c0, color_t c1);
 

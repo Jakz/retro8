@@ -75,6 +75,7 @@ int rect(lua_State* L)
   return 0;
 }
 
+// TODO: fill pattern on filled shaped
 int rectfill(lua_State* L)
 {
   int x0 = lua_tonumber(L, 1);
@@ -85,6 +86,32 @@ int rectfill(lua_State* L)
   int c = lua_gettop(L) == 5 ? lua_tonumber(L, 5) : machine.memory().penColor()->low();
 
   machine.rectfill(x0, y0, x1, y1, static_cast<retro8::color_t>(c));
+
+  return 0;
+}
+
+int circ(lua_State* L)
+{
+  int x = lua_tonumber(L, 1);
+  int y = lua_tonumber(L, 2);
+  int r = lua_tonumber(L, 3);
+
+  int c = lua_gettop(L) == 4 ? lua_tonumber(L, 4) : machine.memory().penColor()->low();
+
+  machine.circ(x, y, r, static_cast<retro8::color_t>(c));
+
+  return 0;
+}
+
+int circfill(lua_State* L)
+{
+  int x = lua_tonumber(L, 1);
+  int y = lua_tonumber(L, 2);
+  int r = lua_tonumber(L, 3);
+
+  int c = lua_gettop(L) == 4 ? lua_tonumber(L, 4) : machine.memory().penColor()->low();
+
+  machine.circfill(x, y, r, static_cast<retro8::color_t>(c));
 
   return 0;
 }
@@ -211,6 +238,12 @@ namespace sound
     //TODO: implement
     return 0;
   }
+
+  int sfx(lua_State* L)
+  {
+    //TODO: implement
+    return 0;
+  }
 }
 
 namespace platform
@@ -230,6 +263,29 @@ namespace platform
       lua_pushnumber(L, machine.state().buttons.value);
     }
     
+    //TODO: finish for player 2?
+    return 1;
+  }
+
+  int btnp(lua_State* L)
+  {
+    //TODO: check behavior
+
+    using bt_t = retro8::button_t;
+    bit_mask<bt_t> changedButtons = machine.state().buttons & ~machine.state().previousButtons;
+    
+    /* we're asking for a specific button*/
+    if (lua_gettop(L) >= 1)
+    {
+      static constexpr std::array<bt_t, 6> buttons = { bt_t::LEFT, bt_t::RIGHT, bt_t::UP, bt_t::DOWN, bt_t::ACTION1, bt_t::ACTION2 };
+      lua_pushboolean(L, changedButtons.isSet(buttons[(int)lua_tonumber(L, 1)]));
+    }
+    /* push whole bitmask*/
+    else
+    {
+      lua_pushnumber(L, changedButtons.value);
+    }
+
     //TODO: finish for player?
     return 1;
   }
@@ -244,6 +300,8 @@ void lua::registerFunctions(lua_State* L)
   lua_register(L, "line", line);
   lua_register(L, "rect", rect);
   lua_register(L, "rectfill", rectfill);
+  lua_register(L, "circ", circ);
+  lua_register(L, "circfill", circfill);
   lua_register(L, "cls", cls);
   lua_register(L, "spr", spr);
   lua_register(L, "print", print);
@@ -256,10 +314,10 @@ void lua::registerFunctions(lua_State* L)
   lua_register(L, "min", math::min);
 
   lua_register(L, "music", sound::music);
+  lua_register(L, "sfx", sound::music);
 
   lua_register(L, "btn", platform::btn);
-
-
+  lua_register(L, "btnp", platform::btnp);
 }
 
 Code::~Code()
@@ -290,6 +348,32 @@ void Code::initFromSource(const std::string& code)
     std::cout << "Error: script not loaded " << message << std::endl;
     getchar();
   }
+
+  lua_getglobal(L, "_update");
+
+  if (lua_isfunction(L, -1))
+  {
+    _hasUpdate = true;
+    _require60fps = false;
+    lua_pop(L, 1);
+  }
+
+  lua_getglobal(L, "_update60");
+
+  if (lua_isfunction(L, -1))
+  {
+    _hasUpdate = true;
+    _require60fps = true;
+    lua_pop(L, 1);
+  }
+
+  lua_getglobal(L, "_draw");
+
+  if (lua_isfunction(L, -1))
+  {
+    _hasDraw = true;
+    lua_pop(L, 1);
+  }
 }
 
 void Code::callVoidFunction(const char* name)
@@ -304,4 +388,21 @@ void Code::callVoidFunction(const char* name)
     std::cout << "Error in " << name << " function: " << message << std::endl;
     getchar();
   }
+}
+
+void Code::update()
+{
+  if (_hasUpdate)
+  {
+    if (_require60fps)
+      callVoidFunction("_update60");
+    else
+      callVoidFunction("_update");
+  }
+}
+
+void Code::draw()
+{
+  if (_hasDraw)
+    callVoidFunction("_draw");
 }

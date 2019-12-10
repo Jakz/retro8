@@ -37,8 +37,8 @@ namespace ui
 
   void GameView::update()
   {
-    code.callVoidFunction("_update");
-    code.callVoidFunction("_draw");
+    code.update();
+    code.draw();
   }
 
   bool init = false;
@@ -46,6 +46,9 @@ namespace ui
   {
     if (!init)
     {
+      // save previous button state for btnp function
+      machine.state().previousButtons = machine.state().buttons;
+      
       namespace r8 = retro8;
 
       machine.init();
@@ -106,10 +109,19 @@ namespace ui
         "end\n"
       ;*/
 
-      std::ifstream i("drippy.p8");
+      std::ifstream i("bounce.p8");
       std::string str((std::istreambuf_iterator<char>(i)), std::istreambuf_iterator<char>());
 
       code.initFromSource(str.c_str());
+
+      manager->setFrameRate(code.require60fps() ? 60 : 30);
+
+      /*for (int i = 0; i < 32; ++i)
+        machine.circ(64, 64, i+1, (r8::color_t)(i % 15 + 1));*/
+      
+      //machine.circfill(64, 64, 13, r8::color_t::RED);
+      //machine.circ(64, 64, 13, r8::color_t::GREEN);
+
 
       init = true;
     }
@@ -146,6 +158,14 @@ namespace ui
       machine.state().buttons.set(retro8::button_t::DOWN, event.type == SDL_KEYDOWN);
       break;
     
+    case SDLK_z:
+      machine.state().buttons.set(retro8::button_t::ACTION1, event.type == SDL_KEYDOWN);
+      break;
+
+    case SDLK_x:
+      machine.state().buttons.set(retro8::button_t::ACTION2, event.type == SDL_KEYDOWN);
+      break;
+
       //TODO: missing action buttons
 
     case SDLK_ESCAPE:

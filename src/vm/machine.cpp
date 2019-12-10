@@ -110,6 +110,57 @@ void Machine::rectfill(coord_t x0, coord_t y0, coord_t x1, coord_t y1, color_t c
       pset(x, y, color);
 }
 
+void Machine::circHelper(coord_t xc, coord_t yc, coord_t x, coord_t y, color_t color)
+{
+  pset(xc + x, yc + y, color);
+  pset(xc - x, yc + y, color);
+  pset(xc + x, yc - y, color);
+  pset(xc - x, yc - y, color);
+  pset(xc + y, yc + x, color);
+  pset(xc - y, yc + x, color);
+  pset(xc + y, yc - x, color);
+  pset(xc - y, yc - x, color);
+}
+
+void Machine::circ(coord_t xc, coord_t yc, amount_t r, color_t color)
+{
+  //TODO: not identical to pico-8 but acceptable for now
+  coord_t x = 0, y = r;
+  float d = 3 - 2 * r;
+  circHelper(xc, yc, x, y, color);
+  
+  while (y >= x)
+  {
+    x++;
+
+    if (d > 0)
+    {
+      y--;
+      d = d + 4 * (x - y) + 10;
+    }
+    else
+      d = d + 4 * x + 6;
+
+    circHelper(xc, yc, x, y, color);
+  }
+}
+
+void Machine::circfill(coord_t xc, coord_t yc, amount_t r, color_t color)
+{
+  //TODO: not identical to pico-8 but acceptable for now
+  const amount_t sr = r * r;
+
+  for (int x = -r; x < r; x++)
+  {
+    int hh = (int)std::sqrt(sr - x * x);
+    int rx = xc + x;
+    int ph = yc + hh;
+
+    for (int y = yc - hh; y < ph; y++)
+      pset(rx, y, color);
+  }
+}
+
 void Machine::spr(index_t idx, coord_t x, coord_t y)
 {
   const gfx::sprite_t* sprite = _memory.spriteAt(idx);
@@ -124,6 +175,7 @@ void Machine::spr(index_t idx, coord_t x, coord_t y)
 
 }
 
+// TODO: fix strange characters like symbols
 void Machine::print(const std::string& string, coord_t x, coord_t y, color_t color)
 {
   for (const auto c : string)

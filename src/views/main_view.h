@@ -124,6 +124,7 @@ namespace ui
 #if DEBUGGER
     {
       SDL_Surface* surface = SDL_CreateRGBSurface(0, 128, 128, 32, 0x00000000, 0x00ff0000, 0x0000ff00, 0x000000ff);
+      SDL_FillRect(surface, nullptr, 0xFFFFFFFF);
       auto* dest = static_cast<uint32_t*>(surface->pixels);
       for (r8::coord_t y = 0; y < r8::gfx::SPRITE_SHEET_HEIGHT; ++y)
         for (r8::coord_t x = 0; x < r8::gfx::SPRITE_SHEET_WIDTH_IN_BYTES; ++x)

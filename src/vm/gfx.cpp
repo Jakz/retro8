@@ -10,7 +10,7 @@ void Font::load(SDL_Surface* surface)
   for (size_t gy = 0; gy < FONT_GLYPHS_ROWS; ++gy)
     for (size_t gx = 0; gx < FONT_GLYPHS_COLUMNS; ++gx)
     {
-      sprite_t& glyph = glyphs[gy*FONT_GLYPHS_COLUMNS + gx];
+      sequential_sprite_t& glyph = glyphs[gy*FONT_GLYPHS_COLUMNS + gx];
 
       for (size_t sy = 0; sy < SPRITE_HEIGHT; ++sy)
         for (size_t sx = 0; sx < SPRITE_WIDTH; ++sx)

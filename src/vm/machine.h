@@ -54,7 +54,11 @@ namespace retro8
     gfx::color_byte_t* screenData() { return reinterpret_cast<gfx::color_byte_t*>(&memory[address::SCREEN_DATA]); }
     gfx::color_byte_t* screenData(coord_t x, coord_t y) { return screenData() + (y * BYTES_PER_SCREEN_ROW + x) / 2; }
 
-    gfx::sprite_t* spriteAt(size_t index) { return reinterpret_cast<gfx::sprite_t*>(&memory[address::SPRITE_SHEET + index * BYTES_PER_SPRITE]); }
+    gfx::sprite_t* spriteAt(size_t index) { 
+      return reinterpret_cast<gfx::sprite_t*>(&memory[address::SPRITE_SHEET 
+        + (index % gfx::SPRITES_PER_SPRITE_SHEET_ROW) * gfx::SPRITE_BYTES_PER_SPRITE_ROW]
+        + (index / gfx::SPRITES_PER_SPRITE_SHEET_ROW) * gfx::SPRITE_SHEET_WIDTH_IN_BYTES * gfx::SPRITE_HEIGHT
+        ); }
     gfx::palette_t* paletteAt(size_t index) { return reinterpret_cast<gfx::palette_t*>(&memory[address::PALETTES + index * BYTES_PER_PALETTE]); }
 
     template<typename T> T* as(address_t addr) { return reinterpret_cast<T*>(&memory[addr]); }

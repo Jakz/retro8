@@ -95,9 +95,12 @@ namespace ui
       code.initFromSource(str.c_str());*/
 
       retro8::io::LoaderP8 loader;
-      loader.load("demos/bounce.p8", machine);
+      loader.load("demos/jelpi.p8", machine);
 
       manager->setFrameRate(machine.code().require60fps() ? 60 : 30);
+
+      if (machine.code().hasInit())
+        machine.code().init();
 
       /*for (int i = 0; i < 32; ++i)
         machine.circ(64, 64, i+1, (r8::color_t)(i % 15 + 1));*/

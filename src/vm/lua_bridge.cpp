@@ -148,6 +148,25 @@ int pal(lua_State* L)
   return 0;
 }
 
+int camera(lua_State* L)
+{
+  //TODO: implement
+  return 0;
+}
+
+int map(lua_State* L)
+{
+  //TODO: implement
+  return 0;
+}
+
+int mget(lua_State* L)
+{
+  //TODO: implement
+  lua_pushinteger(L, 0);
+  return 1;
+}
+
 int print(lua_State* L)
 {
   //TODO: optimize and use const char*?
@@ -157,6 +176,14 @@ int print(lua_State* L)
   int c = lua_gettop(L) == 4 ? lua_tonumber(L, 4) : machine.memory().penColor()->low();
 
   machine.print(text, x, y, static_cast<retro8::color_t>(c));
+
+  return 0;
+}
+
+int debugprint(lua_State* L)
+{
+  std::string text = lua_tostring(L, 1);
+  std::cout << text << std::endl;
 
   return 0;
 }
@@ -304,7 +331,12 @@ void lua::registerFunctions(lua_State* L)
   lua_register(L, "circfill", circfill);
   lua_register(L, "cls", cls);
   lua_register(L, "spr", spr);
+  lua_register(L, "camera", camera);
+  lua_register(L, "map", map);
+  lua_register(L, "mget", mget);
   lua_register(L, "print", print);
+
+  lua_register(L, "debug", debugprint);
 
   lua_register(L, "cos", math::cos);
   lua_register(L, "sin", math::sin);
@@ -330,6 +362,9 @@ void Code::initFromSource(const std::string& code)
 {
   L = luaL_newstate();
 
+  luaopen_base(L);
+  luaopen_table(L);
+
   registerFunctions(L);
 
   if (luaL_loadstring(L, code.c_str()))
@@ -350,11 +385,9 @@ void Code::initFromSource(const std::string& code)
   }
 
   lua_getglobal(L, "_update");
-
   if (lua_isfunction(L, -1))
   {
-    _hasUpdate = true;
-    _require60fps = false;
+    _update = lua_topointer(L, -1);
     lua_pop(L, 1);
   }
 
@@ -362,8 +395,7 @@ void Code::initFromSource(const std::string& code)
 
   if (lua_isfunction(L, -1))
   {
-    _hasUpdate = true;
-    _require60fps = true;
+    _update60 = lua_topointer(L, -1);
     lua_pop(L, 1);
   }
 
@@ -371,7 +403,15 @@ void Code::initFromSource(const std::string& code)
 
   if (lua_isfunction(L, -1))
   {
-    _hasDraw = true;
+    _draw = lua_topointer(L, -1);
+    lua_pop(L, 1);
+  }
+
+  lua_getglobal(L, "_init");
+
+  if (lua_isfunction(L, -1))
+  {
+    _init = lua_topointer(L, -1);
     lua_pop(L, 1);
   }
 }
@@ -392,17 +432,21 @@ void Code::callVoidFunction(const char* name)
 
 void Code::update()
 {
-  if (_hasUpdate)
-  {
-    if (_require60fps)
-      callVoidFunction("_update60");
-    else
-      callVoidFunction("_update");
-  }
+
+  if (_update60)
+    callVoidFunction("_update60");
+  else if (_update)
+    callVoidFunction("_update");
 }
 
 void Code::draw()
 {
-  if (_hasDraw)
+  if (_draw)
     callVoidFunction("_draw");
+}
+
+void Code::init()
+{
+  if (_init)
+    callVoidFunction("_init");
 }

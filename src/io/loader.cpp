@@ -93,6 +93,11 @@ void LoaderP8::load(const std::string& path, Machine& m)
   static constexpr size_t DIGITS_PER_PIXEL_ROW = 128;
   static constexpr size_t BYTES_PER_GFX_ROW = DIGITS_PER_PIXEL_ROW / 2;
 
+  std::ifstream apiFile("api.lua");
+  std::string api((std::istreambuf_iterator<char>(apiFile)), std::istreambuf_iterator<char>());
+
+  code << api;
+
   for (auto& line : lines)
   {
     /* change state according to */

@@ -13,9 +13,10 @@ namespace lua
   private:
     lua_State* L;
 
-    bool _hasUpdate;
-    bool _hasDraw;
-    bool _require60fps;
+    const void* _init;
+    const void* _update;
+    const void* _update60;
+    const void* _draw;
 
   public:
     Code() : L(nullptr) { }
@@ -24,12 +25,13 @@ namespace lua
     void initFromSource(const std::string& code);
     void callVoidFunction(const char* name);
 
-    bool hasUpdate() const { return _hasUpdate; }
-    bool hasDraw() const { return _hasDraw; }
-    bool require60fps() const { return _require60fps; }
+    bool hasUpdate() const { return _update != nullptr || _update60 != nullptr; }
+    bool hasDraw() const { return _draw != nullptr; }
+    bool require60fps() const { return _update60 != nullptr; }
+    bool hasInit() const { return _init != nullptr; }
 
+    void init();
     void update();
     void draw();
-     
   };
 }

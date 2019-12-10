@@ -87,9 +87,7 @@ namespace retro8
     };
 
     class sprite_t
-    {
-      static constexpr size_t PITCH = SPRITE_SHEET_WIDTH_IN_BYTES;
-      
+    {      
       inline const color_byte_t& byteAt(coord_t x, coord_t y) const { return static_cast<const color_byte_t&>(((sprite_t*)this)->byteAt(x, y)); }
       inline color_byte_t& byteAt(coord_t x, coord_t y) { return reinterpret_cast<color_byte_t*>(this)[y * SPRITE_SHEET_WIDTH_IN_BYTES + x / 2]; }
 

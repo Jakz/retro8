@@ -106,7 +106,7 @@ void Machine::rect(coord_t x0, coord_t y0, coord_t x1, coord_t y1, color_t color
 void Machine::rectfill(coord_t x0, coord_t y0, coord_t x1, coord_t y1, color_t color)
 {
   for (coord_t y = y0; y <= y1; ++y)
-    for (coord_t x = x0; x < x1; ++x)
+    for (coord_t x = x0; x <= x1; ++x)
       pset(x, y, color);
 }
 

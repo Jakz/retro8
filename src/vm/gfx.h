@@ -42,18 +42,26 @@ namespace retro8
       }
     }
 
+    static constexpr size_t PIXEL_TO_BYTE_RATIO = 2;
+
     static constexpr size_t SPRITE_WIDTH = 8;
     static constexpr size_t SPRITE_HEIGHT = 8;
     
     static constexpr size_t GLYPH_WIDTH = 4;
     static constexpr size_t GLYPH_HEIGHT = 6;
 
-    static constexpr size_t SPRITE_BYTES_PER_ROW = 4;
+    static constexpr size_t SPRITE_BYTES_PER_ROW = SPRITE_WIDTH / PIXEL_TO_BYTE_RATIO;
     static constexpr size_t PALETTE_SIZE = 16;
 
     static constexpr size_t SCREEN_WIDTH = 128;
     static constexpr size_t SCREEN_HEIGHT = 128;
-    static constexpr size_t BYTES_PER_SCREEN = SCREEN_WIDTH * SCREEN_HEIGHT / 2;
+    static constexpr size_t BYTES_PER_SCREEN = SCREEN_WIDTH * SCREEN_HEIGHT / PIXEL_TO_BYTE_RATIO;
+
+
+
+    static constexpr size_t SPRITE_SHEET_WIDTH = 128;
+    static constexpr size_t SPRITE_SHEET_WIDTH_IN_BYTES = SPRITE_SHEET_WIDTH / PIXEL_TO_BYTE_RATIO;
+    static constexpr size_t SPRITE_SHEET_HEIGHT = 128;
 
     static constexpr size_t FONT_GLYPHS_COLUMNS = 16;
     static constexpr size_t FONT_GLYPHS_ROWS = 10;
@@ -74,6 +82,7 @@ namespace retro8
       inline void high(color_t color) { value = ((value & 0x0f) | color << 4); }
       inline color_t get(coord_t mod) const { return (mod % 2) == 0 ? low() : high(); }
       inline void set(coord_t mod, color_t color) { value = (mod % 2) == 0 ? ((value & 0xf0) | color) : ((value & 0x0f) | color << 4); }
+      inline void setBoth(color_t low, color_t high) { value = low | high << 4; }
     };
 
     class sprite_t

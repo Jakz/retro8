@@ -3,6 +3,7 @@
 #include "common.h"
 #include "defines.h"
 #include "gfx.h"
+#include "lua_bridge.h"
 
 #include <SDL.h>
 #include <array>
@@ -19,18 +20,22 @@ namespace retro8
     bit_mask<button_t> previousButtons;
   };
 
+  namespace address
+  {
+    static constexpr size_t SPRITE_SHEET = 0x0000;
+
+    static constexpr size_t PALETTES = 0x5f10;
+    static constexpr size_t PEN_COLOR = 0x5f25;
+
+    static constexpr size_t SCREEN_DATA = 0x6000;
+  };
+
   class Memory
   {
   private:
     uint8_t memory[1024 * 32];
 
-    static constexpr size_t ADDRESS_SPRITE_SHEET = 0x0000;
-    
-    
-    static constexpr size_t ADDRESS_PALETTES = 0x5f10;
-    static constexpr size_t ADDRESS_PEN_COLOR = 0x5f25;
 
-    static constexpr size_t ADDRESS_SCREEN_DATA = 0x6000;
 
     static constexpr size_t BYTES_PER_SCREEN_ROW = 128;
     static constexpr size_t BYTES_PER_PALETTE = sizeof(retro8::gfx::palette_t);
@@ -44,15 +49,15 @@ namespace retro8
       paletteAt(gfx::SCREEN_PALETTE_INDEX)->reset();
     }
 
-    gfx::color_byte_t* penColor() { return reinterpret_cast<gfx::color_byte_t*>(&memory[ADDRESS_PEN_COLOR]); }
+    gfx::color_byte_t* penColor() { return reinterpret_cast<gfx::color_byte_t*>(&memory[address::PEN_COLOR]); }
 
-    gfx::color_byte_t* screenData() { return reinterpret_cast<gfx::color_byte_t*>(&memory[ADDRESS_SCREEN_DATA]); }
+    gfx::color_byte_t* screenData() { return reinterpret_cast<gfx::color_byte_t*>(&memory[address::SCREEN_DATA]); }
     gfx::color_byte_t* screenData(coord_t x, coord_t y) { return screenData() + (y * BYTES_PER_SCREEN_ROW + x) / 2; }
 
-    gfx::sprite_t* spriteAt(size_t index) { return reinterpret_cast<gfx::sprite_t*>(&memory[ADDRESS_SPRITE_SHEET + index * BYTES_PER_SPRITE]); }
-    gfx::palette_t* paletteAt(size_t index) { return reinterpret_cast<gfx::palette_t*>(&memory[ADDRESS_PALETTES + index * BYTES_PER_PALETTE]); }
+    gfx::sprite_t* spriteAt(size_t index) { return reinterpret_cast<gfx::sprite_t*>(&memory[address::SPRITE_SHEET + index * BYTES_PER_SPRITE]); }
+    gfx::palette_t* paletteAt(size_t index) { return reinterpret_cast<gfx::palette_t*>(&memory[address::PALETTES + index * BYTES_PER_PALETTE]); }
 
-
+    template<typename T> T* as(address_t addr) { return reinterpret_cast<T*>(&memory[addr]); }
   };
 
   class Machine
@@ -60,9 +65,10 @@ namespace retro8
   private:
     State _state;
     Memory _memory;
-    SDL_Surface* _surface;
+    SDL_Surface* _surface; //TODO: should be moved outside here
     gfx::Font _font;
-    
+    lua::Code _code;
+
   private:
     void circHelper(coord_t xc, coord_t yc, coord_t x, coord_t y, color_t col);
 
@@ -100,5 +106,6 @@ namespace retro8
     SDL_Surface* screen() const { return _surface; }
     Memory& memory() { return _memory; }
     gfx::Font& font() { return _font; }
+    lua::Code& code() { return _code; }
   };
 }

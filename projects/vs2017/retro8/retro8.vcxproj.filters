@@ -10,6 +10,9 @@
     <Filter Include="src\vm">
       <UniqueIdentifier>{6e666e1e-d48a-4580-bc53-58b7673c2cfd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\io">
+      <UniqueIdentifier>{191051b8-b13d-4e65-a79b-12a98cfc6288}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\sdl_helper.h">
@@ -36,6 +39,9 @@
     <ClInclude Include="..\..\..\src\vm\lua_bridge.h">
       <Filter>src\vm</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\io\loader.h">
+      <Filter>src\io</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\main.cpp">
@@ -52,6 +58,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\vm\lua_bridge.cpp">
       <Filter>src\vm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\io\loader.cpp">
+      <Filter>src\io</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

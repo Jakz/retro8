@@ -81,7 +81,11 @@ bool SDL<EventHandler, Renderer>::init()
   
   // SDL_WINDOW_FULLSCREEN
 #if defined(WINDOW_SCALE)
+#if defined(DEBUGGER)
+  window = SDL_CreateWindow("retro-8", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1024, 480, SDL_WINDOW_OPENGL);
+#else
   window = SDL_CreateWindow("retro-8", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_OPENGL);
+#endif
 #else
   window = SDL_CreateWindow("retro-8", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 320, 240, SDL_WINDOW_OPENGL);
 #endif

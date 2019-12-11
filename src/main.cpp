@@ -1,4 +1,5 @@
 #include "views/view_manager.h"
+#include "views/main_view.h"
 
 /*
 * D-PAD Left - SDLK_LEFT
@@ -39,6 +40,9 @@ int main(int argc, char* argv[])
     ui.deinit();
     return -1;
   }
+
+  if (argc == 2)
+    ui.gameView()->loadCartridge(argv[1]);
   
   ui.loop();
   ui.deinit();

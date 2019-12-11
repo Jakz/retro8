@@ -6,12 +6,21 @@ void Machine::flip()
 {
   auto* data = _memory.screenData();
   auto* screenPalette = _memory.paletteAt(gfx::SCREEN_PALETTE_INDEX);
-  auto* dest = static_cast<uint32_t*>(_surface->pixels);
+  auto* dest = static_cast<uint32_t*>(_output->pixels);
 
   for (size_t i = 0; i < gfx::BYTES_PER_SCREEN; ++i)
   {
     const gfx::color_byte_t* pixels = data + i;
-    RASTERIZE_PIXEL_PAIR((*this), dest, pixels);
+    
+    auto* screenPalette = memory().paletteAt(retro8::gfx::SCREEN_PALETTE_INDEX);
+    const auto rc1 = retro8::gfx::ColorTable::get(screenPalette->get((pixels)->low()));
+    const auto rc2 = retro8::gfx::ColorTable::get(screenPalette->get((pixels)->high()));
+      
+    *(dest) = rc1;
+    *((dest)+1) = rc2;
+    (dest) += 2;
+    
+    //RASTERIZE_PIXEL_PAIR((*this), dest, pixels);
   }
 }
 
@@ -38,10 +47,10 @@ void Machine::pset(coord_t x, coord_t y, color_t color)
   auto* clip = _memory.clipRect();
   x -= memory().camera()->x();
   y -= memory().camera()->y();
+
   if (x >= clip->x0 && x < clip->x1 && y >= clip->y0 && y < clip->y1)
   {
     color = _memory.paletteAt(gfx::DRAW_PALETTE_INDEX)->get(color);
-    const auto& c = gfx::ColorTable[color];
     _memory.screenData(x, y)->set(x, color);
   }
 }

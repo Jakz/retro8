@@ -71,5 +71,8 @@
     <ClCompile Include="..\..\..\src\test\test.cpp">
       <Filter>src\test</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\views\game_view.cpp">
+      <Filter>src\views</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

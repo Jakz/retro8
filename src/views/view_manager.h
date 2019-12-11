@@ -20,6 +20,8 @@ namespace ui
     bool hovered;
   };
 
+  class GameView;
+
   class ViewManager : public SDL<ViewManager, ViewManager>
   {
   public:
@@ -40,6 +42,9 @@ namespace ui
     void render();
 
     void deinit();
+
+    //TODO: hacky cast to avoid header inclusion
+    GameView* gameView() { return (GameView*)views[0]; }
   };
 }
 

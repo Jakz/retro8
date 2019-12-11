@@ -18,8 +18,8 @@ protected:
   EventHandler& eventHandler;
   Renderer& loopRenderer;
 
-  SDL_Window* window;
-  SDL_Renderer* renderer;
+  SDL_Window* _window;
+  SDL_Renderer* _renderer;
 
 #if defined(WINDOW_SCALE)
   SDL_Texture* buffer;
@@ -34,7 +34,7 @@ protected:
 
 public:
   SDL(EventHandler& eventHandler, Renderer& loopRenderer) : eventHandler(eventHandler), loopRenderer(loopRenderer), 
-    window(nullptr), renderer(nullptr), willQuit(false), ticks(0)
+    _window(nullptr), _renderer(nullptr), willQuit(false), ticks(0)
   {
     setFrameRate(60);
   }
@@ -61,7 +61,8 @@ public:
 
   //void slowTextBlit(TTF_Font* font, int dx, int dy, Align align, const std::string& string);
 
-  SDL_Renderer* getRenderer() { return renderer; }
+  SDL_Window* window() { return _window; }
+  SDL_Renderer* renderer() { return _renderer; }
 };
 
 template<typename EventHandler, typename Renderer>
@@ -82,17 +83,17 @@ bool SDL<EventHandler, Renderer>::init()
   // SDL_WINDOW_FULLSCREEN
 #if defined(WINDOW_SCALE)
 #if defined(DEBUGGER)
-  window = SDL_CreateWindow("retro-8", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1024, 480, SDL_WINDOW_OPENGL);
+  _window = SDL_CreateWindow("retro-8", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1024, 480, SDL_WINDOW_OPENGL);
 #else
-  window = SDL_CreateWindow("retro-8", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_OPENGL);
+  _window = SDL_CreateWindow("retro-8", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_OPENGL);
 #endif
 #else
-  window = SDL_CreateWindow("retro-8", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 320, 240, SDL_WINDOW_OPENGL);
+  _window = SDL_CreateWindow("retro-8", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 320, 240, SDL_WINDOW_OPENGL);
 #endif
-  renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+  _renderer = SDL_CreateRenderer(_window, -1, SDL_RENDERER_ACCELERATED);
 
 #if defined(WINDOW_SCALE)
-  buffer = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, 320, 240);
+  buffer = SDL_CreateTexture(_renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, 320, 240);
 #endif
 
   return true;
@@ -104,14 +105,14 @@ void SDL<EventHandler, Renderer>::loop()
   while (!willQuit)
   {
 #if false && defined(WINDOW_SCALE)
-    SDL_SetRenderTarget(renderer, buffer);
+    SDL_SetRenderTarget(_renderer, buffer);
     loopRenderer.render();
-    SDL_SetRenderTarget(renderer, nullptr);
-    SDL_RenderCopy(renderer, buffer, nullptr, nullptr);
-    SDL_RenderPresent(renderer);
+    SDL_SetRenderTarget(_renderer, nullptr);
+    SDL_RenderCopy(_renderer, buffer, nullptr, nullptr);
+    SDL_RenderPresent(_renderer);
 #else
     loopRenderer.render();
-    SDL_RenderPresent(renderer);
+    SDL_RenderPresent(_renderer);
 #endif
 
     handleEvents();
@@ -148,8 +149,8 @@ void SDL<EventHandler, Renderer>::deinit()
   SDL_DestroyTexture(buffer);
 #endif
 
-  SDL_DestroyRenderer(renderer);
-  SDL_DestroyWindow(window);
+  SDL_DestroyRenderer(_renderer);
+  SDL_DestroyWindow(_window);
   
   SDL_Quit();
 }
@@ -192,14 +193,14 @@ inline void SDL<EventHandler, Renderer>::blit(SDL_Texture* texture, int sx, int 
 {
   SDL_Rect from = { sx, sy, w, h };
   SDL_Rect to = { dx, dy, dw, dh };
-  SDL_RenderCopy(renderer, texture, &from, &to);
+  SDL_RenderCopy(_renderer, texture, &from, &to);
 }
 
 template<typename EventHandler, typename Renderer>
 inline void SDL<EventHandler, Renderer>::blit(SDL_Texture* texture, const SDL_Rect& from, int dx, int dy)
 {
   SDL_Rect to = { dx, dy, from.w, from.h };
-  SDL_RenderCopy(renderer, texture, &from, &to);
+  SDL_RenderCopy(_renderer, texture, &from, &to);
 }
 
 template<typename EventHandler, typename Renderer>
@@ -223,5 +224,5 @@ inline void SDL<EventHandler, Renderer>::blit(SDL_Texture* texture, int dx, int 
   to.w = from.w;
   to.h = from.h;
 
-  SDL_RenderCopy(renderer, texture, &from, &to);
+  SDL_RenderCopy(_renderer, texture, &from, &to);
 }

@@ -10,13 +10,50 @@ namespace retro8
 {
   namespace gfx
   {
+    static constexpr size_t PIXEL_TO_BYTE_RATIO = 2;
+
+    static constexpr size_t SPRITE_WIDTH = 8;
+    static constexpr size_t SPRITE_HEIGHT = 8;
+
+    static constexpr size_t GLYPH_WIDTH = 4;
+    static constexpr size_t GLYPH_HEIGHT = 6;
+
+    static constexpr size_t SPRITE_BYTES_PER_SPRITE_ROW = SPRITE_WIDTH / PIXEL_TO_BYTE_RATIO;
+    static constexpr size_t PALETTE_SIZE = 16;
+
+    static constexpr size_t SCREEN_WIDTH = 128;
+    static constexpr size_t SCREEN_HEIGHT = 128;
+    static constexpr size_t BYTES_PER_SCREEN = SCREEN_WIDTH * SCREEN_HEIGHT / PIXEL_TO_BYTE_RATIO;
+
+    static constexpr size_t TILE_MAP_WIDTH = 128;
+    static constexpr size_t TILE_MAP_HEIGHT = 64;
+
+
+    static constexpr size_t SPRITE_SHEET_WIDTH = 128;
+    static constexpr size_t SPRITES_PER_SPRITE_SHEET_ROW = 16;
+    static constexpr size_t SPRITE_SHEET_WIDTH_IN_BYTES = SPRITE_SHEET_WIDTH / PIXEL_TO_BYTE_RATIO;
+    static constexpr size_t SPRITE_SHEET_HEIGHT = 128;
+
+    static constexpr size_t FONT_GLYPHS_COLUMNS = 16;
+    static constexpr size_t FONT_GLYPHS_ROWS = 10;
+
+    static constexpr size_t DRAW_PALETTE_INDEX = 0;
+    static constexpr size_t SCREEN_PALETTE_INDEX = 1;
+
+    static constexpr size_t COLOR_COUNT = 16;
+    
     //TODO: optimize by generating it the same format as the destination surface
-    static constexpr std::array<SDL_Color, 16> ColorTable = {
-      SDL_Color{  0,   0,   0}, SDL_Color{ 29,  43,  83}, SDL_Color{126,  37,  83}, SDL_Color{  0, 135,  81},
-      SDL_Color{171,  82,  54}, SDL_Color{ 95,  87,  79}, SDL_Color{194, 195, 199}, SDL_Color{255, 241, 232},
-      SDL_Color{255,   0,  77}, SDL_Color{255, 163,   0}, SDL_Color{255, 236,  39}, SDL_Color{  0, 228,  54},
-      SDL_Color{ 41, 173, 255}, SDL_Color{131, 118, 156}, SDL_Color{255, 119, 168}, SDL_Color{255, 204, 170}
+
+    struct ColorTable
+    {
+    private:
+      static std::array<uint32_t, COLOR_COUNT> table;
+
+    public:
+      static void init(SDL_PixelFormat* format);
+      static uint32_t get(color_t c) { return table[c]; }
     };
+
     
     static color_t colorForRGB(uint32_t color)
     {
@@ -42,35 +79,7 @@ namespace retro8
       }
     }
 
-    static constexpr size_t PIXEL_TO_BYTE_RATIO = 2;
 
-    static constexpr size_t SPRITE_WIDTH = 8;
-    static constexpr size_t SPRITE_HEIGHT = 8;
-    
-    static constexpr size_t GLYPH_WIDTH = 4;
-    static constexpr size_t GLYPH_HEIGHT = 6;
-
-    static constexpr size_t SPRITE_BYTES_PER_SPRITE_ROW = SPRITE_WIDTH / PIXEL_TO_BYTE_RATIO;
-    static constexpr size_t PALETTE_SIZE = 16;
-
-    static constexpr size_t SCREEN_WIDTH = 128;
-    static constexpr size_t SCREEN_HEIGHT = 128;
-    static constexpr size_t BYTES_PER_SCREEN = SCREEN_WIDTH * SCREEN_HEIGHT / PIXEL_TO_BYTE_RATIO;
-
-    static constexpr size_t TILE_MAP_WIDTH = 128;
-    static constexpr size_t TILE_MAP_HEIGHT = 64;
-
-
-    static constexpr size_t SPRITE_SHEET_WIDTH = 128;
-    static constexpr size_t SPRITES_PER_SPRITE_SHEET_ROW = 16;
-    static constexpr size_t SPRITE_SHEET_WIDTH_IN_BYTES = SPRITE_SHEET_WIDTH / PIXEL_TO_BYTE_RATIO;
-    static constexpr size_t SPRITE_SHEET_HEIGHT = 128;
-
-    static constexpr size_t FONT_GLYPHS_COLUMNS = 16;
-    static constexpr size_t FONT_GLYPHS_ROWS = 10;
-
-    static constexpr size_t DRAW_PALETTE_INDEX = 0;
-    static constexpr size_t SCREEN_PALETTE_INDEX = 1;
 
     struct color_byte_t
     {
@@ -111,19 +120,19 @@ namespace retro8
 
     class palette_t
     {
-      std::array<color_t, 16> colors;
+      std::array<color_t, COLOR_COUNT> colors;
 
     public:
       void reset()
       {
-        for (size_t i = 0; i < 16; ++i)
+        for (size_t i = 0; i < COLOR_COUNT; ++i)
           colors[i] = (color_t)i;
       }
 
       //TODO: %16 to make it wrap around, is it intended behavior? mandel.
-      color_t get(color_t i) const { return (color_t)(colors[i%16] % 16); }
+      color_t get(color_t i) const { return (color_t)(colors[i%COLOR_COUNT] % COLOR_COUNT); }
       color_t set(color_t i, color_t color) { return colors[i] = color; }
-      color_t operator[](color_t i) { return (color_t)(colors[i%16] % 16); }
+      color_t operator[](color_t i) { return (color_t)(colors[i%COLOR_COUNT] % COLOR_COUNT); }
     };
 
     struct clip_rect_t
@@ -133,7 +142,7 @@ namespace retro8
       uint8_t x1;
       uint8_t y1;
 
-      void reset() { x0 = y0 = 0; x1 = y1 = 128; }
+      void reset() { x0 = y0 = 0; x1 = SCREEN_WIDTH; y1 = SCREEN_HEIGHT; }
       void set(uint8_t xs, uint8_t ys, uint8_t xe, uint8_t ye) { x0 = xs; y0 = ys; x1 = xe; y1 = ye; }
     };
 

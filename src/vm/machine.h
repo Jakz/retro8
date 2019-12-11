@@ -99,9 +99,9 @@ namespace retro8
   private:
     State _state;
     Memory _memory;
-    SDL_Surface* _surface; //TODO: should be moved outside here
     gfx::Font _font;
     lua::Code _code;
+    SDL_Surface* _output;
 
   private:
     void circHelper(coord_t xc, coord_t yc, coord_t x, coord_t y, color_t col);
@@ -111,10 +111,7 @@ namespace retro8
     {
     }
 
-    void init()
-    {
-      _surface = SDL_CreateRGBSurface(0, 128, 128, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
-    }
+    void init(SDL_Surface* output) { _output = output; }
 
     void flip();
 
@@ -138,7 +135,6 @@ namespace retro8
     void print(const std::string& string, coord_t x, coord_t y, color_t color);
 
     State& state() { return _state; }
-    SDL_Surface* screen() const { return _surface; }
     Memory& memory() { return _memory; }
     gfx::Font& font() { return _font; }
     lua::Code& code() { return _code; }

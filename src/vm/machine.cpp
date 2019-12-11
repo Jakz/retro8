@@ -43,7 +43,7 @@ void Machine::cls(color_t color)
 void Machine::pset(coord_t x, coord_t y, color_t color)
 {
   auto* clip = _memory.clipRect();
-  if (x >= clip->x0 && x < clip->y0 && y >= clip->x1 && y < clip->y1)
+  if (x >= clip->x0 && x < clip->x1 && y >= clip->y0 && y < clip->y1)
   {
     color = _memory.paletteAt(gfx::DRAW_PALETTE_INDEX)->get(color);
     const auto& c = gfx::ColorTable[color];

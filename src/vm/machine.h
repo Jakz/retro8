@@ -25,7 +25,7 @@ namespace retro8
     static constexpr address_t SPRITE_SHEET = 0x0000;
     static constexpr address_t SPRITE_FLAGS = 0x3000;
 
-    static constexpr address_t PALETTES = 0x5f10;
+    static constexpr address_t PALETTES = 0x5f00;
     static constexpr address_t CLIP_RECT = 0x5f20;
     static constexpr address_t PEN_COLOR = 0x5f25;
     static constexpr address_t CURSOR = 0x5f26;

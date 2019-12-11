@@ -62,7 +62,7 @@ void LoaderP8::fixOperators(std::string& line)
       else
         break;
     }
-    else if (isalnum(line[t]))
+    else if (isalnum(line[t]) || line[t] == '.')
     {
       if (s == S::BEGIN)
       {
@@ -74,7 +74,7 @@ void LoaderP8::fixOperators(std::string& line)
       else
         break;
     }
-    else if (line[t] == '*' || line[t] == '+' || line[t] == '-' || line[t] == '/')
+    else if (line[t] == '*' || line[t] == '+' || line[t] == '-' || line[t] == '/' || line[t] == '%')
     {
       if (t < line.length() - 1 && line[t+1] == '=' && (s == S::IDENT || s == S::INBETWEEN)) 
       {
@@ -98,6 +98,8 @@ void LoaderP8::load(const std::string& path, Machine& m)
   std::vector<std::string> lines;
 
   std::ifstream input(path);
+  assert(input.good());
+
   for (std::string line; std::getline(input, line); /**/)
     lines.push_back(line);
 

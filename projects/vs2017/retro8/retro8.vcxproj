@@ -84,13 +84,13 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\Jack\Documents\dev\openmom\libs\sdl2\win\include;C:\Users\Jack\Documents\dev\sdl\SDL2_ttf\include;$(SolutionDir)../../../src;C:\Users\Jack\Documents\dev\odreader\projects\vs2017\zlib\include;C:\Users\Jack\Documents\dev\retro-8\projects\vs2017\libs\lua\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Jack\Documents\dev\openmom\libs\sdl2\win\include;C:\Users\Jack\Documents\dev\sdl\SDL2_ttf\include;$(SolutionDir)../../../src;C:\Users\Jack\Documents\dev\retro-8\projects\vs2017\libs\lua\include;C:\Users\Jack\Documents\dev\odreader\projects\vs2017\zlib\include;C:\Users\Jack\Documents\dev\retro-8\projects\vs2017\libs\lua\include</AdditionalIncludeDirectories>
       <LanguageStandard>
       </LanguageStandard>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>C:\Users\Jack\Documents\dev\openmom\libs\sdl2\win\lib\x64\SDL2.lib;C:\Users\Jack\Documents\dev\openmom\libs\sdl2\win\lib\x64\SDL2_image.lib;C:\Users\Jack\Documents\dev\openmom\libs\sdl2\win\lib\x64\SDL2main.lib;C:\Users\Jack\Documents\dev/retro-8\projects\vs2017\libs\zlib\lib\win_x64\zlib.lib;C:\Users\Jack\Documents\dev\retro-8\projects\vs2017\libs\lua\lua53.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>C:\Users\Jack\Documents\dev\openmom\libs\sdl2\win\lib\x64\SDL2.lib;C:\Users\Jack\Documents\dev\openmom\libs\sdl2\win\lib\x64\SDL2_image.lib;C:\Users\Jack\Documents\dev\openmom\libs\sdl2\win\lib\x64\SDL2main.lib;C:\Users\Jack\Documents\dev\retro-8\projects\vs2017\libs\lua\lua53.lib;C:\Users\Jack\Documents\dev/retro-8\projects\vs2017\libs\zlib\lib\win_x64\zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
@@ -116,7 +116,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\Jack\Documents\dev\openmom\libs\sdl2\win\include;C:\Users\Jack\Documents\dev\sdl\SDL2_ttf\include;$(SolutionDir)../../../src;C:\Users\Jack\Documents\dev\odreader\projects\vs2017\zlib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Jack\Documents\dev\openmom\libs\sdl2\win\include;C:\Users\Jack\Documents\dev\sdl\SDL2_ttf\include;$(SolutionDir)../../../src;C:\Users\Jack\Documents\dev\retro-8\projects\vs2017\libs\lua\include;C:\Users\Jack\Documents\dev\odreader\projects\vs2017\zlib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>
       </LanguageStandard>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -124,7 +124,7 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>C:\Users\Jack\Documents\dev\openmom\libs\sdl2\win\lib\x64\SDL2.lib;C:\Users\Jack\Documents\dev\openmom\libs\sdl2\win\lib\x64\SDL2_image.lib;C:\Users\Jack\Documents\dev\openmom\libs\sdl2\win\lib\x64\SDL2main.lib;C:\Users\Jack\Documents\dev\sdl\SDL2_ttf\lib\x64\SDL2_ttf.lib;C:\Users\Jack\Documents\dev\odreader\projects\vs2017\zlib\lib\win_x64\zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>C:\Users\Jack\Documents\dev\openmom\libs\sdl2\win\lib\x64\SDL2.lib;C:\Users\Jack\Documents\dev\openmom\libs\sdl2\win\lib\x64\SDL2_image.lib;C:\Users\Jack\Documents\dev\openmom\libs\sdl2\win\lib\x64\SDL2main.lib;C:\Users\Jack\Documents\dev\retro-8\projects\vs2017\libs\lua\lua53.lib;C:\Users\Jack\Documents\dev\sdl\SDL2_ttf\lib\x64\SDL2_ttf.lib;C:\Users\Jack\Documents\dev\odreader\projects\vs2017\zlib\lib\win_x64\zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>

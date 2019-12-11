@@ -143,6 +143,8 @@ int pal(lua_State* L)
   int c0 = lua_tonumber(L, 1);
   int c1 = lua_tonumber(L, 2);
 
+  //TODO: third parameter to decide which palette
+
   machine.pal(static_cast<retro8::color_t>(c0), static_cast<retro8::color_t>(c1));
 
   return 0;
@@ -207,11 +209,28 @@ int print(lua_State* L)
 {
   //TODO: optimize and use const char*?
   std::string text = lua_tostring(L, 1);
-  int x = lua_tonumber(L, 2); //TODO: these are optional
-  int y = lua_tonumber(L, 3);
-  int c = lua_gettop(L) == 4 ? lua_tonumber(L, 4) : machine.memory().penColor()->low();
 
-  machine.print(text, x, y, static_cast<retro8::color_t>(c));
+  if (lua_gettop(L) == 1)
+  {
+    auto* cursor = machine.memory().cursor();
+    
+    retro8::coord_t x = cursor->x;
+    retro8::coord_t y = cursor->y;
+    retro8::color_t c = machine.memory().penColor()->low();
+    machine.print(text, x, y, c);
+    cursor->y += 6; //TODO: check height / magic number
+  }
+  else if (lua_gettop(L) >= 3)
+  {
+    int x = lua_tonumber(L, 2); //TODO: these are optional
+    int y = lua_tonumber(L, 3);
+    int c = lua_gettop(L) == 4 ? lua_tonumber(L, 4) : machine.memory().penColor()->low();
+
+    machine.print(text, x, y, static_cast<retro8::color_t>(c));
+  }
+  else
+    assert(false);
+
 
   return 0;
 }
@@ -475,6 +494,21 @@ namespace platform
     //TODO: finish for player?
     return 1;
   }
+
+  int stat(lua_State* L)
+  {
+    //TODO: implement
+    lua_pushinteger(L, 0);
+
+    return 1;
+  }
+
+  int flip(lua_State* L)
+  {
+    machine.flip();
+
+    return 0;
+  }
 }
 
 void lua::registerFunctions(lua_State* L)
@@ -521,6 +555,8 @@ void lua::registerFunctions(lua_State* L)
 
   lua_register(L, "btn", platform::btn);
   lua_register(L, "btnp", platform::btnp);
+  lua_register(L, "flip", platform::flip);
+  lua_register(L, "stat", platform::stat);
 }
 
 Code::~Code()

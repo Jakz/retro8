@@ -215,7 +215,7 @@ int mset(lua_State* L)
   retro8::sprite_index_t index = lua_tonumber(L, 3);
 
   *machine.memory().spriteInTileMap(x, y) = index;
-  
+
   return 0;
 }
 
@@ -227,7 +227,7 @@ int print(lua_State* L)
   if (lua_gettop(L) == 1)
   {
     auto* cursor = machine.memory().cursor();
-    
+
     retro8::coord_t x = cursor->x;
     retro8::coord_t y = cursor->y;
     retro8::color_t c = machine.memory().penColor()->low();
@@ -481,7 +481,7 @@ namespace platform
     {
       lua_pushnumber(L, machine.state().buttons.value);
     }
-    
+
     //TODO: finish for player 2?
     return 1;
   }
@@ -492,7 +492,7 @@ namespace platform
 
     using bt_t = retro8::button_t;
     bit_mask<bt_t> changedButtons = machine.state().buttons & ~machine.state().previousButtons;
-    
+
     /* we're asking for a specific button*/
     if (lua_gettop(L) >= 1)
     {
@@ -653,7 +653,6 @@ void Code::callVoidFunction(const char* name)
 
 void Code::update()
 {
-
   if (_update60)
     callVoidFunction("_update60");
   else if (_update)

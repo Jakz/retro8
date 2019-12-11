@@ -14,6 +14,7 @@ CXXFLAGS += -g -W -Wall -Wextra -std=c++0x $(DISABLED_WARNINGS) -I../../src
 SOURCES := $(wildcard ../../src/*.cpp)
 SOURCES += $(wildcard ../../src/views/*.cpp)
 SOURCES += $(wildcard ../../src/vm/*.cpp)
+SOURCES += $(wildcard ../../src/io/*.cpp)
 BINARIES:= $(foreach source, $(SOURCES), $(source:%.cpp=%.o) )
 EXECUTABLE:= ./retro8
 

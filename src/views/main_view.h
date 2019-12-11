@@ -50,7 +50,7 @@ namespace ui
     {
       // save previous button state for btnp function
       machine.state().previousButtons = machine.state().buttons;
-      
+
       namespace r8 = retro8;
 
       machine.init();
@@ -95,7 +95,7 @@ namespace ui
       code.initFromSource(str.c_str());*/
 
       retro8::io::LoaderP8 loader;
-      loader.load("demos/api.p8", machine);
+      loader.load("demos/bounce.p8", machine);
 
       manager->setFrameRate(machine.code().require60fps() ? 60 : 30);
 
@@ -104,7 +104,7 @@ namespace ui
 
       /*for (int i = 0; i < 32; ++i)
         machine.circ(64, 64, i+1, (r8::color_t)(i % 15 + 1));*/
-      
+
       //machine.circfill(64, 64, 13, r8::color_t::RED);
       //machine.circ(64, 64, 13, r8::color_t::GREEN);
 
@@ -120,8 +120,12 @@ namespace ui
     update();
     machine.flip();
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, machine.screen());
+#ifdef _WIN32
     SDL_Rect dest = { (640 - 384) / 2, (480 - 384) / 2, 384, 384 };
+#else
     //SDL_Rect dest = { (320 - 128) / 2, (240 - 128) / 2, 128, 128 };
+    SDL_Rect dest = { (320 - 256) / 2, (240 - 256) / 2, 256, 256 };
+#endif
     SDL_RenderCopy(renderer, texture, nullptr, &dest);
 
 #if DEBUGGER
@@ -195,12 +199,14 @@ namespace ui
     case SDLK_DOWN:
       machine.state().buttons.set(retro8::button_t::DOWN, event.type == SDL_KEYDOWN);
       break;
-    
+
     case SDLK_z:
+    case SDLK_LCTRL:
       machine.state().buttons.set(retro8::button_t::ACTION1, event.type == SDL_KEYDOWN);
       break;
 
     case SDLK_x:
+    case SDLK_LALT:
       machine.state().buttons.set(retro8::button_t::ACTION2, event.type == SDL_KEYDOWN);
       break;
 
@@ -210,7 +216,7 @@ namespace ui
       if (event.type == SDL_KEYDOWN)
         manager->exit();
       break;
- 
+
     }
   }
 

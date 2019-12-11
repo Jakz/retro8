@@ -95,7 +95,7 @@ namespace ui
       code.initFromSource(str.c_str());*/
 
       retro8::io::LoaderP8 loader;
-      loader.load("demos/collide.p8", machine);
+      loader.load("demos/api.p8", machine);
 
       manager->setFrameRate(machine.code().require60fps() ? 60 : 30);
 
@@ -126,28 +126,52 @@ namespace ui
 
 #if DEBUGGER
     {
-      SDL_Surface* surface = SDL_CreateRGBSurface(0, 128, 128, 32, 0x00000000, 0x00ff0000, 0x0000ff00, 0x000000ff);
-      SDL_FillRect(surface, nullptr, 0xFFFFFFFF);
-      auto* dest = static_cast<uint32_t*>(surface->pixels);
-      for (r8::coord_t y = 0; y < r8::gfx::SPRITE_SHEET_HEIGHT; ++y)
-        for (r8::coord_t x = 0; x < r8::gfx::SPRITE_SHEET_WIDTH_IN_BYTES; ++x)
+      {
+        SDL_Surface* spritesheet = SDL_CreateRGBSurface(0, 128, 128, 32, 0x00000000, 0x00ff0000, 0x0000ff00, 0x000000ff);
+
+        SDL_FillRect(spritesheet, nullptr, 0xFFFFFFFF);
+        auto* dest = static_cast<uint32_t*>(spritesheet->pixels);
+        for (r8::coord_t y = 0; y < r8::gfx::SPRITE_SHEET_HEIGHT; ++y)
+          for (r8::coord_t x = 0; x < r8::gfx::SPRITE_SHEET_WIDTH_IN_BYTES; ++x)
+          {
+            const r8::gfx::color_byte_t* data = machine.memory().as<r8::gfx::color_byte_t>(r8::address::SPRITE_SHEET + y * r8::gfx::SPRITE_SHEET_WIDTH_IN_BYTES + x);
+            RASTERIZE_PIXEL_PAIR(machine, dest, data);
+          }
+
+        SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, spritesheet);
+        SDL_Rect destr = { (1024 - 286) , 30, 256, 256 };
+        SDL_RenderCopy(renderer, texture, nullptr, &destr);
+        SDL_DestroyTexture(texture);
+        SDL_FreeSurface(spritesheet);
+      }
+
+      {
+        /*SDL_Surface* tilemap = SDL_CreateRGBSurface(0, 1024, 512, 32, 0x00000000, 0x00ff0000, 0x0000ff00, 0x000000ff);
+        SDL_FillRect(tilemap, nullptr, 0x00000000);
+        uint32_t* base = static_cast<uint32_t*>(tilemap->pixels);
+        for (r8::coord_t ty = 0; ty < r8::gfx::TILE_MAP_HEIGHT; ++ty)
         {
-          r8::gfx::color_byte_t* data = machine.memory().as<r8::gfx::color_byte_t>(r8::address::SPRITE_SHEET + y * r8::gfx::SPRITE_SHEET_WIDTH_IN_BYTES + x);
+          for (r8::coord_t tx = 0; tx < r8::gfx::TILE_MAP_WIDTH; ++tx)
+          {
+            r8::sprite_index_t index = *machine.memory().spriteInTileMap(tx, ty);
 
-          const auto& rc1 = r8::gfx::ColorTable[data->low()];
-          const auto& rc2 = r8::gfx::ColorTable[data->high()];
-
-          *dest = (rc1.r << 16) | (rc1.g << 8) | (rc1.b) | 0xff000000;
-          *(dest + 1) = (rc2.r << 16) | (rc2.g << 8) | (rc2.b) | 0xff000000;
-
-          dest += 2;
+            for (r8::coord_t y = 0; y < r8::gfx::SPRITE_HEIGHT; ++y)
+              for (r8::coord_t x = 0; x < r8::gfx::SPRITE_WIDTH; ++x)
+              {
+                auto* dest = base + x + tx * r8::gfx::SPRITE_WIDTH + (y + ty * r8::gfx::SPRITE_HEIGHT) * tilemap->h;
+                const r8::gfx::color_byte_t& pixels = machine.memory().spriteAt(index)->byteAt(x, y);
+                RASTERIZE_PIXEL_PAIR(machine, dest, &pixels);
+              }
+          }
         }
 
-      SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
-      SDL_Rect destr = { (1024-286) , 30, 256, 256 };
-      SDL_RenderCopy(renderer, texture, nullptr, &destr);
-      SDL_DestroyTexture(texture);
-      SDL_FreeSurface(surface);
+        SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, tilemap);
+        SDL_Rect destr = { (1024 - 286) , 200, 256, 128 };
+        SDL_RenderCopy(renderer, texture, nullptr, &destr);
+        SDL_DestroyTexture(texture);
+        SDL_FreeSurface(tilemap);*/
+      }
+
     }
 #endif
 

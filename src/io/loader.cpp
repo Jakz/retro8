@@ -173,6 +173,7 @@ void LoaderP8::load(const std::string& path, Machine& m)
           *m.memory().spriteInTileMap(x, my) = sindex;
         }
         ++my;
+        break;
       }
       case State::GFF:
       {
@@ -183,12 +184,12 @@ void LoaderP8::load(const std::string& path, Machine& m)
           sprite_flags_t flags = spriteFlagsFromString(sflags);
           *m.memory().spriteFlagsFor(x) = flags;
         }
-        ++my;
+        ++fy;
+        break;
       }
       }
     }
   }
 
   m.code().initFromSource(code.str());
-
 }

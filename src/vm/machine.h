@@ -73,13 +73,15 @@ namespace retro8
 
     sprite_index_t* spriteInTileMap(coord_t x, coord_t y)
     {
+      static_assert(sizeof(sprite_index_t) == 1, "sprite_index_t must be 1 byte");
+
       if (y < ROWS_PER_TILE_MAP_HALF)
         return as<sprite_index_t>(address::TILE_MAP_HIGH) + x + y * gfx::TILE_MAP_WIDTH * sizeof(sprite_index_t);
       else
         return as<sprite_index_t>(address::TILE_MAP_HIGH) + x + (y - ROWS_PER_TILE_MAP_HALF) * gfx::TILE_MAP_WIDTH * sizeof(sprite_index_t);
     }
 
-    gfx::sprite_t* spriteAt(size_t index) { 
+    gfx::sprite_t* spriteAt(sprite_index_t index) { 
       return reinterpret_cast<gfx::sprite_t*>(&memory[address::SPRITE_SHEET 
         + (index % gfx::SPRITES_PER_SPRITE_SHEET_ROW) * gfx::SPRITE_BYTES_PER_SPRITE_ROW]
         + (index / gfx::SPRITES_PER_SPRITE_SHEET_ROW) * gfx::SPRITE_SHEET_WIDTH_IN_BYTES * gfx::SPRITE_HEIGHT
@@ -128,6 +130,7 @@ namespace retro8
 
     void pal(color_t c0, color_t c1);
 
+    void map(coord_t cx, coord_t cy, coord_t x, coord_t y, amount_t cw, amount_t ch, sprite_flags_t layer);
     void spr(index_t idx, coord_t x, coord_t y);
     void print(const std::string& string, coord_t x, coord_t y, color_t color);
 

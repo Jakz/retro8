@@ -6,6 +6,7 @@
 #include <iostream>
 
 using namespace lua;
+using namespace retro8;
 
 extern retro8::Machine machine;
 
@@ -23,7 +24,7 @@ int pset(lua_State* L)
   else
     c = machine.memory().penColor()->low();
 
-  machine.pset(x, y, static_cast<retro8::color_t>(c));
+  machine.pset(x, y, static_cast<color_t>(c));
 
   return 0;
 }
@@ -42,7 +43,7 @@ int color(lua_State* L)
 {
   int c = lua_tonumber(L, 1);
 
-  machine.color(static_cast<retro8::color_t>(c));
+  machine.color(static_cast<color_t>(c));
 
   return 0;
 }
@@ -56,7 +57,7 @@ int line(lua_State* L)
 
   int c = lua_gettop(L) == 5 ? lua_tonumber(L, 5) : machine.memory().penColor()->low();
 
-  machine.line(x0, y0, x1, y1, static_cast<retro8::color_t>(c));
+  machine.line(x0, y0, x1, y1, static_cast<color_t>(c));
 
   return 0;
 }
@@ -70,7 +71,7 @@ int rect(lua_State* L)
 
   int c = lua_gettop(L) == 5 ? lua_tonumber(L, 5) : machine.memory().penColor()->low();
 
-  machine.rect(x0, y0, x1, y1, static_cast<retro8::color_t>(c));
+  machine.rect(x0, y0, x1, y1, static_cast<color_t>(c));
 
   return 0;
 }
@@ -85,7 +86,7 @@ int rectfill(lua_State* L)
 
   int c = lua_gettop(L) == 5 ? lua_tonumber(L, 5) : machine.memory().penColor()->low();
 
-  machine.rectfill(x0, y0, x1, y1, static_cast<retro8::color_t>(c));
+  machine.rectfill(x0, y0, x1, y1, static_cast<color_t>(c));
 
   return 0;
 }
@@ -98,7 +99,7 @@ int circ(lua_State* L)
 
   int c = lua_gettop(L) == 4 ? lua_tonumber(L, 4) : machine.memory().penColor()->low();
 
-  machine.circ(x, y, r, static_cast<retro8::color_t>(c));
+  machine.circ(x, y, r, static_cast<color_t>(c));
 
   return 0;
 }
@@ -111,7 +112,7 @@ int circfill(lua_State* L)
 
   int c = lua_gettop(L) == 4 ? lua_tonumber(L, 4) : machine.memory().penColor()->low();
 
-  machine.circfill(x, y, r, static_cast<retro8::color_t>(c));
+  machine.circfill(x, y, r, static_cast<color_t>(c));
 
   return 0;
 }
@@ -120,7 +121,7 @@ int cls(lua_State* L)
 {
   int c = lua_gettop(L) == 1 ? lua_tonumber(L, -1) : 0;
 
-  machine.cls(static_cast<retro8::color_t>(c));
+  machine.cls(static_cast<color_t>(c));
 
   return 0;
 }
@@ -145,7 +146,7 @@ int pal(lua_State* L)
 
   //TODO: third parameter to decide which palette
 
-  machine.pal(static_cast<retro8::color_t>(c0), static_cast<retro8::color_t>(c1));
+  machine.pal(static_cast<color_t>(c0), static_cast<color_t>(c1));
 
   return 0;
 }
@@ -180,7 +181,17 @@ int camera(lua_State* L)
 
 int map(lua_State* L)
 {
-  //TODO: implement
+  coord_t cx = lua_tonumber(L, 1);
+  coord_t cy = lua_tonumber(L, 2);
+  coord_t x = lua_tonumber(L, 3);
+  coord_t y = lua_tonumber(L, 4);
+  amount_t cw = lua_tonumber(L, 5);
+  amount_t ch = lua_tonumber(L, 6);
+
+  //TODO optional layer
+
+  machine.map(cx, cy, x, y, cw, ch, 0);
+
   return 0;
 }
 

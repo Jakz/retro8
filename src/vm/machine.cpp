@@ -11,14 +11,7 @@ void Machine::flip()
   for (size_t i = 0; i < gfx::BYTES_PER_SCREEN; ++i)
   {
     const gfx::color_byte_t* pixels = data + i;
-    
-    const auto& rc1 = gfx::ColorTable[screenPalette->get(pixels->low())];
-    const auto& rc2 = gfx::ColorTable[screenPalette->get(pixels->high())];
-
-    *dest = (rc1.r << 16) | (rc1.g << 8) | (rc1.b) | 0xff000000;
-    *(dest + 1) = (rc2.r << 16) | (rc2.g << 8) | (rc2.b) | 0xff000000;
-
-    dest += 2;
+    RASTERIZE_PIXEL_PAIR((*this), dest, pixels);
   }
 }
 
@@ -204,3 +197,14 @@ void Machine::pal(color_t c0, color_t c1)
   gfx::palette_t* palette = _memory.paletteAt(gfx::DRAW_PALETTE_INDEX);
   palette->set(c0, c1);
 }
+
+
+void Machine::map(coord_t cx, coord_t cy, coord_t x, coord_t y, amount_t cw, amount_t ch, sprite_flags_t layer)
+{
+  for (amount_t ty = 0; ty < ch; ++ty)
+    for (amount_t tx = 0; tx < cw; ++tx)
+      spr(*_memory.spriteInTileMap(cx + tx, cy + ty), x + tx * gfx::SPRITE_WIDTH, y + ty * gfx::SPRITE_HEIGHT);
+}
+
+
+

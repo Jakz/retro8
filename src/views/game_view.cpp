@@ -27,15 +27,33 @@ void GameView::render()
 {
   if (!init)
   {
-    SDL_PixelFormat* format = SDL_AllocFormat(SDL_GetWindowPixelFormat(manager->window()));
+    SDL_RendererInfo info;
+    SDL_GetRendererInfo(manager->renderer(), &info);
+    //SDL_PixelFormat* format = SDL_AllocFormat(SDL_GetWindowPixelFormat(manager->window()));
+
+    SDL_PixelFormat* format = SDL_AllocFormat(info.texture_formats[0]);
+
+    for (size_t i = 0; i < info.num_texture_formats; ++i)
+      printf("[SDL] Window pixel format: %s\n", SDL_GetPixelFormatName(info.texture_formats[i]));
+
     /* initialize color table to current pixel format */
     r8::gfx::ColorTable::init(format);
+
+    printf("[SDL] Window pixel format: %s\n", SDL_GetPixelFormatName(format->format));
 
     /* initialize main surface and its texture */
     _output = SDL_CreateRGBSurface(0, 128, 128, 32, format->Rmask, format->Gmask, format->Bmask, format->Amask);
     _outputTexture = SDL_CreateTexture(manager->renderer(), format->format, SDL_TEXTUREACCESS_STREAMING, 128, 128);
 
-    SDL_FreeFormat(format);
+    if (!_output)
+    {
+      printf("Unable to allocate buffer surface: %s\n", SDL_GetError());
+    }
+
+    assert(_outputTexture);
+    assert(_output);
+
+    //SDL_FreeFormat(format);
 
     // save previous button state for btnp function
     machine.state().previousButtons = machine.state().buttons;
@@ -83,8 +101,8 @@ void GameView::render()
     code.initFromSource(str.c_str());*/
 
     retro8::io::LoaderP8 loader;
-    std::string path = !_path.empty() ? path : "demos/bounce.p8";
-    loader.load("demos/bounce.p8", machine);
+    std::string path = !_path.empty() ? _path : "demos/bounce.p8";
+    loader.load(_path, machine);
 
     manager->setFrameRate(machine.code().require60fps() ? 60 : 30);
 
@@ -120,8 +138,8 @@ void GameView::render()
 #ifdef _WIN32
   SDL_Rect dest = { (640 - 384) / 2, (480 - 384) / 2, 384, 384 };
 #else
-    //SDL_Rect dest = { (320 - 128) / 2, (240 - 128) / 2, 128, 128 };
-  SDL_Rect dest = { (320 - 256) / 2, (240 - 256) / 2, 256, 256 };
+  SDL_Rect dest = { (320 - 128) / 2, (240 - 128) / 2, 128, 128 };
+  //SDL_Rect dest = { (320 - 256) / 2, (240 - 256) / 2, 256, 256 };
 #endif
   SDL_RenderCopy(renderer, _outputTexture, nullptr, &dest);
 

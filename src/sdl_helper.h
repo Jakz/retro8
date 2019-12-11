@@ -33,7 +33,7 @@ protected:
 
 
 public:
-  SDL(EventHandler& eventHandler, Renderer& loopRenderer) : eventHandler(eventHandler), loopRenderer(loopRenderer), 
+  SDL(EventHandler& eventHandler, Renderer& loopRenderer) : eventHandler(eventHandler), loopRenderer(loopRenderer),
     _window(nullptr), _renderer(nullptr), willQuit(false), ticks(0)
   {
     setFrameRate(60);
@@ -48,7 +48,7 @@ public:
   bool init();
   void deinit();
   void capFPS();
-  
+
   void loop();
   void handleEvents();
 
@@ -79,7 +79,7 @@ bool SDL<EventHandler, Renderer>::init()
     printf("Error on IMG_Init().\n");
     return false;
   }
-  
+
   // SDL_WINDOW_FULLSCREEN
 #if defined(WINDOW_SCALE)
 #if defined(DEBUGGER)
@@ -93,7 +93,7 @@ bool SDL<EventHandler, Renderer>::init()
   _renderer = SDL_CreateRenderer(_window, -1, SDL_RENDERER_ACCELERATED);
 
 #if defined(WINDOW_SCALE)
-  buffer = SDL_CreateTexture(_renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, 320, 240);
+  buffer = SDL_CreateTexture(_renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, 320, 240, SDL_WINDOW_OPENGL);
 #endif
 
   return true;
@@ -144,14 +144,14 @@ template<typename EventHandler, typename Renderer>
 void SDL<EventHandler, Renderer>::deinit()
 {
   IMG_Quit();
-  
+
 #if defined(WINDOW_SCALE)
   SDL_DestroyTexture(buffer);
 #endif
 
   SDL_DestroyRenderer(_renderer);
   SDL_DestroyWindow(_window);
-  
+
   SDL_Quit();
 }
 

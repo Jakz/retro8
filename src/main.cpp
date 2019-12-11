@@ -18,8 +18,16 @@
 
 */
 
+#if TEST_MODE
+extern int testMain(int argc, char* argv[]);
+#endif
+
 int main(int argc, char* argv[])
 {
+#if TEST_MODE
+  return testMain(argc, argv);
+#endif
+
   ui::ViewManager ui;
 
   if (!ui.init())

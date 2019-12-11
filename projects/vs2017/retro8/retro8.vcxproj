@@ -131,6 +131,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\src\io\loader.cpp" />
     <ClCompile Include="..\..\..\src\main.cpp" />
+    <ClCompile Include="..\..\..\src\test\test.cpp" />
     <ClCompile Include="..\..\..\src\views\view_manager.cpp" />
     <ClCompile Include="..\..\..\src\vm\gfx.cpp" />
     <ClCompile Include="..\..\..\src\vm\lua_bridge.cpp" />
@@ -140,6 +141,7 @@
     <ClInclude Include="..\..\..\src\common.h" />
     <ClInclude Include="..\..\..\src\io\loader.h" />
     <ClInclude Include="..\..\..\src\sdl_helper.h" />
+    <ClInclude Include="..\..\..\src\test\catch.hpp" />
     <ClInclude Include="..\..\..\src\views\main_view.h" />
     <ClInclude Include="..\..\..\src\views\view_manager.h" />
     <ClInclude Include="..\..\..\src\vm\defines.h" />

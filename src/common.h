@@ -54,6 +54,7 @@ private:
 #define MOUSE_ENABLED true
 #define WINDOW_SCALE 1
 #define DEBUGGER true
+#define TEST_MODE false
 #else
 #define MOUSE_ENABLED false
 #endif

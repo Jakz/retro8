@@ -226,16 +226,14 @@ int cursor(lua_State* L)
 
     if (lua_gettop(L) == 3)
     {
-      retro8::color_t color = static_cast<retro8::color_t>(lua_tonumber(L, 2));
+      retro8::color_t color = static_cast<retro8::color_t>((int)lua_tonumber(L, 2));
       machine.memory().penColor()->low(color);
     }
   }
   else
     *machine.memory().cursor() = { 0, 0 };
-  
 
-
-  
+  return 0;
 }
 
 int debugprint(lua_State* L)
@@ -378,6 +376,26 @@ namespace math
     return 1;
   }
 
+  int mid(lua_State* L)
+  {
+    assert(lua_isnumber(L, 1));
+    assert(lua_isnumber(L, 2));
+    assert(lua_isnumber(L, 3));
+
+    real_t a = lua_tonumber(L, 1);
+    real_t b = lua_tonumber(L, 2);
+    real_t c = lua_tonumber(L, 3);
+
+    if ((a < b && b < c) || (c < b && b < a))
+      lua_pushnumber(L, b);
+    else if ((b < a && a < c) || (c < a && a < b))
+      lua_pushnumber(L, a);
+    else
+      lua_pushnumber(L, c);
+
+    return 1;
+  }
+
   int abs(lua_State* L)
   {
     assert(lua_isnumber(L, 1));
@@ -477,7 +495,9 @@ void lua::registerFunctions(lua_State* L)
   lua_register(L, "map", map);
   lua_register(L, "mget", mget);
   lua_register(L, "mset", mset);
+
   lua_register(L, "print", print);
+  lua_register(L, "cursor", cursor);
 
   lua_register(L, "fset", sprites::fset);
   lua_register(L, "fget", sprites::fget);
@@ -492,6 +512,7 @@ void lua::registerFunctions(lua_State* L)
   lua_register(L, "flr", math::flr);
   lua_register(L, "min", math::min);
   lua_register(L, "max", math::max);
+  lua_register(L, "mid", math::mid);
   lua_register(L, "abs", math::abs);
   lua_register(L, "sgn", math::sgn);
 

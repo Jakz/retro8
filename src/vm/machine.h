@@ -56,6 +56,7 @@ namespace retro8
       paletteAt(gfx::DRAW_PALETTE_INDEX)->reset();
       paletteAt(gfx::SCREEN_PALETTE_INDEX)->reset();
       clipRect()->reset();
+      *cursor() = { 0, 0 };
     }
 
     gfx::color_byte_t* penColor() { return reinterpret_cast<gfx::color_byte_t*>(&memory[address::PEN_COLOR]); }

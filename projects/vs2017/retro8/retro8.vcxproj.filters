@@ -13,6 +13,9 @@
     <Filter Include="src\io">
       <UniqueIdentifier>{191051b8-b13d-4e65-a79b-12a98cfc6288}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\test">
+      <UniqueIdentifier>{91c70d3b-3da5-4d36-9075-f3004a94a914}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\sdl_helper.h">
@@ -42,6 +45,9 @@
     <ClInclude Include="..\..\..\src\io\loader.h">
       <Filter>src\io</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\test\catch.hpp">
+      <Filter>src\test</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\main.cpp">
@@ -61,6 +67,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\io\loader.cpp">
       <Filter>src\io</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\test\test.cpp">
+      <Filter>src\test</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

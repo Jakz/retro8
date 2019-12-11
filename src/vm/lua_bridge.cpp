@@ -155,7 +155,7 @@ namespace draw
 {
   int clip(lua_State* L)
   {
-    if (lua_gettop(L) == 1)
+    if (lua_gettop(L) == 0)
       machine.memory().clipRect()->reset();
     else
     {
@@ -175,7 +175,10 @@ namespace draw
 
 int camera(lua_State* L)
 {
-  //TODO: implement
+  int16_t cx = lua_tonumber(L, 1);
+  int16_t cy = lua_tonumber(L, 2);
+  machine.memory().camera()->set(cx, cy);
+
   return 0;
 }
 
@@ -252,7 +255,7 @@ int cursor(lua_State* L)
   {
     int x = lua_tonumber(L, 1);
     int y = lua_tonumber(L, 2);
-    *machine.memory().cursor();
+    *machine.memory().cursor() = { (uint8_t)x, (uint8_t)y };
 
     if (lua_gettop(L) == 3)
     {

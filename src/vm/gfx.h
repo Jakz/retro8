@@ -142,6 +142,24 @@ namespace retro8
       uint8_t x, y;
     };
 
+    struct camera_t
+    {
+
+      int16_t _x;
+      int16_t _y;
+
+      int16_t x() const { return _x; }
+      int16_t y() const { return _y; }
+
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+      //TODO: raw memory addresses expect these to be little endian, FIX!
+      void set(int16_t x, int16_t y) { _x = x; _y = y; }
+#else
+      void set(int16_t x, int16_t y) { _x = x; _y = y; }
+#endif
+
+    };
+
     class Font
     {
       sequential_sprite_t glyphs[FONT_GLYPHS_ROWS*FONT_GLYPHS_COLUMNS];

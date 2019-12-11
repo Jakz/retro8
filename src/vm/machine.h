@@ -29,6 +29,7 @@ namespace retro8
     static constexpr address_t CLIP_RECT = 0x5f20;
     static constexpr address_t PEN_COLOR = 0x5f25;
     static constexpr address_t CURSOR = 0x5f26;
+    static constexpr address_t CAMERA = 0x5f28;
 
     static constexpr address_t SCREEN_DATA = 0x6000;
 
@@ -61,7 +62,9 @@ namespace retro8
 
     gfx::color_byte_t* penColor() { return reinterpret_cast<gfx::color_byte_t*>(&memory[address::PEN_COLOR]); }
     gfx::cursor_t* cursor() { return as<gfx::cursor_t>(address::CURSOR); }
+    gfx::camera_t* camera() { return as<gfx::camera_t>(address::CAMERA); }
     gfx::clip_rect_t* clipRect() { return as<gfx::clip_rect_t>(address::CLIP_RECT); }
+    
 
     gfx::color_byte_t* screenData() { return reinterpret_cast<gfx::color_byte_t*>(&memory[address::SCREEN_DATA]); }
     gfx::color_byte_t* screenData(coord_t x, coord_t y) { return screenData() + (y * BYTES_PER_SCREEN_ROW + x) / 2; }

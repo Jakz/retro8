@@ -127,6 +127,22 @@ namespace retro8
       color_t& operator[](color_t i) { return colors[i]; }
     };
 
+    struct clip_rect_t
+    {
+      uint8_t x0;
+      uint8_t y0;
+      uint8_t x1;
+      uint8_t y1;
+
+      void reset() { x0 = y0 = 0; x1 = y1 = 128; }
+      void set(uint8_t xs, uint8_t ys, uint8_t xe, uint8_t ye) { x0 = xs; y0 = ys; x1 = xe; y1 = ye; }
+    };
+
+    struct cursor_t
+    {
+      uint8_t x, y;
+    };
+
     class Font
     {
       sequential_sprite_t glyphs[FONT_GLYPHS_ROWS*FONT_GLYPHS_COLUMNS];

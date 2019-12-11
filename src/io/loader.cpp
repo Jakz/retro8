@@ -9,18 +9,31 @@
 using namespace retro8;
 using namespace retro8::io;
 
+
+
+int LoaderP8::valueForHexDigit(char c)
+{
+  int v = (c >= 'A') ? (c >= 'a') ? (c - 'a' + 10) : (c - 'A' + 10) : (c - '0');
+  assert(v >= 0 && v <= 0xf);
+  return v;
+}
+
 color_t LoaderP8::colorFromDigit(char d)
 {
-  if (isdigit(d)) return static_cast<color_t>(d - '0');
-  else if (d >= 'A' && d <= 'F') return static_cast<color_t>(d - 'F' + 10);
-  else if (d >= 'a' && d <= 'f') return static_cast<color_t>(d - 'f' + 10);
-  else assert(false);
+  return static_cast<color_t>(valueForHexDigit(d));
 }
 
 sprite_index_t LoaderP8::spriteIndexFromString(const char* c)
 {
-  int h = (c[0] >= 'A') ? (c[0] >= 'a') ? (c[0] - 'a' + 10) : (c[0] - 'A' + 10) : (c[0] - '0');
-  int l = (c[1] >= 'A') ? (c[1] >= 'a') ? (c[1] - 'a' + 10) : (c[1] - 'A' + 10) : (c[1] - '0');
+  int h = valueForHexDigit(c[0]);
+  int l = valueForHexDigit(c[1]);
+  return (h << 4) | l;
+}
+
+retro8::sprite_flags_t LoaderP8::spriteFlagsFromString(const char* c)
+{
+  int h = valueForHexDigit(c[0]);
+  int l = valueForHexDigit(c[1]);
   return (h << 4) | l;
 }
 
@@ -95,12 +108,14 @@ void LoaderP8::load(const std::string& path, Machine& m)
   //TODO: not efficient but for now it's fine
   std::stringstream code;
 
-  coord_t sy = 0, my = 0;
+  coord_t sy = 0, my = 0, fy = 0;
 
   static constexpr size_t DIGITS_PER_PIXEL_ROW = 128;
   static constexpr size_t BYTES_PER_GFX_ROW = DIGITS_PER_PIXEL_ROW / 2;
 
   static constexpr size_t DIGITS_PER_MAP_ROW = 256;
+  static constexpr size_t DIGITS_PER_SPRITE_FLAGS_ROW = 128*2;
+
 
   std::ifstream apiFile("api.lua");
   std::string api((std::istreambuf_iterator<char>(apiFile)), std::istreambuf_iterator<char>());
@@ -154,6 +169,17 @@ void LoaderP8::load(const std::string& path, Machine& m)
           const char* index = line.c_str() + x * 2;
           sprite_index_t sindex = spriteIndexFromString(index);
           *m.memory().spriteInTileMap(x, my) = sindex;
+        }
+        ++my;
+      }
+      case State::GFF:
+      {
+        assert(line.length() == DIGITS_PER_SPRITE_FLAGS_ROW);
+        for (size_t x = 0; x < DIGITS_PER_SPRITE_FLAGS_ROW/2; ++x)
+        {
+          const char* sflags = line.c_str() + x * 2;
+          sprite_flags_t flags = spriteFlagsFromString(sflags);
+          *m.memory().spriteFlagsFor(x) = flags;
         }
         ++my;
       }

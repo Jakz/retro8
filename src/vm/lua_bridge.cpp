@@ -148,6 +148,28 @@ int pal(lua_State* L)
   return 0;
 }
 
+namespace draw
+{
+  int clip(lua_State* L)
+  {
+    if (lua_gettop(L) == 1)
+      machine.memory().clipRect()->reset();
+    else
+    {
+      uint8_t x0 = lua_tonumber(L, 1);
+      uint8_t y0 = lua_tonumber(L, 2);
+      uint8_t w = lua_tonumber(L, 3);
+      uint8_t h = lua_tonumber(L, 4);
+
+      machine.memory().clipRect()->set(x0, y0, x0 + w, y0 + h);
+    }
+
+    return 0;
+  }
+}
+
+
+
 int camera(lua_State* L)
 {
   //TODO: implement
@@ -170,6 +192,17 @@ int mget(lua_State* L)
   return 1;
 }
 
+int mset(lua_State* L)
+{
+  int x = lua_tonumber(L, 1);
+  int y = lua_tonumber(L, 2);
+  retro8::sprite_index_t index = lua_tonumber(L, 3);
+
+  *machine.memory().spriteInTileMap(x, y) = index;
+  
+  return 0;
+}
+
 int print(lua_State* L)
 {
   //TODO: optimize and use const char*?
@@ -183,12 +216,86 @@ int print(lua_State* L)
   return 0;
 }
 
+int cursor(lua_State* L)
+{
+  if (lua_gettop(L) >= 2)
+  {
+    int x = lua_tonumber(L, 1);
+    int y = lua_tonumber(L, 2);
+    *machine.memory().cursor();
+
+    if (lua_gettop(L) == 3)
+    {
+      retro8::color_t color = static_cast<retro8::color_t>(lua_tonumber(L, 2));
+      machine.memory().penColor()->low(color);
+    }
+  }
+  else
+    *machine.memory().cursor() = { 0, 0 };
+  
+
+
+  
+}
+
 int debugprint(lua_State* L)
 {
   std::string text = lua_tostring(L, 1);
   std::cout << text << std::endl;
 
   return 0;
+}
+
+namespace sprites
+{
+  int fget(lua_State* L)
+  {
+    retro8::sprite_index_t index = lua_tonumber(L, 1);
+    retro8::sprite_flags_t flags = *machine.memory().spriteFlagsFor(index);
+
+    if (lua_gettop(L) == 2)
+    {
+      int index = lua_tonumber(L, 2);
+      assert(index >= 0 && index <= 7);
+      lua_pushinteger(L, (flags >> index) & 0x1);
+    }
+    else
+      lua_pushinteger(L, *machine.memory().spriteFlagsFor(index));
+
+    return 1;
+  }
+
+  int fset(lua_State* L)
+  {
+    retro8::sprite_index_t index = lua_tonumber(L, 1);
+    retro8::sprite_flags_t* flags = machine.memory().spriteFlagsFor(index);
+
+    if (lua_gettop(L) == 3)
+    {
+      int index = lua_tonumber(L, 2);
+      bool value = lua_toboolean(L, 3);
+      assert(index >= 0 && index <= 7);
+
+      if (value)
+        *flags = *flags | (1 << index);
+      else
+        *flags = *flags & ~(1 << index);
+    }
+    else
+    {
+      retro8::sprite_flags_t value = lua_tonumber(L, 2);
+      *flags = value;
+    }
+
+    return 0;
+  }
+
+  int sspr(lua_State* L)
+  {
+    //TODO: implement
+
+    return 0;
+  }
 }
 
 namespace math
@@ -363,12 +470,18 @@ void lua::registerFunctions(lua_State* L)
   lua_register(L, "rectfill", rectfill);
   lua_register(L, "circ", circ);
   lua_register(L, "circfill", circfill);
+  lua_register(L, "clip", draw::clip);
   lua_register(L, "cls", cls);
   lua_register(L, "spr", spr);
   lua_register(L, "camera", camera);
   lua_register(L, "map", map);
   lua_register(L, "mget", mget);
+  lua_register(L, "mset", mset);
   lua_register(L, "print", print);
+
+  lua_register(L, "fset", sprites::fset);
+  lua_register(L, "fget", sprites::fget);
+  lua_register(L, "sspr", sprites::sspr);
 
   lua_register(L, "debug", debugprint);
 

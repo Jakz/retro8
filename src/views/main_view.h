@@ -95,7 +95,7 @@ namespace ui
       code.initFromSource(str.c_str());*/
 
       retro8::io::LoaderP8 loader;
-      loader.load("demos/jelpi.p8", machine);
+      loader.load("demos/api.p8", machine);
 
       manager->setFrameRate(machine.code().require60fps() ? 60 : 30);
 

@@ -34,3 +34,9 @@ end
 function mapdraw(...)
   map(table.unpack(arg))
 end
+
+function count(t)
+  if t ~= nil then
+    return #t
+  end
+end

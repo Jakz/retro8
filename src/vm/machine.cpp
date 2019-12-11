@@ -35,11 +35,15 @@ void Machine::cls(color_t color)
 
   auto* data = _memory.screenData();
   memset(data, value.value, gfx::BYTES_PER_SCREEN);
+
+  _memory.clipRect()->reset();
+  *_memory.cursor() = { 0, 0 };
 }
 
 void Machine::pset(coord_t x, coord_t y, color_t color)
 {
-  if (x >= 0 && x < gfx::SCREEN_WIDTH && y >= 0 && y < gfx::SCREEN_HEIGHT)
+  auto* clip = _memory.clipRect();
+  if (x >= clip->x0 && x < clip->y0 && y >= clip->x1 && y < clip->y1)
   {
     color = _memory.paletteAt(gfx::DRAW_PALETTE_INDEX)->get(color);
     const auto& c = gfx::ColorTable[color];

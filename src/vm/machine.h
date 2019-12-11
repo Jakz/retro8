@@ -23,9 +23,12 @@ namespace retro8
   namespace address
   {
     static constexpr address_t SPRITE_SHEET = 0x0000;
+    static constexpr address_t SPRITE_FLAGS = 0x3000;
 
     static constexpr address_t PALETTES = 0x5f10;
+    static constexpr address_t CLIP_RECT = 0x5f20;
     static constexpr address_t PEN_COLOR = 0x5f25;
+    static constexpr address_t CURSOR = 0x5f26;
 
     static constexpr address_t SCREEN_DATA = 0x6000;
 
@@ -52,12 +55,20 @@ namespace retro8
     {
       paletteAt(gfx::DRAW_PALETTE_INDEX)->reset();
       paletteAt(gfx::SCREEN_PALETTE_INDEX)->reset();
+      clipRect()->reset();
     }
 
     gfx::color_byte_t* penColor() { return reinterpret_cast<gfx::color_byte_t*>(&memory[address::PEN_COLOR]); }
+    gfx::cursor_t* cursor() { return as<gfx::cursor_t>(address::CURSOR); }
+    gfx::clip_rect_t* clipRect() { return as<gfx::clip_rect_t>(address::CLIP_RECT); }
 
     gfx::color_byte_t* screenData() { return reinterpret_cast<gfx::color_byte_t*>(&memory[address::SCREEN_DATA]); }
     gfx::color_byte_t* screenData(coord_t x, coord_t y) { return screenData() + (y * BYTES_PER_SCREEN_ROW + x) / 2; }
+
+    sprite_flags_t* spriteFlagsFor(sprite_index_t index)
+    {
+      return as<sprite_flags_t>(address::SPRITE_FLAGS + index);
+    }
 
     sprite_index_t* spriteInTileMap(coord_t x, coord_t y)
     {

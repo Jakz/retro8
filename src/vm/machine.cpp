@@ -220,7 +220,6 @@ void Machine::map(coord_t cx, coord_t cy, coord_t x, coord_t y, amount_t cw, amo
       if (index != 0 && (!layer || (layer & *_memory.spriteFlagsFor(index)) == layer))
         spr(index, x + tx * gfx::SPRITE_WIDTH, y + ty * gfx::SPRITE_HEIGHT);
     }
-    printf("\n");
   }
 }
 

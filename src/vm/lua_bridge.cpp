@@ -1,8 +1,8 @@
 #include "lua_bridge.h"
 
 #include "machine.h"
+#include "lua/lua.hpp"
 
-#include <lua.hpp>
 #include <iostream>
 
 using namespace lua;

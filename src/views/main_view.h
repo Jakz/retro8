@@ -2,11 +2,11 @@
 
 #include "view_manager.h"
 
-
-#include <lua.hpp>
 #include <iostream>
 #include <fstream>
 #include <streambuf>
+
+#include "lua/lua.hpp"
 
 #include "vm/machine.h"
 #include "vm/lua_bridge.h"

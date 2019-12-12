@@ -134,7 +134,7 @@ void GameView::render()
 SDL_Rect dest;
   //SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, machine.screen());
 #ifdef _WIN32
-  dest = { (640 - 384) / 2, (480 - 384) / 2, 384, 384 };
+  dest = { (480 - 384) / 2, (480 - 384) / 2, 384, 384 };
 #else
 
 if (scale == Scale::UNSCALED)
@@ -149,6 +149,7 @@ else
 
 #if DEBUGGER
   {
+    /* sprite sheet */
     {
       SDL_Surface* spritesheet = SDL_CreateRGBSurface(0, 128, 128, 32, 0x00000000, 0x00ff0000, 0x0000ff00, 0x000000ff);
 
@@ -167,6 +168,8 @@ else
       SDL_DestroyTexture(texture);
       SDL_FreeSurface(spritesheet);
     }
+
+    /* palette */
 
     {
       /*static SDL_Surface* tilemap = nullptr;

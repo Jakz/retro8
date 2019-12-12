@@ -62,7 +62,7 @@ void LoaderP8::fixOperators(std::string& line)
       else
         break;
     }
-    else if (isalnum(line[t]) || line[t] == '.')
+    else if (isalnum(line[t]) || line[t] == '.' || line[t] == '_')
     {
       if (s == S::BEGIN)
       {

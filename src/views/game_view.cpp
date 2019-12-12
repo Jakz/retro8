@@ -134,13 +134,20 @@ void GameView::render()
     assert(false);
   }
 
+SDL_Rect dest;
   //SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, machine.screen());
 #ifdef _WIN32
-  SDL_Rect dest = { (640 - 384) / 2, (480 - 384) / 2, 384, 384 };
+  dest = { (640 - 384) / 2, (480 - 384) / 2, 384, 384 };
 #else
-  SDL_Rect dest = { (320 - 128) / 2, (240 - 128) / 2, 128, 128 };
-  //SDL_Rect dest = { (320 - 256) / 2, (240 - 256) / 2, 256, 256 };
+
+if (scale == Scale::UNSCALED)
+  dest = { (320 - 128) / 2, (240 - 128) / 2, 128, 128 };
+else if (scale == Scale::SCALED_ASPECT_2x)
+  dest = { (320 - 256) / 2, (240 - 256) / 2, 256, 256 };
+else
+  dest = { 0, 0, 320, 240 };
 #endif
+
   SDL_RenderCopy(renderer, _outputTexture, nullptr, &dest);
 
 #if DEBUGGER
@@ -222,13 +229,21 @@ void GameView::handleKeyboardEvent(const SDL_Event& event)
     machine.state().buttons.set(retro8::button_t::ACTION2, event.type == SDL_KEYDOWN);
     break;
 
-    //TODO: missing action buttons
+#ifndef _WIN32
+  case SDLK_TAB:
+    if (event.type == SDL_KEYDOWN)
+    {
+      if (scale == Scale::UNSCALED) scale = Scale::SCALED_ASPECT_2x;
+      else if (scale == Scale::SCALED_ASPECT_2x) scale = Scale::FULLSCREEN;
+      else scale = Scale::UNSCALED;
+    }
+    break;
+#endif
 
   case SDLK_ESCAPE:
     if (event.type == SDL_KEYDOWN)
       manager->exit();
     break;
-
   }
 }
 

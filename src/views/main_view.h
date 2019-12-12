@@ -15,9 +15,18 @@
 
 namespace ui
 {
+  enum class Scale
+  {
+    UNSCALED,
+    SCALED_ASPECT_2x,
+    FULLSCREEN
+  };
+
   class GameView : public View
   {
   private:
+    Scale scale = Scale::UNSCALED;
+
     ViewManager* manager;
 
     SDL_Surface* _output;

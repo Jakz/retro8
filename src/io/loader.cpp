@@ -76,11 +76,11 @@ void LoaderP8::fixOperators(std::string& line)
     }
     else if (line[t] == '*' || line[t] == '+' || line[t] == '-' || line[t] == '/' || line[t] == '%')
     {
-      if (t < line.length() - 1 && line[t+1] == '=' && (s == S::IDENT || s == S::INBETWEEN)) 
+      if (t < line.length() - 1 && line[t+1] == '=' && (s == S::IDENT || s == S::INBETWEEN))
       {
         if (s == S::IDENT)
           i1 = t - 1;
-          
+
         // replace [i, t+1]
         line = line.substr(0, i0) + line.substr(i0, i1 - i0) + " = " + line.substr(i0, i1 - i0) + ' ' + line[t] + ' ' + line.substr(t + 2);
         break;
@@ -103,8 +103,12 @@ void LoaderP8::load(const std::string& path, Machine& m)
   for (std::string line; std::getline(input, line); /**/)
     lines.push_back(line);
 
+  for (auto& line : lines)
+    if (line.back() == '\r')
+      line.resize(line.length() - 1);
+
   enum class State { HEADER, CODE, GFX, GFF, LABEL, MAP, SFX, MUSIC };
-  
+
   State state = State::HEADER;
 
   //TODO: not efficient but for now it's fine

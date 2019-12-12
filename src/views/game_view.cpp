@@ -33,9 +33,6 @@ void GameView::render()
 
     SDL_PixelFormat* format = SDL_AllocFormat(info.texture_formats[0]);
 
-    for (size_t i = 0; i < info.num_texture_formats; ++i)
-      printf("[SDL] Window pixel format: %s\n", SDL_GetPixelFormatName(info.texture_formats[i]));
-
     /* initialize color table to current pixel format */
     r8::gfx::ColorTable::init(format);
 
@@ -101,8 +98,8 @@ void GameView::render()
     code.initFromSource(str.c_str());*/
 
     retro8::io::LoaderP8 loader;
-    std::string path = !_path.empty() ? _path : "demos/bounce.p8";
-    loader.load(_path, machine);
+    std::string path = !_path.empty() ? _path : "demos/jelpi.p8";
+    loader.load(path, machine);
 
     manager->setFrameRate(machine.code().require60fps() ? 60 : 30);
 

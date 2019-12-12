@@ -190,10 +190,12 @@ int map(lua_State* L)
   coord_t y = lua_tonumber(L, 4);
   amount_t cw = lua_tonumber(L, 5);
   amount_t ch = lua_tonumber(L, 6);
+  sprite_flags_t layer = 0;
 
-  //TODO optional layer
+  if (lua_gettop(L) == 7)
+    layer = lua_tonumber(L, 7);
 
-  machine.map(cx, cy, x, y, cw, ch, 0);
+  machine.map(cx, cy, x, y, cw, ch, layer);
 
   return 0;
 }
@@ -203,7 +205,14 @@ int mget(lua_State* L)
   int x = lua_tonumber(L, 1); //TODO: these are optional
   int y = lua_tonumber(L, 2);
 
-  lua_pushinteger(L, *machine.memory().spriteInTileMap(x, y));
+  sprite_index_t index = 0;
+
+  if (x >= 0 && x <= gfx::TILE_MAP_WIDTH && y >= 0 && y < gfx::TILE_MAP_HEIGHT)
+    index = *machine.memory().spriteInTileMap(x, y);
+
+  //printf("mget(%d, %d) = %d\n", x, y, index);
+
+  lua_pushnumber(L, index);
 
   return 1;
 }
@@ -288,10 +297,10 @@ namespace sprites
     {
       int index = lua_tonumber(L, 2);
       assert(index >= 0 && index <= 7);
-      lua_pushinteger(L, (flags >> index) & 0x1);
+      lua_pushboolean(L, (flags >> index) & 0x1 ? true : false);
     }
     else
-      lua_pushinteger(L, *machine.memory().spriteFlagsFor(index));
+      lua_pushnumber(L, *machine.memory().spriteFlagsFor(index));
 
     return 1;
   }

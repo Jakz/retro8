@@ -21,10 +21,6 @@ protected:
   SDL_Window* _window;
   SDL_Renderer* _renderer;
 
-#if defined(WINDOW_SCALE)
-  SDL_Texture* buffer;
-#endif
-
   bool willQuit;
   u32 ticks;
 
@@ -92,10 +88,6 @@ bool SDL<EventHandler, Renderer>::init()
 #endif
   _renderer = SDL_CreateRenderer(_window, -1, SDL_RENDERER_ACCELERATED);
 
-#if defined(WINDOW_SCALE)
-  buffer = SDL_CreateTexture(_renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, 320, 240, SDL_WINDOW_OPENGL);
-#endif
-
   return true;
 }
 
@@ -104,16 +96,8 @@ void SDL<EventHandler, Renderer>::loop()
 {
   while (!willQuit)
   {
-#if false && defined(WINDOW_SCALE)
-    SDL_SetRenderTarget(_renderer, buffer);
-    loopRenderer.render();
-    SDL_SetRenderTarget(_renderer, nullptr);
-    SDL_RenderCopy(_renderer, buffer, nullptr, nullptr);
-    SDL_RenderPresent(_renderer);
-#else
     loopRenderer.render();
     SDL_RenderPresent(_renderer);
-#endif
 
     handleEvents();
 
@@ -144,10 +128,6 @@ template<typename EventHandler, typename Renderer>
 void SDL<EventHandler, Renderer>::deinit()
 {
   IMG_Quit();
-
-#if defined(WINDOW_SCALE)
-  SDL_DestroyTexture(buffer);
-#endif
 
   SDL_DestroyRenderer(_renderer);
   SDL_DestroyWindow(_window);

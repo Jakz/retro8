@@ -10,9 +10,7 @@ void Machine::flip()
 
   for (size_t i = 0; i < gfx::BYTES_PER_SCREEN; ++i)
   {
-    const gfx::color_byte_t* pixels = data + i;
-    
-    auto* screenPalette = memory().paletteAt(retro8::gfx::SCREEN_PALETTE_INDEX);
+    const gfx::color_byte_t* pixels = data + i;    
     const auto rc1 = retro8::gfx::ColorTable::get(screenPalette->get((pixels)->low()));
     const auto rc2 = retro8::gfx::ColorTable::get(screenPalette->get((pixels)->high()));
       
@@ -214,7 +212,13 @@ void Machine::map(coord_t cx, coord_t cy, coord_t x, coord_t y, amount_t cw, amo
 {
   for (amount_t ty = 0; ty < ch; ++ty)
     for (amount_t tx = 0; tx < cw; ++tx)
-      spr(*_memory.spriteInTileMap(cx + tx, cy + ty), x + tx * gfx::SPRITE_WIDTH, y + ty * gfx::SPRITE_HEIGHT);
+    {
+      const sprite_index_t index = *_memory.spriteInTileMap(cx + tx, cy + ty);
+
+      /* don't draw if index is 0 or layer is not zero and sprite flags are not correcly masked to it */
+      if (index != 0 && (!layer || (layer & *_memory.spriteFlagsFor(index)) != layer))
+        spr(index, x + tx * gfx::SPRITE_WIDTH, y + ty * gfx::SPRITE_HEIGHT);
+    }
 }
 
 

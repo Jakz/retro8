@@ -54,6 +54,7 @@ namespace retro8
   public:
     Memory()
     {
+      memset(memory, 0, 1024 * 32);
       paletteAt(gfx::DRAW_PALETTE_INDEX)->reset();
       paletteAt(gfx::SCREEN_PALETTE_INDEX)->reset();
       clipRect()->reset();
@@ -78,10 +79,16 @@ namespace retro8
     {
       static_assert(sizeof(sprite_index_t) == 1, "sprite_index_t must be 1 byte");
 
-      if (y < ROWS_PER_TILE_MAP_HALF)
-        return as<sprite_index_t>(address::TILE_MAP_HIGH) + x + y * gfx::TILE_MAP_WIDTH * sizeof(sprite_index_t);
+      sprite_index_t *addr;
+
+      if (y >= ROWS_PER_TILE_MAP_HALF)
+        addr = as<sprite_index_t>(address::TILE_MAP_LOWER) + x + (y - ROWS_PER_TILE_MAP_HALF) * gfx::TILE_MAP_WIDTH * sizeof(sprite_index_t);
       else
-        return as<sprite_index_t>(address::TILE_MAP_HIGH) + x + (y - ROWS_PER_TILE_MAP_HALF) * gfx::TILE_MAP_WIDTH * sizeof(sprite_index_t);
+        addr = as<sprite_index_t>(address::TILE_MAP_HIGH) + x + y * gfx::TILE_MAP_WIDTH * sizeof(sprite_index_t);
+
+      assert((addr >= memory + address::TILE_MAP_LOWER && addr <= memory + address::TILE_MAP_LOWER * gfx::TILE_MAP_WIDTH * gfx::TILE_MAP_HEIGHT * sizeof(sprite_index_t)));
+
+      return addr;
     }
 
     gfx::sprite_t* spriteAt(sprite_index_t index) { 

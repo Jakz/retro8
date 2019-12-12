@@ -169,30 +169,35 @@ else
     }
 
     {
-      /*SDL_Surface* tilemap = SDL_CreateRGBSurface(0, 1024, 512, 32, 0x00000000, 0x00ff0000, 0x0000ff00, 0x000000ff);
-      SDL_FillRect(tilemap, nullptr, 0x00000000);
-      uint32_t* base = static_cast<uint32_t*>(tilemap->pixels);
-      for (r8::coord_t ty = 0; ty < r8::gfx::TILE_MAP_HEIGHT; ++ty)
-      {
-        for (r8::coord_t tx = 0; tx < r8::gfx::TILE_MAP_WIDTH; ++tx)
+      /*static SDL_Surface* tilemap = nullptr;
+      
+      if (!tilemap)
+      {        
+        tilemap = SDL_CreateRGBSurface(0, 1024, 512, 32, 0x00000000, 0x00ff0000, 0x0000ff00, 0x000000ff);
+        SDL_FillRect(tilemap, nullptr, 0x00000000);
+        uint32_t* base = static_cast<uint32_t*>(tilemap->pixels);
+        for (r8::coord_t ty = 0; ty < r8::gfx::TILE_MAP_HEIGHT; ++ty)
         {
-          r8::sprite_index_t index = *machine.memory().spriteInTileMap(tx, ty);
+          for (r8::coord_t tx = 0; tx < r8::gfx::TILE_MAP_WIDTH; ++tx)
+          {
+            r8::sprite_index_t index = *machine.memory().spriteInTileMap(tx, ty);
 
-          for (r8::coord_t y = 0; y < r8::gfx::SPRITE_HEIGHT; ++y)
-            for (r8::coord_t x = 0; x < r8::gfx::SPRITE_WIDTH; ++x)
-            {
-              auto* dest = base + x + tx * r8::gfx::SPRITE_WIDTH + (y + ty * r8::gfx::SPRITE_HEIGHT) * tilemap->h;
-              const r8::gfx::color_byte_t& pixels = machine.memory().spriteAt(index)->byteAt(x, y);
-              RASTERIZE_PIXEL_PAIR(machine, dest, &pixels);
-            }
+            for (r8::coord_t y = 0; y < r8::gfx::SPRITE_HEIGHT; ++y)
+              for (r8::coord_t x = 0; x < r8::gfx::SPRITE_WIDTH; ++x)
+              {
+                auto* dest = base + x + tx * r8::gfx::SPRITE_WIDTH + (y + ty * r8::gfx::SPRITE_HEIGHT) * tilemap->h;
+                const r8::gfx::color_byte_t& pixels = machine.memory().spriteAt(index)->byteAt(x, y);
+                RASTERIZE_PIXEL_PAIR(machine, dest, &pixels);
+              }
+          }
         }
       }
 
       SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, tilemap);
-      SDL_Rect destr = { (1024 - 286) , 200, 256, 128 };
+      SDL_Rect destr = { (1024 - 286) , 256, 256, 128 };
       SDL_RenderCopy(renderer, texture, nullptr, &destr);
       SDL_DestroyTexture(texture);
-      SDL_FreeSurface(tilemap);*/
+      //SDL_FreeSurface(tilemap);*/
     }
 
   }

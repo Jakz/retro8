@@ -201,9 +201,9 @@ void Machine::print(const std::string& string, coord_t x, coord_t y, color_t col
   }
 }
 
-void Machine::pal(color_t c0, color_t c1)
+void Machine::pal(color_t c0, color_t c1, palette_index_t index)
 {
-  gfx::palette_t* palette = _memory.paletteAt(gfx::DRAW_PALETTE_INDEX);
+  gfx::palette_t* palette = _memory.paletteAt(index);
   palette->set(c0, c1);
 }
 
@@ -211,14 +211,17 @@ void Machine::pal(color_t c0, color_t c1)
 void Machine::map(coord_t cx, coord_t cy, coord_t x, coord_t y, amount_t cw, amount_t ch, sprite_flags_t layer)
 {
   for (amount_t ty = 0; ty < ch; ++ty)
+  {
     for (amount_t tx = 0; tx < cw; ++tx)
     {
       const sprite_index_t index = *_memory.spriteInTileMap(cx + tx, cy + ty);
 
       /* don't draw if index is 0 or layer is not zero and sprite flags are not correcly masked to it */
-      if (index != 0 && (!layer || (layer & *_memory.spriteFlagsFor(index)) != layer))
+      if (index != 0 && (!layer || (layer & *_memory.spriteFlagsFor(index)) == layer))
         spr(index, x + tx * gfx::SPRITE_WIDTH, y + ty * gfx::SPRITE_HEIGHT);
     }
+    printf("\n");
+  }
 }
 
 

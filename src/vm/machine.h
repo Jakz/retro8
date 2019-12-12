@@ -33,7 +33,7 @@ namespace retro8
 
     static constexpr address_t SCREEN_DATA = 0x6000;
 
-    static constexpr address_t TILE_MAP_LOWER = 0x1000;
+    static constexpr address_t TILE_MAP_LOW = 0x1000;
     static constexpr address_t TILE_MAP_HIGH = 0x2000;
   };
 
@@ -61,6 +61,8 @@ namespace retro8
       *cursor() = { 0, 0 };
     }
 
+    uint8_t* base() { return memory; }
+
     gfx::color_byte_t* penColor() { return reinterpret_cast<gfx::color_byte_t*>(&memory[address::PEN_COLOR]); }
     gfx::cursor_t* cursor() { return as<gfx::cursor_t>(address::CURSOR); }
     gfx::camera_t* camera() { return as<gfx::camera_t>(address::CAMERA); }
@@ -82,11 +84,11 @@ namespace retro8
       sprite_index_t *addr;
 
       if (y >= ROWS_PER_TILE_MAP_HALF)
-        addr = as<sprite_index_t>(address::TILE_MAP_LOWER) + x + (y - ROWS_PER_TILE_MAP_HALF) * gfx::TILE_MAP_WIDTH * sizeof(sprite_index_t);
+        addr = as<sprite_index_t>(address::TILE_MAP_LOW) + x + (y - ROWS_PER_TILE_MAP_HALF) * gfx::TILE_MAP_WIDTH * sizeof(sprite_index_t);
       else
         addr = as<sprite_index_t>(address::TILE_MAP_HIGH) + x + y * gfx::TILE_MAP_WIDTH * sizeof(sprite_index_t);
 
-      assert((addr >= memory + address::TILE_MAP_LOWER && addr <= memory + address::TILE_MAP_LOWER * gfx::TILE_MAP_WIDTH * gfx::TILE_MAP_HEIGHT * sizeof(sprite_index_t)));
+      assert((addr >= memory + address::TILE_MAP_LOW && addr <= memory + address::TILE_MAP_LOW * gfx::TILE_MAP_WIDTH * gfx::TILE_MAP_HEIGHT * sizeof(sprite_index_t)));
 
       return addr;
     }
@@ -96,7 +98,7 @@ namespace retro8
         + (index % gfx::SPRITES_PER_SPRITE_SHEET_ROW) * gfx::SPRITE_BYTES_PER_SPRITE_ROW]
         + (index / gfx::SPRITES_PER_SPRITE_SHEET_ROW) * gfx::SPRITE_SHEET_WIDTH_IN_BYTES * gfx::SPRITE_HEIGHT
         ); }
-    gfx::palette_t* paletteAt(size_t index) { return reinterpret_cast<gfx::palette_t*>(&memory[address::PALETTES + index * BYTES_PER_PALETTE]); }
+    gfx::palette_t* paletteAt(palette_index_t index) { return reinterpret_cast<gfx::palette_t*>(&memory[address::PALETTES + index * BYTES_PER_PALETTE]); }
 
     template<typename T> T* as(address_t addr) { return reinterpret_cast<T*>(&memory[addr]); }
   };
@@ -135,7 +137,7 @@ namespace retro8
     void circ(coord_t x, coord_t y, amount_t r, color_t color);
     void circfill(coord_t x, coord_t y, amount_t r, color_t color);
 
-    void pal(color_t c0, color_t c1);
+    void pal(color_t c0, color_t c1, palette_index_t index);
 
     void map(coord_t cx, coord_t cy, coord_t x, coord_t y, amount_t cw, amount_t ch, sprite_flags_t layer);
     void spr(index_t idx, coord_t x, coord_t y);

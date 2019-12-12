@@ -134,20 +134,37 @@ int spr(lua_State* L)
   int x = lua_tonumber(L, 2);
   int y = lua_tonumber(L, 3);
 
-  machine.spr(idx, x, y);
+  if (lua_gettop(L) > 3)
+  {
+    float w = 1.0f, h = 1.0f;
+    bool fx = false, fy = false;
+    machine.spr(idx, x, y);
+  }
+  else
+    /* optimized path */
+    machine.spr(idx, x, y);
 
   return 0;
 }
 
 int pal(lua_State* L)
 {
-  int c0 = lua_tonumber(L, 1);
-  int c1 = lua_tonumber(L, 2);
+  /* no arguments, reset palette */
+  if (lua_gettop(L) == 0)
+  {
+    machine.memory().paletteAt(gfx::DRAW_PALETTE_INDEX)->reset();
+  }
+  else
+  {
+    int c0 = lua_tonumber(L, 1);
+    int c1 = lua_tonumber(L, 2);
+    palette_index_t index = gfx::DRAW_PALETTE_INDEX;
 
-  //TODO: third parameter to decide which palette
+    if (lua_gettop(L) == 3)
+      index = lua_tonumber(L, 3);
 
-  machine.pal(static_cast<color_t>(c0), static_cast<color_t>(c1));
-
+    machine.pal(static_cast<color_t>(c0), static_cast<color_t>(c1), index);
+  }
   return 0;
 }
 

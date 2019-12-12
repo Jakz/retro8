@@ -30,6 +30,7 @@ namespace retro8
   using sprite_index_t = uint8_t;
   using sprite_flags_t = uint8_t;
   using color_index_t = uint8_t;
+  using palette_index_t = size_t;
   using address_t = int32_t;
   struct point_t { coord_t x, y; };
 }

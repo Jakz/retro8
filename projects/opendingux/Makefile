@@ -5,10 +5,10 @@ CXX:= $(CROSS)g++
 SYSROOT:= $(shell $(CXX) -print-sysroot)
 CXXFLAGS += $(shell $(SYSROOT)/usr/bin/sdl2-config --cflags)
 LDFLAGS += $(shell $(SYSROOT)/usr/bin/sdl2-config --libs)
-LDFLAGS += -lSDL2_image -L$(shell pwd) -llua
+LDFLAGS += -lSDL2_image -L$(shell pwd) -llua -flto
 
 DISABLED_WARNINGS += -Wno-unused-parameter -Wno-missing-field-initializers -Wno-sign-compare -Wno-parentheses -Wno-unused-variable -Wno-reorder
-CXXFLAGS += -g -W -Wall -Wextra -std=c++0x $(DISABLED_WARNINGS) -I../../src
+CXXFLAGS += -g -O2 -W -Wall -Wextra -std=c++0x $(DISABLED_WARNINGS) -I../../src
 # -O2
 
 SOURCES := $(wildcard ../../src/*.cpp)

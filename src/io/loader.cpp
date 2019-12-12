@@ -104,7 +104,7 @@ void LoaderP8::load(const std::string& path, Machine& m)
     lines.push_back(line);
 
   for (auto& line : lines)
-    if (line.back() == '\r')
+    if (!line.empty() && line.back() == '\r')
       line.resize(line.length() - 1);
 
   enum class State { HEADER, CODE, GFX, GFF, LABEL, MAP, SFX, MUSIC };
@@ -186,7 +186,7 @@ void LoaderP8::load(const std::string& path, Machine& m)
         {
           const char* sflags = line.c_str() + x * 2;
           sprite_flags_t flags = spriteFlagsFromString(sflags);
-          *m.memory().spriteFlagsFor(x) = flags;
+          *m.memory().spriteFlagsFor(128*fy + x) = flags;
         }
         ++fy;
         break;

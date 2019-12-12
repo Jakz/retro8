@@ -7,7 +7,6 @@ function all(t)
       ni = ni + 1
     end
     for k,v in pairs(nt) do
-      print(k .. " " .. v)
     end
 
     local i = 0

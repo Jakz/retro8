@@ -6,6 +6,7 @@
 #include "catch.hpp"
 
 #include "vm/machine.h"
+#include "lua/lua.hpp"
 
 #include <unordered_set>
 
@@ -53,7 +54,25 @@ TEST_CASE("tilemap")
     REQUIRE(m.memory().spriteInTileMap(0, 0) - m.memory().base() == address::TILE_MAP_HIGH);
     REQUIRE(address::TILE_MAP_HIGH > address::TILE_MAP_LOW);
   }
+}
 
+TEST_CASE("lua language modifications")
+{
+  lua_State* L = luaL_newstate();
+
+  SECTION("!= operator")
+  {
+    SECTION("!= operator is compiled successfully")
+    {
+      const std::string code = "x = 5 != 4";
+
+      REQUIRE(luaL_loadstring(L, code.c_str()) == 0);
+      REQUIRE(lua_pcall(L, 0, 0, 0) == 0);
+    }
+
+  }
+
+  lua_close(L);
 
 }
 

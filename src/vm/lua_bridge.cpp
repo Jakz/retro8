@@ -4,6 +4,7 @@
 #include "lua/lua.hpp"
 
 #include <iostream>
+#include <fstream>
 
 using namespace lua;
 using namespace retro8;
@@ -605,9 +606,29 @@ Code::~Code()
     lua_close(L);
 }
 
+void Code::loadAPI()
+{
+  if (!L)
+  {
+    L = luaL_newstate();
+  }
+  
+  std::ifstream apiFile("api.lua");
+  std::string api((std::istreambuf_iterator<char>(apiFile)), std::istreambuf_iterator<char>());
+
+  if (luaL_dostring(L, api.c_str()))
+  {
+    const char* message = lua_tostring(L, -1);
+    std::cout << "Error while loading API: " << message << std::endl;
+    getchar();
+  }
+
+}
+
 void Code::initFromSource(const std::string& code)
 {
-  L = luaL_newstate();
+  if (!L)
+    L = luaL_newstate();
 
   luaopen_base(L);
   luaopen_table(L);

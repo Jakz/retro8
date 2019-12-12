@@ -22,6 +22,7 @@ namespace lua
     Code() : L(nullptr) { }
     ~Code();
 
+    void loadAPI();
     void initFromSource(const std::string& code);
     void callVoidFunction(const char* name);
 

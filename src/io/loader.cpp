@@ -122,12 +122,6 @@ void LoaderP8::load(const std::string& path, Machine& m)
   static constexpr size_t DIGITS_PER_MAP_ROW = 256;
   static constexpr size_t DIGITS_PER_SPRITE_FLAGS_ROW = 128*2;
 
-
-  std::ifstream apiFile("api.lua");
-  std::string api((std::istreambuf_iterator<char>(apiFile)), std::istreambuf_iterator<char>());
-
-  code << api;
-
   for (auto& line : lines)
   {
     /* change state according to */

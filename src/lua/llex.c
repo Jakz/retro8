@@ -505,7 +505,8 @@ static int llex (LexState *ls, SemInfo *seminfo) {
       }
       case '+': {
         next(ls);
-        if (check_next1(ls, '=')) return TK_ASSADD;
+        if (check_next1(ls, '=')) 
+          return TK_ASSADD;
         else return '+';
       }
       case '*': {

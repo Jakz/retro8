@@ -1151,7 +1151,7 @@ static void assignment (LexState *ls, struct LHS_assign *lh, int nvars) {
   if (testnext(ls, ',')) {  /* assignment -> ',' suffixedexp assignment */
     struct LHS_assign nv;
     nv.prev = lh;
-    suffixedexp(ls, &nv.v);
+    suffixedexp(ls, &nv.v); // read next lhs into nv
     if (nv.v.k != VINDEXED)
       check_conflict(ls, lh, &nv.v);
     checklimit(ls->fs, nvars + ls->L->nCcalls, LUAI_MAXCCALLS,
@@ -1160,13 +1160,29 @@ static void assignment (LexState *ls, struct LHS_assign *lh, int nvars) {
   }
   else {  /* assignment -> '=' explist */
     int nexps;
-    checknext(ls, '=');
+
+    BinOpr op = op_for_compound_assign(ls->t);
+
+    if (op == OPR_NOBINOPR && ls->t.token != '=')
+      luaX_syntaxerror(ls, luaO_pushfstring(ls->L, "expected assignment operator"));
+
+    luaX_next(ls);
+
     nexps = explist(ls, &e);
     if (nexps != nvars)
       adjust_assign(ls, nvars, nexps, &e);
     else {
       luaK_setoneret(ls->fs, &e);  /* close last expression */
-      luaK_storevar(ls->fs, &lh->v, &e);
+
+      if (op != OPR_NOBINOPR)
+      {
+        expdesc ec = lh->v;
+        luaK_infix(ls->fs, op, &ec);
+        luaK_posfix(ls->fs, op, &ec, &e, ls->linenumber); 
+        luaK_storevar(ls->fs, &lh->v, &ec);
+      }
+      else
+        luaK_storevar(ls->fs, &lh->v, &e);
       return;  /* avoid default */
     }
   }
@@ -1486,12 +1502,32 @@ static void funcstat (LexState *ls, int line) {
 }
 
 
+static BinOpr op_for_compound_assign(Token r)
+{
+  switch (r.token) {
+  case TK_ASSADD:
+    return OPR_ADD;
+  case TK_ASSDIV:
+    return OPR_DIV;
+  case TK_ASSMUL:
+    return OPR_MUL;
+  case TK_ASSSUB:
+    return OPR_SUB;
+  case TK_ASSMOD: 
+    return OPR_MOD;
+  default:
+    return OPR_NOBINOPR;
+  }
+}
+
+
 static void exprstat (LexState *ls) {
   /* stat -> func | assignment */
   FuncState *fs = ls->fs;
   struct LHS_assign v;
   suffixedexp(ls, &v.v);
-  if (ls->t.token == '=' || ls->t.token == ',') { /* stat -> assignment ? */
+
+  if (ls->t.token == '=' || ls->t.token == ',' || op_for_compound_assign(ls->t) != OPR_NOBINOPR) { /* stat -> assignment ? */
     v.prev = NULL;
     assignment(ls, &v, 1);
   }

@@ -144,7 +144,7 @@ void LoaderP8::load(const std::string& path, Machine& m)
       switch (state)
       {
       case State::CODE:
-        fixOperators(line);
+        //fixOperators(line);
         code << line << std::endl;
         break;
 

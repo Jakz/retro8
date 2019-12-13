@@ -1019,7 +1019,7 @@ static void codeunexpval (FuncState *fs, OpCode op, expdesc *e, int line) {
 ** in "stack order" (that is, first on 'e2', which may have more
 ** recent registers to be released).
 */
-static void codebinexpval (FuncState *fs, OpCode op,
+void codebinexpval (FuncState *fs, OpCode op,
                            expdesc *e1, expdesc *e2, int line) {
   int rk2 = luaK_exp2RK(fs, e2);  /* both operands are "RK" */
   int rk1 = luaK_exp2RK(fs, e1);

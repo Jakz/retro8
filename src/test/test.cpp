@@ -102,6 +102,19 @@ TEST_CASE("lua language modifications")
     REQUIRE(lua_tonumber(L, -1) == expected);
   }
 
+  SECTION("compound assignment")
+  {
+    SECTION("+= operator")
+    {
+      std::string code = "x = 2; x += 4; return x";
+      REQUIRE(luaL_loadstring(L, code.c_str()) == 0);
+      REQUIRE(lua_pcall(L, 0, 1, 0) == 0);
+      REQUIRE(lua_tonumber(L, -1) == 6);
+    }
+
+
+  }
+
   lua_close(L);
 
 }

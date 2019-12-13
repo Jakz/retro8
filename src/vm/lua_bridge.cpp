@@ -613,6 +613,8 @@ void Code::loadAPI()
     L = luaL_newstate();
   }
   
+  return;
+
   std::ifstream apiFile("api.lua");
   std::string api((std::istreambuf_iterator<char>(apiFile)), std::istreambuf_iterator<char>());
 

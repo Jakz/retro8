@@ -84,5 +84,7 @@ LUAI_FUNC void luaK_posfix (FuncState *fs, BinOpr op, expdesc *v1,
                             expdesc *v2, int line);
 LUAI_FUNC void luaK_setlist (FuncState *fs, int base, int nelems, int tostore);
 
+LUAI_FUNC void codebinexpval(FuncState *fs, OpCode op, expdesc *e1, expdesc *e2, int line);
+
 
 #endif

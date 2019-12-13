@@ -100,7 +100,7 @@ void GameView::render()
     machine.code().loadAPI();
 
     retro8::io::LoaderP8 loader;
-    std::string path = !_path.empty() ? _path : "test.p8";
+    std::string path = !_path.empty() ? _path : "pico_physics.p8";
     loader.load(path, machine);
 
     manager->setFrameRate(machine.code().require60fps() ? 60 : 30);

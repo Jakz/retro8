@@ -72,6 +72,36 @@ TEST_CASE("lua language modifications")
 
   }
 
+  SECTION("binary literals")
+  {
+    std::string literal;
+    int expected = 0;
+    
+    SECTION("0b1")
+    {
+      literal = "0b1";
+      expected = 0b1;
+    }
+
+    SECTION("0b100")
+    {
+      literal = "0b100";
+      expected = 0b100;
+    }
+
+    SECTION("0b000")
+    {
+      literal = "0b000";
+      expected = 0b000;
+    }
+
+
+    const std::string code = "x = " + literal + "; return x";
+    REQUIRE(luaL_loadstring(L, code.c_str()) == 0);
+    REQUIRE(lua_pcall(L, 0, 1, 0) == 0);
+    REQUIRE(lua_tonumber(L, -1) == expected);
+  }
+
   lua_close(L);
 
 }

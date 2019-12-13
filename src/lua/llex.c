@@ -243,7 +243,6 @@ static int read_numeral (LexState *ls, SemInfo *seminfo) {
   }
 }
 
-
 /*
 ** skip a sequence '[=*[' or ']=*]'; if sequence is well formed, return
 ** its number of '='s; otherwise, return a negative number (-1 iff there

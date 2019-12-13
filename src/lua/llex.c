@@ -491,6 +491,7 @@ static int llex (LexState *ls, SemInfo *seminfo) {
       case '/': {
         next(ls);
         if (check_next1(ls, '/')) return TK_IDIV;
+        else if (check_next1(ls, '=')) return TK_ASSDIV;
         else return '/';
       }
       case '~': {
@@ -513,11 +514,6 @@ static int llex (LexState *ls, SemInfo *seminfo) {
         next(ls);
         if (check_next1(ls, '=')) return TK_ASSMUL;
         else return '*';
-      }
-      case '//': {
-        next(ls);
-        if (check_next1(ls, '=')) return TK_ASSDIV;
-        else return '//';
       }
       case '%': {
         next(ls);

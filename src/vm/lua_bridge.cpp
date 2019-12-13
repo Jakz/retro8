@@ -3,6 +3,7 @@
 #include "machine.h"
 #include "lua/lua.hpp"
 
+#include <functional>
 #include <iostream>
 #include <fstream>
 
@@ -414,12 +415,20 @@ namespace math
     return 1;
   }
 
+#define FAIL_IF_NOT_NUMBER(i) do { if (!lua_isnumber(L, i)) { printf("Expected number but got %s\n", lua_typename(L, i)); assert(false); } } while (false)
+
   int min(lua_State* L)
   {
-    assert(lua_isnumber(L, 1));
-    assert(lua_isnumber(L, 2));
+    FAIL_IF_NOT_NUMBER(1);
+    real_t v1 = lua_tonumber(L, 1);
+    real_t v2 = 0;
 
-    real_t v1 = lua_tonumber(L, 1), v2 = lua_tonumber(L, 2);
+    if (lua_gettop(L) == 2)
+    {
+      FAIL_IF_NOT_NUMBER(2);
+      v2 = lua_tonumber(L, 2);
+    }
+
     lua_pushnumber(L, std::min(v1, v2));
 
     return 1;
@@ -427,10 +436,16 @@ namespace math
 
   int max(lua_State* L)
   {
-    assert(lua_isnumber(L, 1));
-    assert(lua_isnumber(L, 2));
+    FAIL_IF_NOT_NUMBER(1);
+    real_t v1 = lua_tonumber(L, 1);
+    real_t v2 = 0;
 
-    real_t v1 = lua_tonumber(L, 1), v2 = lua_tonumber(L, 2);
+    if (lua_gettop(L) == 2)
+    {
+      FAIL_IF_NOT_NUMBER(2);
+      v2 = lua_tonumber(L, 2);
+    }
+
     lua_pushnumber(L, std::max(v1, v2));
 
     return 1;
@@ -472,6 +487,35 @@ namespace math
 
     real_t v = lua_tonumber(L, 1);
     lua_pushnumber(L, v > 0 ? 1.0 : -1.0);
+
+    return 1;
+  }
+
+  int sqrt(lua_State* L)
+  {
+    assert(lua_isnumber(L, 1));
+
+    real_t v = lua_tonumber(L, 1);
+    lua_pushnumber(L, sqrtf(v));
+
+    return 1;
+  }
+}
+
+namespace bitwise
+{
+  using data_t = uint64_t;
+
+  template<typename F>
+  int bitwise(lua_State* L)
+  {
+    assert(lua_isnumber(L, 1));
+    assert(lua_isnumber(L, 2));
+
+    uint64_t a = lua_tonumber(L, 1);
+    uint64_t b = lua_tonumber(L, 2);
+
+    lua_pushnumber(L, F()(a,b));
 
     return 1;
   }
@@ -590,6 +634,10 @@ void lua::registerFunctions(lua_State* L)
   lua_register(L, "mid", math::mid);
   lua_register(L, "abs", math::abs);
   lua_register(L, "sgn", math::sgn);
+  lua_register(L, "sqrt", math::sqrt);
+
+  lua_register(L, "band", bitwise::bitwise<std::bit_and<uint64_t>>);
+
 
   lua_register(L, "music", sound::music);
   lua_register(L, "sfx", sound::music);

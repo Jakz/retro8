@@ -170,12 +170,13 @@ void Machine::circfill(coord_t xc, coord_t yc, amount_t r, color_t color)
 void Machine::spr(index_t idx, coord_t x, coord_t y)
 {
   const gfx::sprite_t* sprite = _memory.spriteAt(idx);
+  const gfx::palette_t* palette = _memory.paletteAt(gfx::DRAW_PALETTE_INDEX);
 
   for (coord_t ty = 0; ty < gfx::SPRITE_HEIGHT; ++ty)
     for (coord_t tx = 0; tx < gfx::SPRITE_WIDTH; ++tx)
     {
       color_t color = sprite->get(tx, ty);
-      if (color != 0) //TODO: manage real transparency through flags
+      if (!palette->transparent(color)) //TODO: manage real transparency through flags
         pset(x + tx, y + ty, sprite->get(tx, ty));
     }
 

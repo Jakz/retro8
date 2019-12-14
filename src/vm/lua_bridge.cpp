@@ -170,6 +170,24 @@ int pal(lua_State* L)
   return 0;
 }
 
+int palt(lua_State* L)
+{
+  /* no arguments, reset palette */
+  if (lua_gettop(L) == 0)
+  {
+    machine.memory().paletteAt(gfx::DRAW_PALETTE_INDEX)->resetTransparency();
+  }
+  else
+  {
+    color_t c = color_t(int(lua_tonumber(L, 1)));
+    int f = lua_toboolean(L, 2);
+    palette_index_t index = gfx::DRAW_PALETTE_INDEX;
+
+    machine.memory().paletteAt(gfx::DRAW_PALETTE_INDEX)->transparent(c, f);
+  }
+  return 0;
+}
+
 namespace draw
 {
   int clip(lua_State* L)
@@ -512,10 +530,23 @@ namespace bitwise
     assert(lua_isnumber(L, 1));
     assert(lua_isnumber(L, 2));
 
-    uint64_t a = lua_tonumber(L, 1);
-    uint64_t b = lua_tonumber(L, 2);
+    data_t a = lua_tonumber(L, 1);
+    data_t b = lua_tonumber(L, 2);
 
     lua_pushnumber(L, F()(a,b));
+
+    return 1;
+  }
+
+  inline int band(lua_State* L) { return bitwise<std::bit_and<data_t>>(L); }
+  
+  int bnot(lua_State* L)
+  {
+    assert(lua_isnumber(L, 1));
+
+    data_t a = lua_tonumber(L, 1);
+
+    lua_pushnumber(L, std::bit_not<data_t>()(a));
 
     return 1;
   }
@@ -583,7 +614,17 @@ namespace platform
   int stat(lua_State* L)
   {
     //TODO: implement
-    lua_pushinteger(L, 0);
+
+    enum class Stat { FRAME_RATE = 7 };
+    Stat s = static_cast<Stat>((int)lua_tonumber(L, -1));
+
+
+    switch (s)
+    {
+    case Stat::FRAME_RATE: lua_pushnumber(L, machine.code().require60fps() ? 60 : 30); break;
+      default: lua_pushnumber(L, 0);
+
+    }
 
     return 1;
   }
@@ -601,6 +642,7 @@ void lua::registerFunctions(lua_State* L)
   lua_register(L, "pset", pset);
   lua_register(L, "pget", pget);
   lua_register(L, "pal", pal);
+  lua_register(L, "palt", palt);
   lua_register(L, "color", color);
   lua_register(L, "line", line);
   lua_register(L, "rect", rect);
@@ -636,7 +678,8 @@ void lua::registerFunctions(lua_State* L)
   lua_register(L, "sgn", math::sgn);
   lua_register(L, "sqrt", math::sqrt);
 
-  lua_register(L, "band", bitwise::bitwise<std::bit_and<uint64_t>>);
+  lua_register(L, "band", bitwise::band);
+  lua_register(L, "bnot", bitwise::bnot);
 
 
   lua_register(L, "music", sound::music);
@@ -661,8 +704,6 @@ void Code::loadAPI()
     L = luaL_newstate();
   }
   
-  return;
-
   std::ifstream apiFile("api.lua");
   std::string api((std::istreambuf_iterator<char>(apiFile)), std::istreambuf_iterator<char>());
 

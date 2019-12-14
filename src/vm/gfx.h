@@ -120,19 +120,30 @@ namespace retro8
 
     class palette_t
     {
-      std::array<color_t, COLOR_COUNT> colors;
+      std::array<uint8_t, COLOR_COUNT> colors;
 
     public:
       void reset()
       {
         for (size_t i = 0; i < COLOR_COUNT; ++i)
-          colors[i] = (color_t)i;
+          colors[i] = i;
+        transparent(color_t::BLACK, true);
+      }
+
+      void resetTransparency()
+      {
+        transparent(color_t::BLACK, true);
+
+        for (size_t i = 1; i < COLOR_COUNT; ++i)
+          transparent(color_t(i), false);
       }
 
       //TODO: %16 to make it wrap around, is it intended behavior? mandel.
-      color_t get(color_t i) const { return (color_t)(colors[i%COLOR_COUNT] % COLOR_COUNT); }
-      color_t set(color_t i, color_t color) { return colors[i] = color; }
-      color_t operator[](color_t i) { return (color_t)(colors[i%COLOR_COUNT] % COLOR_COUNT); }
+      color_t get(color_t i) const { return color_t(colors[i] & 0x0F); }
+      void set(color_t i, color_t color) { colors[i] |= color | (colors[i] & 0x10); }
+      color_t operator[](color_t i) { return get(i); }
+      bool transparent(color_t i) const { return (colors[i] & 0x10) != 0; }
+      void transparent(color_t i, bool f) { colors[i] = f ? (colors[i] | 0x10) : (colors[i] & 0x0f); }
     };
 
     struct clip_rect_t

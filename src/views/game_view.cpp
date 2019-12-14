@@ -109,6 +109,9 @@ void GameView::render()
     if (machine.code().hasInit())
       machine.code().init();
 
+    machine.sound().init();
+    machine.sound().resume();
+
     /*for (int i = 0; i < 32; ++i)
       machine.circ(64, 64, i+1, (r8::color_t)(i % 15 + 1));*/
 
@@ -264,4 +267,6 @@ GameView::~GameView()
 {
   SDL_FreeSurface(_output);
   SDL_DestroyTexture(_outputTexture);
+
+  machine.sound().close();
 }

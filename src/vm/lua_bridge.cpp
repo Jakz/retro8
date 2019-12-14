@@ -699,8 +699,8 @@ void lua::registerFunctions(lua_State* L)
   lua_register(L, "bnot", bitwise::bnot);
 
 
-  lua_register(L, "music", sound::music);
-  lua_register(L, "sfx", sound::music);
+  lua_register(L, "music", ::sound::music);
+  lua_register(L, "sfx", ::sound::music);
 
   lua_register(L, "btn", platform::btn);
   lua_register(L, "btnp", platform::btnp);

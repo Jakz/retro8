@@ -3,6 +3,7 @@
 #include "common.h"
 #include "defines.h"
 #include "gfx.h"
+#include "sound.h"
 #include "lua_bridge.h"
 
 #include <SDL.h>
@@ -108,9 +109,12 @@ namespace retro8
   private:
     State _state;
     Memory _memory;
+    sound::APU _sound;
     gfx::Font _font;
     lua::Code _code;
     SDL_Surface* _output;
+
+    
 
   private:
     void circHelper(coord_t xc, coord_t yc, coord_t x, coord_t y, color_t col);
@@ -148,5 +152,6 @@ namespace retro8
     Memory& memory() { return _memory; }
     gfx::Font& font() { return _font; }
     lua::Code& code() { return _code; }
+    sound::APU& sound() { return _sound; }
   };
 }

@@ -132,6 +132,9 @@
     <ClInclude Include="..\..\..\src\lua\lua.hpp">
       <Filter>src\lua</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\vm\sound.h">
+      <Filter>src\vm</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\main.cpp">
@@ -259,6 +262,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\lua\lmathlib.c">
       <Filter>src\lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\vm\sound.cpp">
+      <Filter>src\vm</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

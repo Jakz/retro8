@@ -49,6 +49,8 @@ private:
   bit_mask<T>(utype value) : value(value) { }
 };
 
+#define SOUND_ENABLED true
+
 
 #ifdef _WIN32
 #define MOUSE_ENABLED true

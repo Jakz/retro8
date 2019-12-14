@@ -1396,6 +1396,35 @@ static void forstat (LexState *ls, int line) {
 }
 
 
+static void inline_if(LexState* ls)
+{
+  BlockCnt bl;
+  FuncState* fs = ls->fs;
+  expdesc v;
+  int jf;
+  
+  /* IF ( COND ) block */
+  checknext(ls, TK_IF); /* consume IF */
+  checknext(ls, '('); /* consume ( */
+  expr(ls, &v); /* parse condition */
+  checknext(ls, ')'); /* consume ) */
+
+  if (ls->t.token == TK_GOTO || ls->t.token == TK_BREAK)
+    luaX_syntaxerror(ls, luaO_pushfstring(ls->L, "unsupported goto or break in inline if"));
+  
+  luaK_goiftrue(ls->fs, &v);  /* skip over block if condition is false */
+  enterblock(fs, &bl, 0);
+  jf = v.f;
+
+  statement(ls);  /* parse true block */
+  leaveblock(fs);
+
+  luaK_patchtohere(fs, jf);
+
+  if (testnext(ls, TK_ELSE))
+    block(ls);  /* 'else' part */
+}
+
 static void test_then_block (LexState *ls, int *escapelist) {
   /* test_then_block -> [IF | ELSEIF] cond THEN block */
   BlockCnt bl;
@@ -1403,6 +1432,7 @@ static void test_then_block (LexState *ls, int *escapelist) {
   expdesc v;
   int jf;  /* instruction to skip 'then' code (if condition is false) */
   luaX_next(ls);  /* skip IF or ELSEIF */
+
   expr(ls, &v);  /* read condition */
   checknext(ls, TK_THEN);
   if (ls->t.token == TK_GOTO || ls->t.token == TK_BREAK) {
@@ -1432,6 +1462,12 @@ static void test_then_block (LexState *ls, int *escapelist) {
 
 
 static void ifstat (LexState *ls, int line) {
+  /* inline if */
+  if (luaX_lookahead(ls) == '(') {
+    inline_if(ls);
+    return;
+  }
+
   /* ifstat -> IF cond THEN block {ELSEIF cond THEN block} [ELSE block] END */
   FuncState *fs = ls->fs;
   int escapelist = NO_JUMP;  /* exit list for finished parts */

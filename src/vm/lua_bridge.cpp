@@ -7,6 +7,9 @@
 #include <iostream>
 #include <fstream>
 
+#pragma warning(push)
+#pragma warning(disable: 4244)
+
 using namespace lua;
 using namespace retro8;
 
@@ -649,6 +652,8 @@ namespace platform
   }
 }
 
+#pragma warning(pop)
+
 void lua::registerFunctions(lua_State* L)
 {
   lua_register(L, "pset", pset);
@@ -720,12 +725,7 @@ void Code::loadAPI()
   std::string api((std::istreambuf_iterator<char>(apiFile)), std::istreambuf_iterator<char>());
 
   if (luaL_dostring(L, api.c_str()))
-  {
-    const char* message = lua_tostring(L, -1);
-    std::cout << "Error while loading API: " << message << std::endl;
-    getchar();
-  }
-
+    printError("api.lua loading");
 }
 
 void Code::printError(const char* where)
@@ -743,7 +743,6 @@ void Code::printError(const char* where)
       std::cout << message << std::endl;
     }
   }
-
   getchar();
 }
 

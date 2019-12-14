@@ -126,7 +126,7 @@ namespace retro8
       void reset()
       {
         for (size_t i = 0; i < COLOR_COUNT; ++i)
-          colors[i] = i;
+          colors[i] = uint8_t(i);
         transparent(color_t::BLACK, true);
       }
 

@@ -150,7 +150,7 @@ void LoaderP8::load(const std::string& path, Machine& m)
 
       case State::GFX:
         assert(line.length() == DIGITS_PER_PIXEL_ROW);
-        for (size_t x = 0; x < BYTES_PER_GFX_ROW; ++x)
+        for (coord_t x = 0; x < BYTES_PER_GFX_ROW; ++x)
         {
           const char* pair = line.c_str() + x * 2;
           auto* dest = m.memory().as<gfx::color_byte_t>(address::SPRITE_SHEET + sy * BYTES_PER_GFX_ROW + x);
@@ -164,7 +164,7 @@ void LoaderP8::load(const std::string& path, Machine& m)
       case State::MAP:
       {
         assert(line.length() == DIGITS_PER_MAP_ROW);
-        for (size_t x = 0; x < gfx::TILE_MAP_WIDTH; ++x)
+        for (coord_t x = 0; x < gfx::TILE_MAP_WIDTH; ++x)
         {
           const char* index = line.c_str() + x * 2;
           sprite_index_t sindex = spriteIndexFromString(index);
@@ -176,7 +176,7 @@ void LoaderP8::load(const std::string& path, Machine& m)
       case State::GFF:
       {
         assert(line.length() == DIGITS_PER_SPRITE_FLAGS_ROW);
-        for (size_t x = 0; x < DIGITS_PER_SPRITE_FLAGS_ROW/2; ++x)
+        for (coord_t x = 0; x < DIGITS_PER_SPRITE_FLAGS_ROW/2; ++x)
         {
           const char* sflags = line.c_str() + x * 2;
           sprite_flags_t flags = spriteFlagsFromString(sflags);

@@ -1144,6 +1144,24 @@ static void check_conflict (LexState *ls, struct LHS_assign *lh, expdesc *v) {
   }
 }
 
+static BinOpr op_for_compound_assign(Token r)
+{
+  switch (r.token) {
+  case TK_ASSADD:
+    return OPR_ADD;
+  case TK_ASSDIV:
+    return OPR_DIV;
+  case TK_ASSMUL:
+    return OPR_MUL;
+  case TK_ASSSUB:
+    return OPR_SUB;
+  case TK_ASSMOD:
+    return OPR_MOD;
+  default:
+    return OPR_NOBINOPR;
+  }
+}
+
 
 static void assignment (LexState *ls, struct LHS_assign *lh, int nvars) {
   expdesc e;
@@ -1178,7 +1196,7 @@ static void assignment (LexState *ls, struct LHS_assign *lh, int nvars) {
       {
         expdesc ec = lh->v;
         luaK_infix(ls->fs, op, &ec);
-        luaK_posfix(ls->fs, op, &ec, &e, ls->linenumber); 
+        luaK_posfix(ls->fs, op, &ec, &e, ls->linenumber);
         luaK_storevar(ls->fs, &lh->v, &ec);
       }
       else
@@ -1403,10 +1421,10 @@ static void inline_if(LexState* ls, expdesc* v)
   BlockCnt bl;
   FuncState* fs = ls->fs;
   int jf;
-  
+
   if (ls->t.token == TK_GOTO || ls->t.token == TK_BREAK)
     luaX_syntaxerror(ls, luaO_pushfstring(ls->L, "unsupported goto or break in inline if"));
-  
+
   luaK_goiftrue(ls->fs, v);  /* skip over block if condition is false */
   enterblock(fs, &bl, 0);
   jf = v->f;
@@ -1473,7 +1491,7 @@ static void ifstat (LexState *ls, int line) {
   /* ifstat -> IF cond THEN block {ELSEIF cond THEN block} [ELSE block] END */
   FuncState *fs = ls->fs;
   int escapelist = NO_JUMP;  /* exit list for finished parts */
-  
+
   if (test_then_block(ls, &escapelist))  /* IF cond THEN block */
     return;
 
@@ -1541,26 +1559,6 @@ static void funcstat (LexState *ls, int line) {
   luaK_storevar(ls->fs, &v, &b);
   luaK_fixline(ls->fs, line);  /* definition "happens" in the first line */
 }
-
-
-static BinOpr op_for_compound_assign(Token r)
-{
-  switch (r.token) {
-  case TK_ASSADD:
-    return OPR_ADD;
-  case TK_ASSDIV:
-    return OPR_DIV;
-  case TK_ASSMUL:
-    return OPR_MUL;
-  case TK_ASSSUB:
-    return OPR_SUB;
-  case TK_ASSMOD: 
-    return OPR_MOD;
-  default:
-    return OPR_NOBINOPR;
-  }
-}
-
 
 static void exprstat (LexState *ls) {
   /* stat -> func | assignment */
@@ -1725,4 +1723,3 @@ LClosure *luaY_parser (lua_State *L, ZIO *z, Mbuffer *buff,
   L->top--;  /* remove scanner's table */
   return cl;  /* closure is on the stack, too */
 }
-

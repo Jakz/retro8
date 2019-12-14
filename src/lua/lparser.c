@@ -1396,25 +1396,20 @@ static void forstat (LexState *ls, int line) {
 }
 
 
-static void inline_if(LexState* ls)
+static void inline_if(LexState* ls, expdesc* v)
 {
+  /* IF ( COND ) block [ELSE block]*/
+
   BlockCnt bl;
   FuncState* fs = ls->fs;
-  expdesc v;
   int jf;
   
-  /* IF ( COND ) block */
-  checknext(ls, TK_IF); /* consume IF */
-  checknext(ls, '('); /* consume ( */
-  expr(ls, &v); /* parse condition */
-  checknext(ls, ')'); /* consume ) */
-
   if (ls->t.token == TK_GOTO || ls->t.token == TK_BREAK)
     luaX_syntaxerror(ls, luaO_pushfstring(ls->L, "unsupported goto or break in inline if"));
   
-  luaK_goiftrue(ls->fs, &v);  /* skip over block if condition is false */
+  luaK_goiftrue(ls->fs, v);  /* skip over block if condition is false */
   enterblock(fs, &bl, 0);
-  jf = v.f;
+  jf = v->f;
 
   statement(ls);  /* parse true block */
   leaveblock(fs);
@@ -1425,7 +1420,7 @@ static void inline_if(LexState* ls)
     block(ls);  /* 'else' part */
 }
 
-static void test_then_block (LexState *ls, int *escapelist) {
+static int test_then_block (LexState *ls, int *escapelist) {
   /* test_then_block -> [IF | ELSEIF] cond THEN block */
   BlockCnt bl;
   FuncState *fs = ls->fs;
@@ -1433,7 +1428,23 @@ static void test_then_block (LexState *ls, int *escapelist) {
   int jf;  /* instruction to skip 'then' code (if condition is false) */
   luaX_next(ls);  /* skip IF or ELSEIF */
 
+  int maybeInline = ls->t.token == '(';
+
+  if (maybeInline) /* consume '(' */
+    checknext(ls, '(');
+
   expr(ls, &v);  /* read condition */
+
+  /* if we have a closing paren and there is no then, it's an inline */
+  maybeInline = maybeInline & ls->t.token == ')' && luaX_lookahead != TK_THEN;
+
+  if (maybeInline) /* surely inline inline, consume ')' */
+  {
+    checknext(ls, ')');
+    inline_if(ls, &v);
+    return 1;
+  }
+
   checknext(ls, TK_THEN);
   if (ls->t.token == TK_GOTO || ls->t.token == TK_BREAK) {
     luaK_goiffalse(ls->fs, &v);  /* will jump to label if condition is true */
@@ -1442,7 +1453,7 @@ static void test_then_block (LexState *ls, int *escapelist) {
     while (testnext(ls, ';')) {}  /* skip colons */
     if (block_follow(ls, 0)) {  /* 'goto' is the entire block? */
       leaveblock(fs);
-      return;  /* and that is it */
+      return 0;  /* and that is it */
     }
     else  /* must skip over 'then' part if condition is false */
       jf = luaK_jump(fs);
@@ -1458,20 +1469,18 @@ static void test_then_block (LexState *ls, int *escapelist) {
       ls->t.token == TK_ELSEIF)  /* followed by 'else'/'elseif'? */
     luaK_concat(fs, escapelist, luaK_jump(fs));  /* must jump over it */
   luaK_patchtohere(fs, jf);
+  return 0;
 }
 
 
 static void ifstat (LexState *ls, int line) {
-  /* inline if */
-  if (luaX_lookahead(ls) == '(') {
-    inline_if(ls);
-    return;
-  }
-
   /* ifstat -> IF cond THEN block {ELSEIF cond THEN block} [ELSE block] END */
   FuncState *fs = ls->fs;
   int escapelist = NO_JUMP;  /* exit list for finished parts */
-  test_then_block(ls, &escapelist);  /* IF cond THEN block */
+  
+  if (test_then_block(ls, &escapelist))  /* IF cond THEN block */
+    return;
+
   while (ls->t.token == TK_ELSEIF)
     test_then_block(ls, &escapelist);  /* ELSEIF cond THEN block */
   if (testnext(ls, TK_ELSE))

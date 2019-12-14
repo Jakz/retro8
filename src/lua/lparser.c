@@ -1430,17 +1430,13 @@ static int test_then_block (LexState *ls, int *escapelist) {
 
   int maybeInline = ls->t.token == '(';
 
-  if (maybeInline) /* consume '(' */
-    checknext(ls, '(');
-
   expr(ls, &v);  /* read condition */
 
-  /* if we have a closing paren and there is no then, it's an inline */
-  maybeInline = maybeInline & ls->t.token == ')' && luaX_lookahead != TK_THEN;
+  /* if we had parenthesis and there is no then, it's an inline */
+  maybeInline = maybeInline && ls->t.token != TK_THEN;
 
   if (maybeInline) /* surely inline inline, consume ')' */
   {
-    checknext(ls, ')');
     inline_if(ls, &v);
     return 1;
   }

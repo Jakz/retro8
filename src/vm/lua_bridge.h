@@ -23,6 +23,9 @@ namespace lua
     ~Code();
 
     void loadAPI();
+
+
+    void printError(const char* where);
     void initFromSource(const std::string& code);
     void callVoidFunction(const char* name);
 

@@ -12,6 +12,8 @@ using namespace retro8;
 
 extern retro8::Machine machine;
 
+using real_t = float;
+
 int pset(lua_State* L)
 {
   int args = lua_gettop(L);
@@ -138,9 +140,19 @@ int spr(lua_State* L)
 
   if (lua_gettop(L) > 3)
   {
-    float w = 1.0f, h = 1.0f;
+    assert(lua_gettop(L) >= 5);
+    
+    real_t w = lua_tonumber(L, 4);
+    real_t h = lua_tonumber(L, 5);
     bool fx = false, fy = false;
-    machine.spr(idx, x, y);
+
+    if (lua_gettop(L) >= 6)
+      fx = lua_toboolean(L, 6);
+
+    if (lua_gettop(L) >= 7)
+      fy = lua_toboolean(L, 7);
+   
+    machine.spr(idx, x, y, w, h, fx, fy);
   }
   else
     /* optimized path */
@@ -716,6 +728,25 @@ void Code::loadAPI()
 
 }
 
+void Code::printError(const char* where)
+{
+  //for (int i = 1; i < lua_gettop(L); ++i)
+  {
+    std::cout << "Error on " << where << std::endl;
+   
+    //luaL_traceback(L, L, NULL, 1);
+    //printf("%s\n", lua_tostring(L, -1));
+    
+    if (lua_isstring(L, -1))
+    {
+      const char* message = lua_tostring(L, -1);
+      std::cout << message << std::endl;
+    }
+  }
+
+  getchar();
+}
+
 void Code::initFromSource(const std::string& code)
 {
   if (!L)
@@ -726,22 +757,16 @@ void Code::initFromSource(const std::string& code)
 
   registerFunctions(L);
 
+
+
   if (luaL_loadstring(L, code.c_str()))
-  {
-    const char* message = lua_tostring(L, -1);
-    std::cout << "Error: on loadstring: " << message << std::endl;
-    getchar();
-  }
+    printError("luaL_loadString");
 
   int error = lua_pcall(L, 0, 0, 0);
 
   if (error)
-  {
-    const char* message = lua_tostring(L, -1);
+    printError("lua_pcall on init");
 
-    std::cout << "Error: script not loaded " << message << std::endl;
-    getchar();
-  }
 
   lua_getglobal(L, "_update");
   if (lua_isfunction(L, -1))
@@ -781,12 +806,7 @@ void Code::callVoidFunction(const char* name)
   int error = lua_pcall(L, 0, 0, 0);
 
   if (error)
-  {
-    const char* message = lua_tostring(L, -1);
-
-    std::cout << "Error in " << name << " function: " << message << std::endl;
-    getchar();
-  }
+    printError(name);
 }
 
 void Code::update()

@@ -168,7 +168,7 @@ void Machine::circfill(coord_t xc, coord_t yc, amount_t r, color_t color)
 }
 
 void Machine::spr(index_t idx, coord_t x, coord_t y)
-{
+{  
   const gfx::sprite_t* sprite = _memory.spriteAt(idx);
   const gfx::palette_t* palette = _memory.paletteAt(gfx::DRAW_PALETTE_INDEX);
 
@@ -176,10 +176,36 @@ void Machine::spr(index_t idx, coord_t x, coord_t y)
     for (coord_t tx = 0; tx < gfx::SPRITE_WIDTH; ++tx)
     {
       color_t color = sprite->get(tx, ty);
-      if (!palette->transparent(color)) //TODO: manage real transparency through flags
-        pset(x + tx, y + ty, sprite->get(tx, ty));
+      if (!palette->transparent(color))
+        pset(x + tx, y + ty, color);
     }
+}
 
+void Machine::spr(index_t idx, coord_t bx, coord_t by, float sw, float sh, bool flipX, bool flipY)
+{
+  const gfx::palette_t* palette = _memory.paletteAt(gfx::DRAW_PALETTE_INDEX);
+  
+  coord_t w = sw * gfx::SPRITE_WIDTH;
+  coord_t h = sh * gfx::SPRITE_HEIGHT;
+
+  /* we bypass spriteAt since we can use directly the address */
+  const gfx::color_byte_t* base = reinterpret_cast<const gfx::color_byte_t*>(_memory.spriteAt(idx));
+ 
+  for (coord_t y = 0; y < h; ++y)
+  {
+    for (coord_t x = 0; x < w; ++x)
+    {
+      coord_t fx = flipX ? (w - x - 1) : x;
+      coord_t fy = flipY ? (h - y - 1) : y;
+      
+      //TODO: optimize by fetching only once if we need to read next pixel?
+      const gfx::color_byte_t pair = *(base + y * gfx::SPRITE_SHEET_WIDTH_IN_BYTES + x / gfx::PIXEL_TO_BYTE_RATIO);
+      const color_t color = pair.get(x);
+
+      if (!palette->transparent(color))
+        pset(bx + fx, by + fy, color);
+    }
+  }
 }
 
 // TODO: fix strange characters like symbols

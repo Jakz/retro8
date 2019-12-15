@@ -60,6 +60,7 @@ void GameView::render()
 
     SDL_Surface* font = IMG_Load("pico8_font.png");
     machine.font().load(font);
+    _font = SDL_CreateTextureFromSurface(manager->renderer(), font);
     SDL_FreeSurface(font);
 
     /*SDL_Surface* surface = IMG_Load("hello_p8_gfx.png");
@@ -100,8 +101,11 @@ void GameView::render()
     machine.code().loadAPI();
 
     retro8::io::LoaderP8 loader;
-    std::string path = !_path.empty() ? _path : "test.p8";
-    loader.load(path, machine);
+
+    if (_path.empty())
+      _path = "breakout_hero.p8";
+
+    loader.load(_path, machine);
 
     manager->setFrameRate(machine.code().require60fps() ? 60 : 30);
 
@@ -136,6 +140,8 @@ void GameView::render()
     printf("SDL Error: %s\n", SDL_GetError());
     assert(false);
   }
+
+  text(_path, 2, 2);
 
 SDL_Rect dest;
   //SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, machine.screen());
@@ -175,6 +181,29 @@ else
       SDL_FreeSurface(spritesheet);
     }
 
+    /* palettes */
+    {
+      SDL_Surface* palettes = SDL_CreateRGBSurface(0, 16, 2, 32, 0x00000000, 0x00ff0000, 0x0000ff00, 0x000000ff);
+
+      SDL_FillRect(palettes, nullptr, 0xFFFFFFFF);
+      auto* dest = static_cast<uint32_t*>(palettes->pixels);
+
+      for (r8::palette_index_t j = 0; j < 2; ++j)
+      {
+        const r8::gfx::palette_t* palette = machine.memory().paletteAt(j);
+
+        for (size_t i = 0; i < r8::gfx::COLOR_COUNT; ++i)
+          dest[j*16 + i] = r8::gfx::ColorTable::get(palette->get(r8::color_t(i)));
+      }
+
+      SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, palettes);
+      SDL_Rect destr = { (1024 - 286) , 300, 256, 32 };
+      SDL_RenderCopy(renderer, texture, nullptr, &destr);
+      SDL_DestroyTexture(texture);
+      SDL_FreeSurface(palettes);
+
+    }
+
     /* palette */
 
     {
@@ -211,6 +240,18 @@ else
 
   }
 #endif
+}
+
+void GameView::text(const std::string& text, int32_t x, int32_t y)
+{
+  constexpr int32_t GLYPHS_PER_ROW = 16;
+  
+  for (size_t i = 0; i < text.length(); ++i)
+  {
+    SDL_Rect src = { 8 * (i % GLYPHS_PER_ROW), 8 * (i / GLYPHS_PER_ROW), 4, 6 };
+    SDL_Rect dest = { x + 4 * i, y, 4, 6 };
+    SDL_RenderCopy(manager->renderer(), _font, &src, &dest);
+  }
 }
 
 void GameView::handleKeyboardEvent(const SDL_Event& event)

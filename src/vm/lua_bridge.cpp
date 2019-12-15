@@ -168,6 +168,7 @@ int pal(lua_State* L)
   if (lua_gettop(L) == 0)
   {
     machine.memory().paletteAt(gfx::DRAW_PALETTE_INDEX)->reset();
+    machine.memory().paletteAt(gfx::SCREEN_PALETTE_INDEX)->reset();
   }
   else
   {

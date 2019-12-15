@@ -226,7 +226,7 @@ void Machine::spr(index_t idx, coord_t bx, coord_t by, float sw, float sh, bool 
       coord_t fy = flipY ? (h - y - 1) : y;
       
       //TODO: optimize by fetching only once if we need to read next pixel?
-      const gfx::color_byte_t pair = *(base + y * gfx::SPRITE_SHEET_WIDTH_IN_BYTES + x / gfx::PIXEL_TO_BYTE_RATIO);
+      const gfx::color_byte_t pair = *(base + y * gfx::SPRITE_SHEET_PITCH + x / gfx::PIXEL_TO_BYTE_RATIO);
       const color_t color = pair.get(x);
 
       if (!palette->transparent(color))
@@ -235,23 +235,54 @@ void Machine::spr(index_t idx, coord_t bx, coord_t by, float sw, float sh, bool 
   }
 }
 
-// TODO: fix strange characters like symbols
+void Machine::sspr(coord_t sx, coord_t sy, coord_t sw, coord_t sh, coord_t dx, coord_t dy, coord_t dw, coord_t dh, bool flipX, bool flipY)
+{
+  const gfx::palette_t* palette = _memory.paletteAt(gfx::DRAW_PALETTE_INDEX);
+
+  float fx = sx, fy = sy;
+  float xr = sw / float(dw);
+  float yr = sh / float(dh);
+
+  //TODO: flipx flipy, test ratio calculation
+
+  for (coord_t y = 0; y < dh; ++y)
+  {
+    for (coord_t x = 0; x < dw; ++x)
+    {
+      coord_t cx = fx, cy = fy;
+      auto pair = _memory.spriteSheet(cx, cy);
+      auto color = pair->get(cx);
+
+      if (!palette->transparent(color))
+        pset(dx + x, dy + y, color);
+
+      fx += xr;
+    }
+
+    fx = sx;
+    fy += yr;
+  }
+}
+
+// TODO: add support for strange characters like symbols
 void Machine::print(const std::string& string, coord_t x, coord_t y, color_t color)
 {
   for (const auto c : string)
   {
     const auto sprite = _font.glyph(c);
+    
+    if (sprite)
+    {
+      for (coord_t ty = 0; ty < gfx::GLYPH_HEIGHT; ++ty)
+        for (coord_t tx = 0; tx < gfx::GLYPH_WIDTH; ++tx)
+        {
+          color_t fcolor = sprite->get(tx, ty);
+          if (fcolor != 0)
+            pset(x + tx, y + ty, color);
+        }
 
-    for (coord_t ty = 0; ty < gfx::GLYPH_HEIGHT; ++ty)
-      for (coord_t tx = 0; tx < gfx::GLYPH_WIDTH; ++tx)
-      {
-        //TODO: check if print is using pal override or not
-        color_t fcolor = sprite->get(tx, ty);
-        if (fcolor != 0)
-          pset(x + tx, y + ty, color);
-      }
-
-    x += 4;
+      x += 4;
+    }
   }
 }
 

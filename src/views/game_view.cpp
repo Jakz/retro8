@@ -168,9 +168,9 @@ else
       SDL_FillRect(spritesheet, nullptr, 0xFFFFFFFF);
       auto* dest = static_cast<uint32_t*>(spritesheet->pixels);
       for (r8::coord_t y = 0; y < r8::gfx::SPRITE_SHEET_HEIGHT; ++y)
-        for (r8::coord_t x = 0; x < r8::gfx::SPRITE_SHEET_WIDTH_IN_BYTES; ++x)
+        for (r8::coord_t x = 0; x < r8::gfx::SPRITE_SHEET_PITCH; ++x)
         {
-          const r8::gfx::color_byte_t* data = machine.memory().as<r8::gfx::color_byte_t>(r8::address::SPRITE_SHEET + y * r8::gfx::SPRITE_SHEET_WIDTH_IN_BYTES + x);
+          const r8::gfx::color_byte_t* data = machine.memory().as<r8::gfx::color_byte_t>(r8::address::SPRITE_SHEET + y * r8::gfx::SPRITE_SHEET_PITCH + x);
           RASTERIZE_PIXEL_PAIR(machine, dest, data);
         }
 

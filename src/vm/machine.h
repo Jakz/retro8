@@ -44,9 +44,6 @@ namespace retro8
   private:
     uint8_t memory[1024 * 32];
 
-
-
-    static constexpr size_t BYTES_PER_SCREEN_ROW = 128;
     static constexpr size_t BYTES_PER_PALETTE = sizeof(retro8::gfx::palette_t);
     static constexpr size_t BYTES_PER_SPRITE = sizeof(retro8::gfx::sprite_t);
 
@@ -65,14 +62,15 @@ namespace retro8
 
     uint8_t* base() { return memory; }
 
-    gfx::color_byte_t* penColor() { return reinterpret_cast<gfx::color_byte_t*>(&memory[address::PEN_COLOR]); }
+    gfx::color_byte_t* penColor() { return as<gfx::color_byte_t>(address::PEN_COLOR); }
     gfx::cursor_t* cursor() { return as<gfx::cursor_t>(address::CURSOR); }
     gfx::camera_t* camera() { return as<gfx::camera_t>(address::CAMERA); }
     gfx::clip_rect_t* clipRect() { return as<gfx::clip_rect_t>(address::CLIP_RECT); }
     
-
-    gfx::color_byte_t* screenData() { return reinterpret_cast<gfx::color_byte_t*>(&memory[address::SCREEN_DATA]); }
-    gfx::color_byte_t* screenData(coord_t x, coord_t y) { return screenData() + (y * BYTES_PER_SCREEN_ROW + x) / 2; }
+    gfx::color_byte_t* spriteSheet(coord_t x, coord_t y) { return spriteSheet() + x / gfx::PIXEL_TO_BYTE_RATIO + y * gfx::SPRITE_SHEET_PITCH; }
+    gfx::color_byte_t* spriteSheet() { return as<gfx::color_byte_t>(address::SPRITE_SHEET); }
+    gfx::color_byte_t* screenData() { return as<gfx::color_byte_t>(address::SCREEN_DATA); }
+    gfx::color_byte_t* screenData(coord_t x, coord_t y) { return screenData() + y * gfx::SCREEN_PITCH + x / gfx::PIXEL_TO_BYTE_RATIO; }
     integral_t* cartData(index_t idx) { return as<integral_t>(address::CART_DATA + idx * sizeof(integral_t)); } //TODO: ENDIANNESS!!
 
     sprite_flags_t* spriteFlagsFor(sprite_index_t index)
@@ -99,7 +97,7 @@ namespace retro8
     gfx::sprite_t* spriteAt(sprite_index_t index) { 
       return reinterpret_cast<gfx::sprite_t*>(&memory[address::SPRITE_SHEET 
         + (index % gfx::SPRITES_PER_SPRITE_SHEET_ROW) * gfx::SPRITE_BYTES_PER_SPRITE_ROW]
-        + (index / gfx::SPRITES_PER_SPRITE_SHEET_ROW) * gfx::SPRITE_SHEET_WIDTH_IN_BYTES * gfx::SPRITE_HEIGHT
+        + (index / gfx::SPRITES_PER_SPRITE_SHEET_ROW) * gfx::SPRITE_SHEET_PITCH * gfx::SPRITE_HEIGHT
         ); }
     gfx::palette_t* paletteAt(palette_index_t index) { return reinterpret_cast<gfx::palette_t*>(&memory[address::PALETTES + index * BYTES_PER_PALETTE]); }
 
@@ -153,6 +151,8 @@ namespace retro8
     void map(coord_t cx, coord_t cy, coord_t x, coord_t y, amount_t cw, amount_t ch, sprite_flags_t layer);
     void spr(index_t idx, coord_t x, coord_t y);
     void spr(index_t idx, coord_t x, coord_t y, float w, float h, bool flipX, bool flipY);
+    void sspr(coord_t sx, coord_t sy, coord_t sw, coord_t sh, coord_t dx, coord_t dy, coord_t dw, coord_t dh, bool flipX, bool flipY);
+
     void print(const std::string& string, coord_t x, coord_t y, color_t color);
 
     State& state() { return _state; }

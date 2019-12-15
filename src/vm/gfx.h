@@ -23,6 +23,7 @@ namespace retro8
 
     static constexpr size_t SCREEN_WIDTH = 128;
     static constexpr size_t SCREEN_HEIGHT = 128;
+    static constexpr size_t SCREEN_PITCH = SCREEN_WIDTH / PIXEL_TO_BYTE_RATIO;;
     static constexpr size_t BYTES_PER_SCREEN = SCREEN_WIDTH * SCREEN_HEIGHT / PIXEL_TO_BYTE_RATIO;
 
     static constexpr size_t TILE_MAP_WIDTH = 128;
@@ -31,7 +32,7 @@ namespace retro8
 
     static constexpr size_t SPRITE_SHEET_WIDTH = 128;
     static constexpr size_t SPRITES_PER_SPRITE_SHEET_ROW = 16;
-    static constexpr size_t SPRITE_SHEET_WIDTH_IN_BYTES = SPRITE_SHEET_WIDTH / PIXEL_TO_BYTE_RATIO;
+    static constexpr size_t SPRITE_SHEET_PITCH = SPRITE_SHEET_WIDTH / PIXEL_TO_BYTE_RATIO;
     static constexpr size_t SPRITE_SHEET_HEIGHT = 128;
 
     static constexpr size_t FONT_GLYPHS_COLUMNS = 16;
@@ -103,7 +104,7 @@ namespace retro8
       color_t get(coord_t x, coord_t y) const { return byteAt(x, y).get(x); }
       void set(coord_t x, coord_t y, color_t color) { byteAt(x, y).set(x, color); }
       inline const color_byte_t& byteAt(coord_t x, coord_t y) const { return static_cast<const color_byte_t&>(((sprite_t*)this)->byteAt(x, y)); }
-      inline color_byte_t& byteAt(coord_t x, coord_t y) { return reinterpret_cast<color_byte_t*>(this)[y * SPRITE_SHEET_WIDTH_IN_BYTES + x / 2]; }
+      inline color_byte_t& byteAt(coord_t x, coord_t y) { return reinterpret_cast<color_byte_t*>(this)[y * SPRITE_SHEET_PITCH + x / 2]; }
     };
 
     class sequential_sprite_t
@@ -191,7 +192,7 @@ namespace retro8
 
     public:
       Font() { }
-      inline const sequential_sprite_t* glyph(char c) const { return &glyphs[c]; }
+      inline const sequential_sprite_t* glyph(char c) const { return c < 128 ? &glyphs[c] : nullptr; }
 
       void load(SDL_Surface* surface);
     };

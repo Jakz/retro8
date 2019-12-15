@@ -404,9 +404,9 @@ namespace sprites
     coord_t dw = lua_to_or_default(L, number, 7, sw);
     coord_t dh = lua_to_or_default(L, number, 8, sh);
     bool flipX = lua_to_or_default(L, boolean, 8, false);
-    bool flipY = lua_to_or_default(L, boolean, 8, true);
+    bool flipY = lua_to_or_default(L, boolean, 8, false);
 
-    //TODO: implement
+    machine.sspr(sx, sy, sw, sh, dx, dy, dw, dh, flipX, flipY);
 
     return 0;
   }

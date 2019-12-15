@@ -78,20 +78,31 @@ void Machine::line(coord_t x0, coord_t y0, coord_t x1, coord_t y1, color_t color
   }
   else
   {
-    float dx = x1 - (float)x0;
-    float dy = y1 - y0;
-    float derror = abs(dy / dx);
-    float error = 0.0f;
+    coord_t dx = abs(x1 - x0);
+    coord_t sx = x0 < x1 ? 1 : -1;
+    coord_t dy = -abs(y1 - y0);
+    coord_t sy = y0 < y1 ? 1 : -1;
+    coord_t err = dx + dy;
 
-    coord_t y = y0;
-    for (coord_t x = x0; x <= x1; ++x)
+    while (true)
     {
-      pset(x, y, color);
-      error += derror;
-      if (error >= 0.5f)
+      pset(x0, y0, color);
+
+      if (x0 == x1 && y0 == y1)
+        break;
+
+      coord_t err2 = 2 * err;
+
+      if (err2 >= dy)
       {
-        y += copysignf(1, dy);
-        error -= 1.0f;
+        err += dy;
+        x0 += sx;
+      }
+
+      if (err2 <= dx)
+      {
+        err += dx;
+        y0 += sy;
       }
     }
   }

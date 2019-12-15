@@ -553,8 +553,20 @@ namespace bitwise
     return 1;
   }
 
+  struct shift_left
+  {
+    data_t operator()(data_t v, data_t a) { return v << a; }
+  };
+
+  struct shift_right
+  {
+    data_t operator()(data_t v, data_t a) { return v >> a; }
+  };
+
   inline int band(lua_State* L) { return bitwise<std::bit_and<data_t>>(L); }
-  
+  inline int shl(lua_State* L) { return bitwise<shift_left>(L); }
+  inline int shr(lua_State* L) { return bitwise<shift_right>(L); }
+
   int bnot(lua_State* L)
   {
     assert(lua_isnumber(L, 1));
@@ -697,6 +709,8 @@ void lua::registerFunctions(lua_State* L)
 
   lua_register(L, "band", bitwise::band);
   lua_register(L, "bnot", bitwise::bnot);
+  lua_register(L, "shl", bitwise::shl);
+  lua_register(L, "shr", bitwise::shr);
 
 
   lua_register(L, "music", ::sound::music);

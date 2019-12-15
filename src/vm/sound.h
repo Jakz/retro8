@@ -14,9 +14,14 @@ namespace retro8
     using volume_t = int32_t;
     using pitch_t = int32_t;
     
-    enum Waveform
+    enum class Waveform
     {
       TRIANGLE, TILTED_SAW, SAW, SQUARE, PULSE, ORGAN, NOISE, PHASER
+    };
+
+    enum class Effect
+    {
+      NONE, SLIDE, VIBRATO, DROP, FADE_IN, FADE_OUT, ARPEGGIO_FAST, ARPEGGIO_SLOW
     };
 
     struct SoundSample
@@ -25,6 +30,7 @@ namespace retro8
       uint16_t value;
 
       bool useSfx() const { return value & 0x8000; }
+      Effect effect() const { return Effect((value >> 12) & 0b111); }
       Waveform waveform() const { return Waveform((value >> 6) & 0b111); }
       volume_t volume() const { return (value >> 9) & 0b111; }
       pitch_t pitch() const { return value & 0x111111; }
@@ -46,12 +52,17 @@ namespace retro8
 
     public:
       DSP(int32_t rate) : rate(rate) { }
-      inline void squareWave(uint32_t frequency, int16_t amplitude, int16_t offset, int32_t position, int16_t* dest, size_t samples);
-      inline void pulseWave(uint32_t frequency, int16_t amplitude, int16_t offset, float dutyCycle, int32_t position, int16_t* dest, size_t samples);
-      inline void triangleWave(uint32_t frequency, int16_t amplitude, int16_t offset, int32_t position, int16_t* dest, size_t samples);
-      inline void sawtoothWave(uint32_t frequency, int16_t amplitude, int16_t offset, int32_t position, int16_t* dest, size_t samples);
-      inline void tiltedSawtoothWave(uint32_t frequency, int16_t amplitude, int16_t offset, float dutyCycle, int32_t position, int16_t* dest, size_t samples);
-      inline void organWave(uint32_t frequency, int16_t amplitude, int16_t offset, float coefficient, int32_t position, int16_t* dest, size_t samples);
+      void squareWave(uint32_t frequency, int16_t amplitude, int16_t offset, int32_t position, int16_t* dest, size_t samples);
+      void pulseWave(uint32_t frequency, int16_t amplitude, int16_t offset, float dutyCycle, int32_t position, int16_t* dest, size_t samples);
+      void triangleWave(uint32_t frequency, int16_t amplitude, int16_t offset, int32_t position, int16_t* dest, size_t samples);
+      void sawtoothWave(uint32_t frequency, int16_t amplitude, int16_t offset, int32_t position, int16_t* dest, size_t samples);
+      void tiltedSawtoothWave(uint32_t frequency, int16_t amplitude, int16_t offset, float dutyCycle, int32_t position, int16_t* dest, size_t samples);
+      void organWave(uint32_t frequency, int16_t amplitude, int16_t offset, float coefficient, int32_t position, int16_t* dest, size_t samples);
+      void noise(uint32_t frequency, int16_t amplitude, int32_t position, int16_t* dest, size_t samples);
+
+      void fadeIn(int16_t amplitude, int16_t* dest, size_t samples);
+      void fadeOut(int16_t amplitude, int16_t* dest, size_t samples);
+
     };
 
 

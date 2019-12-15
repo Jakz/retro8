@@ -428,9 +428,7 @@ namespace math
 
   int rnd(lua_State* L)
   {
-    assert(lua_isnumber(L, 1));
-
-    real_t max = lua_tonumber(L, 1);
+    real_t max = lua_gettop(L) >= 1 ? lua_tonumber(L, 1) : 1.0f;
     lua_pushnumber(L, (machine.state().rnd() / (float)machine.state().rnd.max()) * max);
 
     return 1;
@@ -592,6 +590,26 @@ namespace sound
   }
 }
 
+namespace string
+{
+  int sub(lua_State* L)
+  {
+    const std::string v = lua_tostring(L, 1);
+    size_t s = lua_tonumber(L, 2);
+    size_t e = lua_to_or_default(L, number, 3, -1);
+
+    if (s < 0)
+      s = v.length() - s + 1;
+    if (e < 0)
+      e = v.length() - e + 1;
+
+    assert(s <= e);
+    lua_pushstring(L, v.substr(s, e - s + 1).c_str());
+
+    return 1;
+  }
+}
+
 namespace platform
 {
   int btn(lua_State* L)
@@ -650,6 +668,30 @@ namespace platform
       default: lua_pushnumber(L, 0);
 
     }
+
+    return 1;
+  }
+
+  int cartdata(lua_State* L)
+  {
+    //TODO: implement
+    return 0;
+  }
+
+  int dset(lua_State* L)
+  {
+    index_t idx = lua_tonumber(L, 1);
+    integral_t value = lua_tonumber(L, 2);
+
+    *machine.memory().cartData(idx) = value;
+    return 0;
+  }
+
+  int dget(lua_State* L)
+  {
+    index_t idx = lua_tonumber(L, 1);
+    
+    lua_pushnumber(L, *machine.memory().cartData(idx));
 
     return 1;
   }
@@ -714,10 +756,16 @@ void lua::registerFunctions(lua_State* L)
   lua_register(L, "music", ::sound::music);
   lua_register(L, "sfx", ::sound::music);
 
+  lua_register(L, "sub", string::sub);
+
   lua_register(L, "btn", platform::btn);
   lua_register(L, "btnp", platform::btnp);
-  lua_register(L, "flip", platform::flip);
   lua_register(L, "stat", platform::stat);
+  lua_register(L, "cartdata", platform::cartdata);
+  lua_register(L, "dset", platform::dset);
+  lua_register(L, "dget", platform::dget);
+
+  lua_register(L, "flip", platform::flip);
 }
 
 Code::~Code()

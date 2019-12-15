@@ -26,6 +26,7 @@ namespace retro8
     static constexpr address_t SPRITE_SHEET = 0x0000;
     static constexpr address_t SPRITE_FLAGS = 0x3000;
 
+    static constexpr address_t CART_DATA = 0x5e00;
     static constexpr address_t PALETTES = 0x5f00;
     static constexpr address_t CLIP_RECT = 0x5f20;
     static constexpr address_t PEN_COLOR = 0x5f25;
@@ -72,6 +73,7 @@ namespace retro8
 
     gfx::color_byte_t* screenData() { return reinterpret_cast<gfx::color_byte_t*>(&memory[address::SCREEN_DATA]); }
     gfx::color_byte_t* screenData(coord_t x, coord_t y) { return screenData() + (y * BYTES_PER_SCREEN_ROW + x) / 2; }
+    integral_t* cartData(index_t idx) { return as<integral_t>(address::CART_DATA + idx * sizeof(integral_t)); } //TODO: ENDIANNESS!!
 
     sprite_flags_t* spriteFlagsFor(sprite_index_t index)
     {

@@ -364,7 +364,7 @@ LUA_API void      (lua_setallocf) (lua_State *L, lua_Alloc f, void *ud);
 	((void)lua_rawgeti(L, LUA_REGISTRYINDEX, LUA_RIDX_GLOBALS))
 
 #define lua_tostring(L,i)	lua_tolstring(L, (i), NULL)
-
+#define lua_to_or_default(L, w, i, d) lua_gettop(L) >= i ? lua_to ## w(L, i) : d  
 
 #define lua_insert(L,idx)	lua_rotate(L, (idx), 1)
 

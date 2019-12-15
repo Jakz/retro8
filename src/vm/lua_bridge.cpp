@@ -584,6 +584,9 @@ namespace bitwise
   };
 
   inline int band(lua_State* L) { return bitwise<std::bit_and<data_t>>(L); }
+  inline int bor(lua_State* L) { return bitwise<std::bit_or<data_t>>(L); }
+  inline int bxor(lua_State* L) { return bitwise<std::bit_xor<data_t>>(L); }
+
   inline int shl(lua_State* L) { return bitwise<shift_left>(L); }
   inline int shr(lua_State* L) { return bitwise<shift_right>(L); }
 
@@ -773,6 +776,8 @@ void lua::registerFunctions(lua_State* L)
   lua_register(L, "sqrt", math::sqrt);
 
   lua_register(L, "band", bitwise::band);
+  lua_register(L, "bor", bitwise::bor);
+  lua_register(L, "bxor", bitwise::bxor);
   lua_register(L, "bnot", bitwise::bnot);
   lua_register(L, "shl", bitwise::shl);
   lua_register(L, "shr", bitwise::shr);

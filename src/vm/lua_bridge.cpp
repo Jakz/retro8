@@ -190,6 +190,7 @@ int palt(lua_State* L)
   if (lua_gettop(L) == 0)
   {
     machine.memory().paletteAt(gfx::DRAW_PALETTE_INDEX)->resetTransparency();
+    machine.memory().paletteAt(gfx::SCREEN_PALETTE_INDEX)->resetTransparency();
   }
   else
   {
@@ -329,13 +330,24 @@ int cursor(lua_State* L)
   return 0;
 }
 
-int debugprint(lua_State* L)
+namespace debug
 {
-  std::string text = lua_tostring(L, 1);
-  std::cout << text << std::endl;
+  int debugprint(lua_State* L)
+  {
+    std::string text = lua_tostring(L, 1);
+    std::cout << text << std::endl;
 
-  return 0;
+    return 0;
+  }
+
+  int breakpoint(lua_State* L)
+  {
+    __debugbreak();
+
+    return 0;
+  }
 }
+
 
 namespace sprites
 {
@@ -383,6 +395,17 @@ namespace sprites
 
   int sspr(lua_State* L)
   {
+    coord_t sx = lua_tonumber(L, 1);
+    coord_t sy = lua_tonumber(L, 2);
+    coord_t sw = lua_tonumber(L, 3);
+    coord_t sh = lua_tonumber(L, 4);
+    coord_t dx = lua_tonumber(L, 5);
+    coord_t dy = lua_tonumber(L, 6);
+    coord_t dw = lua_to_or_default(L, number, 7, sw);
+    coord_t dh = lua_to_or_default(L, number, 8, sh);
+    bool flipX = lua_to_or_default(L, boolean, 8, false);
+    bool flipY = lua_to_or_default(L, boolean, 8, true);
+
     //TODO: implement
 
     return 0;
@@ -734,7 +757,8 @@ void lua::registerFunctions(lua_State* L)
   lua_register(L, "fget", sprites::fget);
   lua_register(L, "sspr", sprites::sspr);
 
-  lua_register(L, "debug", debugprint);
+  lua_register(L, "__debug", debug::debugprint);
+  lua_register(L, "__breakpoint", debug::breakpoint);
 
   lua_register(L, "cos", math::cos);
   lua_register(L, "sin", math::sin);

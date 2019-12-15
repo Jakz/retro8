@@ -91,7 +91,7 @@ int rectfill(lua_State* L)
   int x1 = lua_tonumber(L, 3);
   int y1 = lua_tonumber(L, 4);
 
-  int c = lua_gettop(L) == 5 ? lua_tonumber(L, 5) : machine.memory().penColor()->low();
+  int c = lua_gettop(L) >= 5 ? lua_tonumber(L, 5) : machine.memory().penColor()->low();
 
   machine.rectfill(x0, y0, x1, y1, static_cast<color_t>(c));
 
@@ -102,9 +102,8 @@ int circ(lua_State* L)
 {
   int x = lua_tonumber(L, 1);
   int y = lua_tonumber(L, 2);
-  int r = lua_tonumber(L, 3);
-
-  int c = lua_gettop(L) == 4 ? lua_tonumber(L, 4) : machine.memory().penColor()->low();
+  int r = lua_gettop(L) >= 3 ? lua_tonumber(L, 3) : 4;
+  int c = lua_gettop(L) >= 4 ? lua_tonumber(L, 4) : machine.memory().penColor()->low();
 
   machine.circ(x, y, r, static_cast<color_t>(c));
 
@@ -115,11 +114,10 @@ int circfill(lua_State* L)
 {
   int x = lua_tonumber(L, 1);
   int y = lua_tonumber(L, 2);
-  int r = lua_tonumber(L, 3);
+  int r = lua_gettop(L) >= 3 ? lua_tonumber(L, 3) : 4;
+  int c = lua_gettop(L) >= 4 ? lua_tonumber(L, 4) : machine.memory().penColor()->low();
 
-  int c = lua_gettop(L) == 4 ? lua_tonumber(L, 4) : machine.memory().penColor()->low();
-
-  machine.circfill(x, y, r, static_cast<color_t>(c));
+  machine.circfill(x, y, r, color_t(c));
 
   return 0;
 }
@@ -128,7 +126,7 @@ int cls(lua_State* L)
 {
   int c = lua_gettop(L) == 1 ? lua_tonumber(L, -1) : 0;
 
-  machine.cls(static_cast<color_t>(c));
+  machine.cls(color_t(c));
 
   return 0;
 }

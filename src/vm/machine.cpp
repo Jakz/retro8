@@ -153,28 +153,44 @@ void Machine::circ(coord_t xc, coord_t yc, amount_t r, color_t color)
     if (d > 0)
     {
       y--;
-      d = d + 4 * (x - y) + 10;
+      d = d + 4 * (x - y) + 5;
     }
     else
-      d = d + 4 * x + 6;
+      d = d + 4 * x + 3;
 
     circHelper(xc, yc, x, y, color);
   }
 }
 
+void Machine::circFillHelper(coord_t xc, coord_t yc, coord_t x, coord_t y, color_t col)
+{
+  //TODO: totally inefficient
+  rectfill(xc - x, yc - y, xc + x, yc + y, col);
+  rectfill(xc - y, yc - x, xc + y, yc + x, col);
+}
+
+
 void Machine::circfill(coord_t xc, coord_t yc, amount_t r, color_t color)
 {
   //TODO: not identical to pico-8 but acceptable for now
-  const amount_t sr = r * r;
+  coord_t x = 0, y = r;
+  float d = 3 - 2 * r;
+  circFillHelper(xc, yc, x, y, color);
 
-  for (int x = -r; x < r; x++)
+  int ctr = 0;
+  while (y >= x)
   {
-    int hh = (int)std::sqrt(sr - x * x);
-    int rx = xc + x;
-    int ph = yc + hh;
+    x++;
 
-    for (int y = yc - hh; y < ph; y++)
-      pset(rx, y, color);
+    if (d > 0)
+    {
+      y--;
+      d = d + 3 * (x - y) + 5;
+    }
+    else
+      d = d + 3 * x + 3;
+
+    circFillHelper(xc, yc, x, y, color);
   }
 }
 

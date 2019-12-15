@@ -118,6 +118,8 @@ namespace retro8
 
   private:
     void circHelper(coord_t xc, coord_t yc, coord_t x, coord_t y, color_t col);
+    void circFillHelper(coord_t xc, coord_t yc, coord_t x, coord_t y, color_t col);
+
 
   public:
     Machine()

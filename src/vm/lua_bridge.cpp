@@ -227,8 +227,8 @@ namespace draw
 
 int camera(lua_State* L)
 {
-  int16_t cx = lua_tonumber(L, 1);
-  int16_t cy = lua_tonumber(L, 2);
+  int16_t cx = lua_gettop(L) >= 1 ? lua_tonumber(L, 1) : 0;
+  int16_t cy = lua_gettop(L) == 2 ? lua_tonumber(L, 2) : 0;
   machine.memory().camera()->set(cx, cy);
 
   return 0;
@@ -289,11 +289,11 @@ int print(lua_State* L)
   {
     auto* cursor = machine.memory().cursor();
 
-    retro8::coord_t x = cursor->x;
-    retro8::coord_t y = cursor->y;
+    retro8::coord_t x = cursor->x();
+    retro8::coord_t y = cursor->y();
     retro8::color_t c = machine.memory().penColor()->low();
     machine.print(text, x, y, c);
-    cursor->y += 6; //TODO: check height / magic number
+    cursor->set(cursor->x(), cursor->y() + 6); //TODO: check height / magic number
   }
   else if (lua_gettop(L) >= 3)
   {

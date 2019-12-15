@@ -159,7 +159,12 @@ namespace retro8
 
     struct cursor_t
     {
-      uint8_t x, y;
+      uint8_t _x, _y;
+
+      void reset() { _x = _y = 0; }
+      void set(uint8_t x, uint8_t y) { _x = x; _y = y; }
+      uint8_t x() const { return _x; }
+      uint8_t y() const { return _y; }
     };
 
     struct camera_t

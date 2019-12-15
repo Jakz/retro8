@@ -13,18 +13,51 @@
 using namespace retro8;
 using namespace retro8::gfx;
 
+extern retro8::Machine machine;
+Machine& m = machine;
+
 TEST_CASE("cursor([x,] [y,] [col])")
 {
+  Machine& m = machine;
+  auto* cursor = m.memory().cursor();
+
   SECTION("cursor starts at 0,0")
   {
-    Machine m;
-    REQUIRE(m.memory().cursor()->x == 0);
-    REQUIRE(m.memory().cursor()->y == 0);
+    REQUIRE((cursor->x() == 0 && cursor->y() == 0));
+  }
+}
+
+TEST_CASE("camera([x,] [y])")
+{
+  auto* camera = m.memory().camera();
+
+  SECTION("camera starts at 0,0")
+  {
+    REQUIRE((camera->x() == 0 && camera->y() == 0));
   }
 
-  SECTION("cursor is correctly set by cursor function")
+  SECTION("camera is properly set by camera() function")
   {
+    m.code().initFromSource("camera(20,-10)");
+    auto* camera = m.memory().camera();
+    REQUIRE(camera->x() == 20);
+    REQUIRE(camera->y() == -10);
+  }
 
+  SECTION("camera is properly reset by camera() function")
+  {
+    m.code().initFromSource("camera(20,-10)");
+    REQUIRE((camera->x() == 20 && camera->y() == -10));
+    m.code().initFromSource("camera()");
+    REQUIRE((camera->x() == 0 && camera->y() == 0));
+  }
+
+  SECTION("single argument sets x and resets y")
+  {
+    m.code().initFromSource("camera(20,-10)");
+    REQUIRE((camera->x() == 20 && camera->y() == -10));
+    m.code().initFromSource("camera(40)");
+    REQUIRE((camera->x() == 40 && camera->y() == 0));
   }
 }
 

@@ -59,7 +59,7 @@ namespace retro8
       paletteAt(gfx::DRAW_PALETTE_INDEX)->reset();
       paletteAt(gfx::SCREEN_PALETTE_INDEX)->reset();
       clipRect()->reset();
-      *cursor() = { 0, 0 };
+      cursor()->reset();
     }
 
     uint8_t* base() { return memory; }
@@ -123,6 +123,9 @@ namespace retro8
     Machine()
     {
     }
+
+    Machine(const Machine&) = delete;
+    Machine& operator=(const Machine&) = delete;
 
     void init(SDL_Surface* output) { _output = output; }
 

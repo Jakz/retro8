@@ -17,6 +17,37 @@ inline void DSP::squareWave(uint32_t frequency, int16_t amplitude, int16_t offse
   }
 }
 
+inline void DSP::pulseWave(uint32_t frequency, int16_t amplitude, int16_t offset, float dutyCycle, int32_t position, int16_t* dest, size_t samples)
+{
+  const size_t periodLength = float(rate) / frequency;
+  const size_t dutyOnLength = dutyCycle * periodLength;
+
+  for (size_t i = 0; i < samples; ++i)
+  {
+    const auto sampleInPeriod = position % periodLength;
+    dest[i] = offset + sampleInPeriod < dutyOnLength ? amplitude : -amplitude;
+    ++position;
+  }
+}
+
+inline void DSP::triangleWave(uint32_t frequency, int16_t amplitude, int16_t offset, int32_t position, int16_t* dest, size_t samples)
+{
+  const size_t periodLength = float(rate) / frequency;
+
+  for (size_t i = 0; i < samples; ++i)
+  {
+    const size_t repetitions = position / periodLength;
+    const float p = position / float(periodLength) - repetitions;
+
+    if (p < 0.50f)
+      dest[i] = offset + amplitude - amplitude * 2 * (p / 0.5f);
+    else
+      dest[i] = offset - amplitude + amplitude * 2 * ((p - 0.5f) / 0.5f);
+
+    ++position;
+  }
+}
+
 inline void DSP::sawtoothWave(uint32_t frequency, int16_t amplitude, int16_t offset, int32_t position, int16_t* dest, size_t samples)
 {
   const size_t periodLength = float(rate) / frequency;
@@ -51,50 +82,51 @@ inline void DSP::tiltedSawtoothWave(uint32_t frequency, int16_t amplitude, int16
   }
 }
 
+inline void DSP::organWave(uint32_t frequency, int16_t amplitude, int16_t offset, float coefficient, int32_t position, int16_t* dest, size_t samples)
+{
+  const size_t periodLength = float(rate) / frequency;
+
+  for (size_t i = 0; i < samples; ++i)
+  {
+    const size_t repetitions = position / periodLength;
+    const float p = position / float(periodLength) - repetitions;
+
+    if (p < 0.25f) // drop +a -a
+      dest[i] = offset + amplitude - amplitude * 2 * (p / 0.25f);
+    else if (p < 0.50f) // raise -a +c
+      dest[i] = offset - amplitude + amplitude * (1.0f + coefficient) * (p - 0.25) / 0.25;
+    else if (p < 0.75) // drop +c -a
+      dest[i] = offset + amplitude * coefficient - amplitude * (1.0f + coefficient) * (p - 0.50) / 0.25f;
+    else
+      dest[i] = offset - amplitude + amplitude * 2 * (p - 0.75f) / 0.25f;
+
+    ++position;
+  }
+}
+
 static int pos = 0;
 static float period = 44100 / 440.0f;
 
 DSP dsp(44100);
+
+// C C# D D# E F F# G G# A A# B
+
+constexpr float PULSE_WAVE_DEFAULT_DUTY = 1 / 3.0f;
+constexpr float ORGAN_DEFAULT_COEFFICIENT = 0.5f;
+
+enum Note { C, CS, D, DS, E, F, FS, G, GS, A, AS, B };
+const std::array<float, 12> NoteTable = {
+  130.81f, 138.59f, 146.83f, 155.56f, 164.81f, 174.61f, 185.00f, 196.00, 207.65, 220.0, 233.08, 246.94
+};
 
 void audio_callback(void* data, uint8_t* cbuffer, int length)
 {
   APU* apu = static_cast<APU*>(data);
   int16_t* buffer = reinterpret_cast<int16_t*>(cbuffer);
 
-  dsp.tiltedSawtoothWave(440, 4096, 0, 0.85f, pos, buffer, length / sizeof(int16_t));
+  dsp.triangleWave(NoteTable[A]*2, 4096, 0, pos, buffer, length / sizeof(int16_t));
   pos += length / sizeof(int16_t);
   return;
-
-  for (int i = 0; i < length/sizeof(int16_t); ++i)
-  {
-    //SIN buffer[i] = std::sin(pos / period * M_PI * 2)*8192;
-    int integral = (pos / period);
-    float p = pos / period - integral;
-
-    //TRIANGLE
-    //float posInPeriod = pos / period - (int)(pos / period);
-    //buffer[i] = (posInPeriod <= 0.5f ? (posInPeriod * 2) : (1.0 - ((posInPeriod - 0.5) * 2))) * 8192 + 4096;
-
-    // SAWTOOTH
-    buffer[i] = (p -0.5f)* 4096;
-
-    // SAWTOOTH
-    //float posInPeriod = pos / period - (int)(pos / period);
-    //buffer[i] = (posInPeriod > 0.2 && posInPeriod < 0.8 ? (posInPeriod/0.6) : (1.0 - ((posInPeriod - 0.5) * 2))) * 4096;
-
-    //SQUARE
-    buffer[i] = p < 0.5f ? -4096 : 4096;
-
-    //PULSE: dirtier!
-    buffer[i] = p < 0.33f ? 4096 : -4096;
-
-    //ORGAN
-    bool odd = integral & 0x01;
-    buffer[i] = (p <= 0.5f ? (p * 2) : (1.0 - ((p - 0.5) * 2))) * 8192 + 4096;
-
-
-    ++pos;
-  }
 }
 
 void APU::init()

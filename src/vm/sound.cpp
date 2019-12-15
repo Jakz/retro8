@@ -1,5 +1,7 @@
 #include "sound.h"
 
+#include <random>
+
 using namespace retro8;
 using namespace retro8::sound;
 
@@ -104,6 +106,46 @@ inline void DSP::organWave(uint32_t frequency, int16_t amplitude, int16_t offset
   }
 }
 
+inline void DSP::noise(uint32_t frequency, int16_t amplitude, int32_t position, int16_t* dest, size_t samples)
+{
+  static std::random_device rdevice;
+  static std::mt19937 mt(rdevice());
+
+  std::uniform_int_distribution<int16_t> dist(-amplitude/2, amplitude/2);
+
+  const size_t periodLength = float(rate) / frequency;
+  const size_t halfPeriod = periodLength / 2;
+
+  for (size_t i = 0; i < samples; ++i)
+  {
+    const auto sampleInPeriod = position % periodLength;
+    dest[i] = dist(mt);
+    ++position;
+  }
+}
+
+void DSP::fadeIn(int16_t amplitude, int16_t* dest, size_t samples)
+{
+  const float incr = 1.0f / samples;
+
+  for (size_t i = 0; i < samples; ++i)
+  {
+    const float v = dest[i] / amplitude;
+    dest[i] = v * incr * i * amplitude;
+  }
+}
+
+void DSP::fadeOut(int16_t amplitude, int16_t* dest, size_t samples)
+{
+  const float incr = 1.0f / samples;
+
+  for (size_t i = 0; i < samples; ++i)
+  {
+    const float v = dest[i] / amplitude;
+    dest[i] = v * incr * (samples - i - 1) * amplitude;
+  }
+}
+
 static int pos = 0;
 static float period = 44100 / 440.0f;
 
@@ -119,13 +161,35 @@ const std::array<float, 12> NoteTable = {
   130.81f, 138.59f, 146.83f, 155.56f, 164.81f, 174.61f, 185.00f, 196.00, 207.65, 220.0, 233.08, 246.94
 };
 
+size_t position = 0;
+int16_t* rendered = nullptr;
+
 void audio_callback(void* data, uint8_t* cbuffer, int length)
 {
-  APU* apu = static_cast<APU*>(data);
-  int16_t* buffer = reinterpret_cast<int16_t*>(cbuffer);
+  if (!rendered)
+  {
+    rendered = new int16_t[44100 * 3];
+    dsp.squareWave(440, 4096, 0, 0, rendered, 44100 * 3);
+    dsp.fadeIn(4096, rendered, 44100);
+    dsp.fadeOut(4096, rendered + 88200, 44100);
 
-  dsp.triangleWave(NoteTable[A]*2, 4096, 0, pos, buffer, length / sizeof(int16_t));
-  pos += length / sizeof(int16_t);
+  }
+  
+  //APU* apu = static_cast<APU*>(data);
+  //int16_t* buffer = reinterpret_cast<int16_t*>(cbuffer);
+
+  if (position < 44100 * 3)
+  {
+    size_t max = std::min((44100 * 3 - position) * 2, size_t(length));
+    memcpy(cbuffer, rendered + position, max);
+    position += max / sizeof(int16_t);
+  }
+  else
+    memset(cbuffer, 0, length);
+
+  //dsp.triangleWave(NoteTable[A]*2, 4096, 0, pos, buffer, length / sizeof(int16_t));
+  //dsp.noise(NoteTable[A] * 2, 4096, pos, buffer, length / sizeof(int16_t));
+  //pos += length / sizeof(int16_t);
   return;
 }
 

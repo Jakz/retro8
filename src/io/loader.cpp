@@ -145,9 +145,9 @@ void LoaderP8::load(const std::string& path, Machine& m)
         const char* p = line.c_str();
 
         sfx::Sound* sound = m.memory().sound(snd);
-        sound->speed = valueForUint8(p+2); break;
-        sound->loopStart = valueForUint8(p+4); break;
-        sound->loopEnd = valueForUint8(p+6); break;
+        sound->speed = valueForUint8(p+2);
+        sound->loopStart = valueForUint8(p+4);
+        sound->loopEnd = valueForUint8(p+6);
 
         p = p + 8;
 

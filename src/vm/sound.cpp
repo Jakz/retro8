@@ -17,7 +17,7 @@ inline void DSP::squareWave(uint32_t frequency, int16_t amplitude, int16_t offse
   for (size_t i = 0; i < samples; ++i)
   {
     const auto sampleInPeriod = position % periodLength;
-    dest[i] = offset + sampleInPeriod < halfPeriod ? -amplitude : amplitude;
+    dest[i] += offset + sampleInPeriod < halfPeriod ? -amplitude : amplitude;
     ++position;
   }
 }
@@ -30,7 +30,7 @@ inline void DSP::pulseWave(uint32_t frequency, int16_t amplitude, int16_t offset
   for (size_t i = 0; i < samples; ++i)
   {
     const auto sampleInPeriod = position % periodLength;
-    dest[i] = offset + sampleInPeriod < dutyOnLength ? amplitude : -amplitude;
+    dest[i] += offset + sampleInPeriod < dutyOnLength ? amplitude : -amplitude;
     ++position;
   }
 }
@@ -45,9 +45,9 @@ inline void DSP::triangleWave(uint32_t frequency, int16_t amplitude, int16_t off
     const float p = position / float(periodLength) - repetitions;
 
     if (p < 0.50f)
-      dest[i] = offset + amplitude - amplitude * 2 * (p / 0.5f);
+      dest[i] += offset + amplitude - amplitude * 2 * (p / 0.5f);
     else
-      dest[i] = offset - amplitude + amplitude * 2 * ((p - 0.5f) / 0.5f);
+      dest[i] += offset - amplitude + amplitude * 2 * ((p - 0.5f) / 0.5f);
 
     ++position;
   }
@@ -61,7 +61,7 @@ inline void DSP::sawtoothWave(uint32_t frequency, int16_t amplitude, int16_t off
   {
     const size_t repetitions = position / periodLength;
     const float p = position / float(periodLength) - repetitions;
-    dest[i] = offset - amplitude + amplitude * 2 * p;
+    dest[i] += offset - amplitude + amplitude * 2 * p;
     ++position;
   }
 }
@@ -76,11 +76,11 @@ inline void DSP::tiltedSawtoothWave(uint32_t frequency, int16_t amplitude, int16
     const float p = position / float(periodLength) - repetitions;
 
     if (p < dutyCycle)
-      dest[i] = offset - amplitude + amplitude * 2 * (p / dutyCycle);
+      dest[i] += offset - amplitude + amplitude * 2 * (p / dutyCycle);
     else
     {
       const float op = (p - dutyCycle) / (1.0f - dutyCycle);
-      dest[i] = offset + amplitude - amplitude * 2 * op;
+      dest[i] += offset + amplitude - amplitude * 2 * op;
     }
 
     ++position;
@@ -97,13 +97,13 @@ inline void DSP::organWave(uint32_t frequency, int16_t amplitude, int16_t offset
     const float p = position / float(periodLength) - repetitions;
 
     if (p < 0.25f) // drop +a -a
-      dest[i] = offset + amplitude - amplitude * 2 * (p / 0.25f);
+      dest[i] += offset + amplitude - amplitude * 2 * (p / 0.25f);
     else if (p < 0.50f) // raise -a +c
-      dest[i] = offset - amplitude + amplitude * (1.0f + coefficient) * (p - 0.25) / 0.25;
+      dest[i] += offset - amplitude + amplitude * (1.0f + coefficient) * (p - 0.25) / 0.25;
     else if (p < 0.75) // drop +c -a
-      dest[i] = offset + amplitude * coefficient - amplitude * (1.0f + coefficient) * (p - 0.50) / 0.25f;
+      dest[i] += offset + amplitude * coefficient - amplitude * (1.0f + coefficient) * (p - 0.50) / 0.25f;
     else
-      dest[i] = offset - amplitude + amplitude * 2 * (p - 0.75f) / 0.25f;
+      dest[i] += offset - amplitude + amplitude * 2 * (p - 0.75f) / 0.25f;
 
     ++position;
   }
@@ -122,7 +122,7 @@ inline void DSP::noise(uint32_t frequency, int16_t amplitude, int32_t position, 
   for (size_t i = 0; i < samples; ++i)
   {
     const auto sampleInPeriod = position % periodLength;
-    dest[i] = dist(mt);
+    dest[i] += dist(mt);
     ++position;
   }
 }
@@ -301,7 +301,9 @@ void APU::renderSounds(int16_t* dest, size_t totalSamples)
   constexpr size_t rate = 44100;
   constexpr int16_t maxVolume = 4096;
 
-  for (SoundState state : channels)
+  memset(dest, 0, sizeof(int16_t)*totalSamples);
+
+  for (SoundState& state : channels)
   {
     if (state.sound)
     {

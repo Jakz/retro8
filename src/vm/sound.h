@@ -4,17 +4,23 @@
 #include "common.h"
 
 #include <array>
+#include <vector>
+#include <mutex>
 #include <SDL_audio.h>
 
 #if SOUND_ENABLED
 
 namespace retro8
 {
+  class Memory;
+  
   namespace sfx
   {
     using volume_t = int32_t;
     using pitch_t = int32_t;
     using frequency_t = int32_t;
+    using channel_index_t = int32_t;
+    using sound_index_t = int32_t;
     
     enum class Waveform
     {
@@ -85,12 +91,15 @@ namespace retro8
 
     static constexpr size_t SOUND_COUNT = 64;
     static constexpr size_t MUSIC_COUNT = 64;
+    static constexpr size_t TICKS_PER_SECOND = 128;
 
     struct SoundState
     {
       const Sound* sound;
+      uint32_t soundIndex;
       uint32_t sample;
       uint32_t position; // absolute
+      uint32_t end;
     };
     
     class DSP
@@ -116,15 +125,37 @@ namespace retro8
 
     class APU
     {
+      retro8::Memory& memory;
+      
+      struct Command
+      {
+        sound_index_t index;
+        channel_index_t channel;
+        uint32_t start;
+        uint32_t end;
+      };
+
+      static constexpr size_t CHANNEL_COUNT = 4;
+
       SDL_AudioSpec spec;
       SDL_AudioDeviceID device;
     
+      std::array<SoundState, CHANNEL_COUNT> channels;
+      std::mutex queueMutex;
+      std::vector<Command> queue;
+
+      void handleCommands();
+
     public:
+      APU(Memory& memory) : memory(memory) { }
+
       void init();
       void close();
 
       void resume();
       void pause();
+
+      void play(sound_index_t index, channel_index_t channel, uint32_t start, uint32_t end);
 
       void renderSounds(int16_t* dest, size_t samples);
     };

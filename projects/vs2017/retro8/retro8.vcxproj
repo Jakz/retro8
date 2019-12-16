@@ -172,6 +172,7 @@
     <ClCompile Include="..\..\..\src\vm\gfx.cpp" />
     <ClCompile Include="..\..\..\src\vm\lua_bridge.cpp" />
     <ClCompile Include="..\..\..\src\vm\machine.cpp" />
+    <ClCompile Include="..\..\..\src\vm\memory.cpp" />
     <ClCompile Include="..\..\..\src\vm\sound.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -213,6 +214,7 @@
     <ClInclude Include="..\..\..\src\vm\gfx.h" />
     <ClInclude Include="..\..\..\src\vm\lua_bridge.h" />
     <ClInclude Include="..\..\..\src\vm\machine.h" />
+    <ClInclude Include="..\..\..\src\vm\memory.h" />
     <ClInclude Include="..\..\..\src\vm\sound.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

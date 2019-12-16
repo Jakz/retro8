@@ -1,6 +1,7 @@
 #include "sound.h"
 
 #include <random>
+#include <cassert>
 
 using namespace retro8;
 using namespace retro8::sfx;
@@ -255,28 +256,92 @@ void APU::close()
   SDL_CloseAudioDevice(device);
 }
 
+void APU::play(sound_index_t index, channel_index_t channel, uint32_t start, uint32_t end)
+{
+  queueMutex.lock();
+  queue.push_back({ index, channel, start, end });
+  queueMutex.unlock();
+}
 
-void APU::renderSounds(int16_t* dest, size_t samples)
+void APU::handleCommands()
+{
+  if (queueMutex.try_lock())
+  {
+    for (Command& c : queue)
+    { 
+      /* stop sound on channel*/
+      if (c.index == -1)
+      {
+        assert(c.channel >= 0 && c.channel <= channels.size());
+        channels[c.channel].sound = nullptr;
+        continue;
+      }
+      /* stop sound from looping */
+      else if (c.index == -2)
+      {
+        continue;
+      }
+      /* stop sound on all channels that are playing it*/
+      else if (c.channel == -2)
+      {
+        for (auto& chan : channels)
+          if (chan.soundIndex == c.index)
+            chan.sound = nullptr;
+        continue;
+      }
+      /* find first available channel*/
+      else if (c.channel == -1)
+        for (size_t i = 0; channels.size(); ++i)
+          if (!channels[i].sound)
+            c.channel = i;
+
+
+      if (c.channel >= 0 && c.channel < channels.size() && c.index >= 0 && c.index <= SOUND_COUNT)
+      {
+        auto& channel = channels[c.channel];
+
+        //channel.sound = 
+      }
+    }
+
+    queue.clear();
+  }
+
+  /* stop sound on channel*/
+}
+
+void APU::renderSounds(int16_t* dest, size_t totalSamples)
 {
   constexpr size_t rate = 44100;
   size_t samplePerTick = (44100 / 128) * (sstate.sound->speed + 1);
+  int16_t maxVolume = 4096;
 
-  while (samples > 0)
+  for (SoundState state : channels)
   {
-    /* generate the maximum amount of samples available for same note */
-    // TODO: optimize if next note is equal to current
-    size_t available = std::min(samples, samplePerTick - (sstate.position % samplePerTick));
-    const SoundSample& sample = sstate.sound->samples[sstate.sample];
+    if (state.sound)
+    {
+      int16_t* buffer = dest;
+      size_t samples = totalSamples;
 
-    /* render samples */
-    dsp.squareWave(Note::frequency(sample.pitch()), (4096 / 8) * sample.volume(), 0, sstate.position, dest, samples);
+      while (samples > 0 && state.sound)
+      {
+        /* generate the maximum amount of samples available for same note */
+        // TODO: optimize if next note is equal to current
+        size_t available = std::min(samples, samplePerTick - (sstate.position % samplePerTick));
 
-    samples -= available;
-    dest += available;
-    sstate.position += available;
-    sstate.sample = sstate.position / samplePerTick;
+        const SoundSample& sample = sstate.sound->samples[sstate.sample];
+
+        /* render samples */
+        dsp.squareWave(Note::frequency(sample.pitch()), (maxVolume / 8) * sample.volume(), 0, sstate.position, dest, samples);
+
+        samples -= available;
+        dest += available;
+        sstate.position += available;
+        sstate.sample = sstate.position / samplePerTick;
+
+        if (sstate.sample >= sstate.end)
+          sstate.sound = nullptr;
+      }
+    }
   }
-
-
-
 }

@@ -10,7 +10,7 @@
 
 namespace retro8
 {
-  namespace sound
+  namespace sfx
   {
     using volume_t = int32_t;
     using pitch_t = int32_t;
@@ -74,6 +74,17 @@ namespace retro8
       uint8_t loopStart;
       uint8_t loopEnd;
     };
+
+    struct Music
+    {
+      uint8_t dummy[4];
+    };
+
+    using sound_t = Sound;
+    using music_t = Music;
+
+    static constexpr size_t SOUND_COUNT = 64;
+    static constexpr size_t MUSIC_COUNT = 64;
 
     struct SoundState
     {

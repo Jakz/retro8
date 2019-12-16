@@ -130,6 +130,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\io\loader.cpp" />
+    <ClCompile Include="..\..\..\src\io\stegano.cpp" />
     <ClCompile Include="..\..\..\src\lua\lapi.c" />
     <ClCompile Include="..\..\..\src\lua\lauxlib.c" />
     <ClCompile Include="..\..\..\src\lua\lbaselib.c" />
@@ -176,6 +177,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\src\common.h" />
     <ClInclude Include="..\..\..\src\io\loader.h" />
+    <ClInclude Include="..\..\..\src\io\stegano.h" />
     <ClInclude Include="..\..\..\src\lua\lapi.h" />
     <ClInclude Include="..\..\..\src\lua\lauxlib.h" />
     <ClInclude Include="..\..\..\src\lua\lcode.h" />

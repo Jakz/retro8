@@ -3,7 +3,7 @@
 #include <random>
 
 using namespace retro8;
-using namespace retro8::sound;
+using namespace retro8::sfx;
 
 
 inline void DSP::squareWave(uint32_t frequency, int16_t amplitude, int16_t offset, int32_t position, int16_t* dest, size_t samples)

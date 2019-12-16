@@ -1,7 +1,11 @@
 #include "main_view.h"
 
+#include "io/loader.h"
+#include "io/stegano.h"
+
 using namespace ui;
 namespace r8 = retro8;
+
 
 retro8::Machine machine;
 
@@ -103,7 +107,7 @@ void GameView::render()
     retro8::io::LoaderP8 loader;
 
     if (_path.empty())
-      _path = "breakout_hero.p8";
+      _path = "pico-man.p8";
 
     loader.load(_path, machine);
 
@@ -115,6 +119,12 @@ void GameView::render()
 
     //machine.sound().init();
     //machine.sound().resume();
+
+    /*SDL_Surface* surface = IMG_Load("pico-man.p8.png");
+    r8::io::PngData pngData = { static_cast<const uint32_t*>(surface->pixels), surface->h * surface->w };
+    assert(surface->format->BytesPerPixel == 4);
+    r8::io::Stegano stegano;
+    stegano.load(pngData, machine);*/
 
     /*for (int i = 0; i < 32; ++i)
       machine.circ(64, 64, i+1, (r8::color_t)(i % 15 + 1));*/

@@ -135,6 +135,9 @@
     <ClInclude Include="..\..\..\src\vm\sound.h">
       <Filter>src\vm</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\io\stegano.h">
+      <Filter>src\io</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\main.cpp">
@@ -265,6 +268,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\vm\sound.cpp">
       <Filter>src\vm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\io\stegano.cpp">
+      <Filter>src\io</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

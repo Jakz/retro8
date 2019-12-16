@@ -34,6 +34,7 @@ namespace retro8
     static constexpr size_t SPRITES_PER_SPRITE_SHEET_ROW = 16;
     static constexpr size_t SPRITE_SHEET_PITCH = SPRITE_SHEET_WIDTH / PIXEL_TO_BYTE_RATIO;
     static constexpr size_t SPRITE_SHEET_HEIGHT = 128;
+    static constexpr size_t SPRITE_COUNT = (SPRITE_SHEET_WIDTH * SPRITE_SHEET_HEIGHT) / (SPRITE_WIDTH * SPRITE_HEIGHT);
 
     static constexpr size_t FONT_GLYPHS_COLUMNS = 16;
     static constexpr size_t FONT_GLYPHS_ROWS = 10;

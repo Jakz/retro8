@@ -11,8 +11,6 @@
 #include "vm/machine.h"
 #include "vm/lua_bridge.h"
 
-#include "io/loader.h"
-
 namespace ui
 {
   enum class Scale

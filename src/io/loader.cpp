@@ -37,62 +37,6 @@ retro8::sprite_flags_t LoaderP8::spriteFlagsFromString(const char* c)
   return (h << 4) | l;
 }
 
-//TODO: worst hacky solution ever, it's just a quick fix
-void LoaderP8::fixOperators(std::string& line)
-{
-  size_t t = 0;
-  size_t i0 = 0, i1 = 0;
-  enum class S { BEGIN, IDENT, INBETWEEN, OPERATOR } s = S::BEGIN;
-
-  while (t < line.length())
-  {
-    if (line[t] < 0)
-      break;
-    else if (isspace(line[t]))
-    {
-      if (s == S::BEGIN)
-        ;
-      else if (s == S::INBETWEEN)
-        ;
-      else if (s == S::IDENT)
-      {
-        i1 = t;
-        s = S::INBETWEEN;
-      }
-      else
-        break;
-    }
-    else if (isalnum(line[t]) || line[t] == '.' || line[t] == '_')
-    {
-      if (s == S::BEGIN)
-      {
-        s = S::IDENT;
-        i0 = t;
-      }
-      else if (s == S::IDENT)
-        ;
-      else
-        break;
-    }
-    else if (line[t] == '*' || line[t] == '+' || line[t] == '-' || line[t] == '/' || line[t] == '%')
-    {
-      if (t < line.length() - 1 && line[t+1] == '=' && (s == S::IDENT || s == S::INBETWEEN))
-      {
-        if (s == S::IDENT)
-          i1 = t - 1;
-
-        // replace [i, t+1]
-        line = line.substr(0, i0) + line.substr(i0, i1 - i0) + " = " + line.substr(i0, i1 - i0) + ' ' + line[t] + ' ' + line.substr(t + 2);
-        break;
-      }
-      else
-        break;
-    }
-
-    ++t;
-  }
-}
-
 void LoaderP8::load(const std::string& path, Machine& m)
 {
   std::vector<std::string> lines;

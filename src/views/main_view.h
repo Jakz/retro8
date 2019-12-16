@@ -33,6 +33,8 @@ namespace ui
 
     std::string _path;
 
+    bool _paused;
+
     void rasterize();
     void render();
     void update();

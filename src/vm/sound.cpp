@@ -1,5 +1,7 @@
 #include "sound.h"
 
+#include "memory.h"
+
 #include <random>
 #include <cassert>
 
@@ -206,6 +208,8 @@ void APU::init()
   wantSpec.samples = 2048;
   wantSpec.userdata = this;
   wantSpec.callback = audio_callback;
+
+  for (auto& channel : channels) channel.sound = nullptr;
   
   device = SDL_OpenAudioDevice(NULL, 0, &wantSpec, &spec, 0);
 
@@ -215,39 +219,8 @@ void APU::init()
   }
 }
 
-Sound ssound;
-SoundState sstate;
-
 void APU::resume()
 {
-  ssound.speed = 32;
-  ssound.samples[0].setPitch(Note::pitch(Tone::E, 2));
-  ssound.samples[1].setPitch(Note::pitch(Tone::E, 2));
-  ssound.samples[2].setPitch(Note::pitch(Tone::F, 2));
-  ssound.samples[3].setPitch(Note::pitch(Tone::G, 2));
-  ssound.samples[4].setPitch(Note::pitch(Tone::G, 2));
-  ssound.samples[5].setPitch(Note::pitch(Tone::F, 2));
-  ssound.samples[6].setPitch(Note::pitch(Tone::E, 2));
-  ssound.samples[7].setPitch(Note::pitch(Tone::D, 2));
-  ssound.samples[8].setPitch(Note::pitch(Tone::C, 2));
-  ssound.samples[9].setPitch(Note::pitch(Tone::C, 2));
-  ssound.samples[10].setPitch(Note::pitch(Tone::D, 2));
-  ssound.samples[11].setPitch(Note::pitch(Tone::E, 2));
-  ssound.samples[12].setPitch(Note::pitch(Tone::E, 2));
-  ssound.samples[13].setPitch(Note::pitch(Tone::D, 2));
-
-
-  for (size_t i = 0; i < ssound.samples.size(); ++i)
-  {
-    ssound.samples[i].setVolume(7);
-    ssound.samples[i].setWaveform(Waveform::ORGAN);
-    printf("%d ", Note::frequency(ssound.samples[i].pitch()));
-  }
-
-  sstate.sound = &ssound;
-  sstate.position = 0;
-  sstate.sample = 0;
-  
   SDL_PauseAudioDevice(device, false);
 }
 
@@ -291,20 +264,31 @@ void APU::handleCommands()
       }
       /* find first available channel*/
       else if (c.channel == -1)
-        for (size_t i = 0; channels.size(); ++i)
+        for (size_t i = 0; i < channels.size(); ++i)
           if (!channels[i].sound)
+          {
             c.channel = i;
+            break;
+          }
 
 
       if (c.channel >= 0 && c.channel < channels.size() && c.index >= 0 && c.index <= SOUND_COUNT)
       {
         auto& channel = channels[c.channel];
 
-        //channel.sound = 
+        channel.soundIndex = c.index;
+        channel.sound = memory.sound(c.index);
+        channel.end = c.end;
+        channel.sample = c.start;
+
+        size_t samplePerTick = (44100 / 128) * (channel.sound->speed + 1);
+
+        channel.position = c.start*samplePerTick;
       }
     }
 
     queue.clear();
+    queueMutex.unlock();
   }
 
   /* stop sound on channel*/
@@ -312,9 +296,10 @@ void APU::handleCommands()
 
 void APU::renderSounds(int16_t* dest, size_t totalSamples)
 {
+  handleCommands();
+  
   constexpr size_t rate = 44100;
-  size_t samplePerTick = (44100 / 128) * (sstate.sound->speed + 1);
-  int16_t maxVolume = 4096;
+  constexpr int16_t maxVolume = 4096;
 
   for (SoundState state : channels)
   {
@@ -322,25 +307,54 @@ void APU::renderSounds(int16_t* dest, size_t totalSamples)
     {
       int16_t* buffer = dest;
       size_t samples = totalSamples;
+      size_t samplePerTick = (44100 / 128) * (state.sound->speed + 1);
+
 
       while (samples > 0 && state.sound)
       {
         /* generate the maximum amount of samples available for same note */
         // TODO: optimize if next note is equal to current
-        size_t available = std::min(samples, samplePerTick - (sstate.position % samplePerTick));
+        size_t available = std::min(samples, samplePerTick - (state.position % samplePerTick));
 
-        const SoundSample& sample = sstate.sound->samples[sstate.sample];
+        const SoundSample& sample = state.sound->samples[state.sample];
+
+        const int16_t volume = (maxVolume / 8) * sample.volume();
+        const frequency_t frequency = Note::frequency(sample.pitch());
 
         /* render samples */
-        dsp.squareWave(Note::frequency(sample.pitch()), (maxVolume / 8) * sample.volume(), 0, sstate.position, dest, samples);
+        switch (sample.waveform())
+        {
+        case Waveform::SQUARE:
+          dsp.squareWave(frequency, volume, 0, state.position, buffer, samples);
+          break;
+        case Waveform::TILTED_SAW:
+          dsp.tiltedSawtoothWave(frequency, volume, 0, 0.85f, state.position, buffer, samples);
+          break;
+        case Waveform::SAW:
+          dsp.sawtoothWave(frequency, volume, 0, state.position, buffer, samples);
+          break;
+        case Waveform::TRIANGLE:
+          dsp.triangleWave(frequency, volume, 0, state.position, buffer, samples);
+          break;
+        case Waveform::PULSE:
+          dsp.pulseWave(frequency, volume, 0, 1/3.0f, state.position, buffer, samples);
+          break;
+        case Waveform::ORGAN:
+          dsp.organWave(frequency, volume, 0, 0.5f, state.position, buffer, samples);
+          break;
+        case Waveform::NOISE:
+          dsp.noise(frequency, volume, state.position, buffer, samples);
+          break;
+        }
+        
 
         samples -= available;
-        dest += available;
-        sstate.position += available;
-        sstate.sample = sstate.position / samplePerTick;
+        buffer += available;
+        state.position += available;
+        state.sample = state.position / samplePerTick;
 
-        if (sstate.sample >= sstate.end)
-          sstate.sound = nullptr;
+        if (state.sample >= state.end)
+          state.sound = nullptr;
       }
     }
   }

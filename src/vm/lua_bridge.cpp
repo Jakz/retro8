@@ -612,7 +612,13 @@ namespace sound
 
   int sfx(lua_State* L)
   {
-    //TODO: implement
+    sfx::sound_index_t index = lua_tonumber(L, 1);
+    sfx::channel_index_t channel = lua_to_or_default(L, number, 2, -1);
+    int32_t start = lua_to_or_default(L, number, 3, 0);
+    int32_t end = lua_to_or_default(L, number, 3, 31); //TODO: actual length
+
+    machine.sound().play(index, channel, start, end);
+
     return 0;
   }
 }
@@ -784,7 +790,7 @@ void lua::registerFunctions(lua_State* L)
 
 
   lua_register(L, "music", ::sound::music);
-  lua_register(L, "sfx", ::sound::music);
+  lua_register(L, "sfx", ::sound::sfx);
 
   lua_register(L, "sub", string::sub);
 

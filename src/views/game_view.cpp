@@ -10,7 +10,7 @@ namespace r8 = retro8;
 retro8::Machine machine;
 
 
-GameView::GameView(ViewManager* manager) : manager(manager)
+GameView::GameView(ViewManager* manager) : manager(manager), _paused(false)
 {
 }
 
@@ -107,9 +107,9 @@ void GameView::render()
     retro8::io::LoaderP8 loader;
 
     if (_path.empty())
-      _path = "test.p8";
+      _path = "breakout_hero.p8";
 
-    //loader.load(_path, machine);
+    loader.load(_path, machine);
 
 
     /*SDL_Surface* surface = IMG_Load("pico-man.p8.png");
@@ -125,8 +125,8 @@ void GameView::render()
     if (machine.code().hasInit())
       machine.code().init();
 
-    //machine.sound().init();
-    //machine.sound().resume();
+    machine.sound().init();
+    machine.sound().resume();
 
 
     /*for (int i = 0; i < 32; ++i)
@@ -144,15 +144,14 @@ void GameView::render()
   SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
   SDL_RenderClear(renderer);
 
-  update();
-  machine.flip();
-  int r = SDL_UpdateTexture(_outputTexture, nullptr, _output->pixels, _output->pitch);
-
-  if (r < 0)
+  if (!_paused)
   {
-    printf("SDL Error: %s\n", SDL_GetError());
-    assert(false);
+    update();
+    machine.flip();
+    SDL_UpdateTexture(_outputTexture, nullptr, _output->pixels, _output->pitch);
   }
+
+
 
   text(_path, 2, 2);
 
@@ -293,6 +292,12 @@ void GameView::handleKeyboardEvent(const SDL_Event& event)
   case SDLK_LALT:
     machine.state().buttons.set(retro8::button_t::ACTION2, event.type == SDL_KEYDOWN);
     break;
+
+  case SDLK_p:
+    if (event.type == SDL_KEYDOWN)
+      _paused = !_paused;
+    break;
+
 
 #ifndef _WIN32
   case SDLK_TAB:

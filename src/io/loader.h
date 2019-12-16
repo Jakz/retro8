@@ -16,6 +16,7 @@ namespace retro8
       retro8::color_t colorFromDigit(char d);
       retro8::sprite_index_t spriteIndexFromString(const char* c);
       retro8::sprite_flags_t spriteFlagsFromString(const char* c);
+      uint8_t valueForUint8(const char* c);
 
     public:
       void load(const std::string& path, Machine& dest);

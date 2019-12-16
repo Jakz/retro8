@@ -30,6 +30,13 @@ sprite_index_t LoaderP8::spriteIndexFromString(const char* c)
   return (h << 4) | l;
 }
 
+uint8_t LoaderP8::valueForUint8(const char* c)
+{
+  int h = valueForHexDigit(c[0]);
+  int l = valueForHexDigit(c[1]);
+  return (h << 4) | l;
+}
+
 retro8::sprite_flags_t LoaderP8::spriteFlagsFromString(const char* c)
 {
   int h = valueForHexDigit(c[0]);
@@ -58,13 +65,16 @@ void LoaderP8::load(const std::string& path, Machine& m)
   //TODO: not efficient but for now it's fine
   std::stringstream code;
 
-  coord_t sy = 0, my = 0, fy = 0;
+  coord_t sy = 0, my = 0, fy = 0, snd = 0;
 
   static constexpr size_t DIGITS_PER_PIXEL_ROW = 128;
   static constexpr size_t BYTES_PER_GFX_ROW = DIGITS_PER_PIXEL_ROW / 2;
 
   static constexpr size_t DIGITS_PER_MAP_ROW = 256;
   static constexpr size_t DIGITS_PER_SPRITE_FLAGS_ROW = 128*2;
+
+  static constexpr size_t DIGITS_PER_SOUND = 168;
+
 
   for (auto& line : lines)
   {
@@ -128,6 +138,34 @@ void LoaderP8::load(const std::string& path, Machine& m)
         }
         ++fy;
         break;
+      }
+      case State::SFX:
+      {
+        assert(line.length() == DIGITS_PER_SOUND);
+        const char* p = line.c_str();
+
+        sfx::Sound* sound = m.memory().sound(snd);
+        sound->speed = valueForUint8(p+2); break;
+        sound->loopStart = valueForUint8(p+4); break;
+        sound->loopEnd = valueForUint8(p+6); break;
+
+        p = p + 8;
+
+        for (size_t i = 0; i < sound->samples.size(); ++i)
+        {
+          const char* s = p + (i * 5);
+          
+          auto& sample = sound->samples[i];
+          
+          sample.setPitch(valueForUint8(s));
+          sample.setWaveform(sfx::Waveform(valueForHexDigit(s[2])));
+          sample.setVolume(valueForHexDigit(s[3]));
+          sample.setEffect(sfx::Effect(valueForHexDigit(s[4])));
+        }
+
+        ++snd;
+        break;
+
       }
       }
     }

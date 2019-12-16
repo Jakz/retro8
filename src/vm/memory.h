@@ -17,6 +17,9 @@ namespace retro8
     static constexpr address_t SPRITE_SHEET = 0x0000;
     static constexpr address_t SPRITE_FLAGS = 0x3000;
 
+    static constexpr address_t MUSIC = 0x3100;
+    static constexpr address_t SOUNDS = 0x3200;
+
     static constexpr address_t CART_DATA = 0x5e00;
     static constexpr address_t PALETTES = 0x5f00;
     static constexpr address_t CLIP_RECT = 0x5f20;
@@ -63,6 +66,8 @@ namespace retro8
     gfx::color_byte_t* screenData() { return as<gfx::color_byte_t>(address::SCREEN_DATA); }
     gfx::color_byte_t* screenData(coord_t x, coord_t y) { return screenData() + y * gfx::SCREEN_PITCH + x / gfx::PIXEL_TO_BYTE_RATIO; }
     integral_t* cartData(index_t idx) { return as<integral_t>(address::CART_DATA + idx * sizeof(integral_t)); } //TODO: ENDIANNESS!!
+
+    sfx::Sound* sound(sfx::sound_index_t i) { return as<sfx::Sound>(address::SOUNDS + sizeof(sfx::Sound)*i); }
 
     sprite_flags_t* spriteFlagsFor(sprite_index_t index)
     {

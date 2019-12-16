@@ -16,6 +16,10 @@ namespace retro8
     
     class Stegano
     {
+    public:
+      static constexpr size_t IMAGE_WIDTH = 160;
+      static constexpr size_t IMAGE_HEIGHT = 205;
+
     private:
       uint8_t assembleByte(const uint32_t v);
     public:

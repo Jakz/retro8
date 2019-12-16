@@ -3,6 +3,7 @@
 #include "defines.h"
 #include "common.h"
 
+#include <array>
 #include <SDL_audio.h>
 
 #if SOUND_ENABLED
@@ -13,6 +14,7 @@ namespace retro8
   {
     using volume_t = int32_t;
     using pitch_t = int32_t;
+    using frequency_t = int32_t;
     
     enum class Waveform
     {
@@ -24,16 +26,44 @@ namespace retro8
       NONE, SLIDE, VIBRATO, DROP, FADE_IN, FADE_OUT, ARPEGGIO_FAST, ARPEGGIO_SLOW
     };
 
+    enum class Tone { C, CS, D, DS, E, F, FS, G, GS, A, AS, B };
+    struct Note
+    {
+    private:
+      constexpr static std::array<float, 12> frequencies = {
+        130.81f, 138.59f, 146.83f, 155.56f, 164.81f, 174.61f, 185.00f, 196.00, 207.65, 220.0, 233.08, 246.94
+      };
+
+    public:
+      static pitch_t pitch(Tone tone, int32_t octave = 1) { return pitch_t(tone) + octave * 12; }
+      static frequency_t frequency(Tone tone, int32_t octave = 1) { return frequencies[size_t(tone)] * octave; };
+      static frequency_t frequency(pitch_t pitch) { return frequencies[pitch % 12] * (1 + pitch / 12); }
+    };
+
     struct SoundSample
     {
+      static constexpr uint16_t EffectMask = 0x7000;
+      static constexpr uint16_t VolumeMask = 0x0E00;
+      static constexpr uint16_t WaveformMask = 0x01C0;
+      static constexpr uint16_t PitchMask = 0x003F;
+
+      static constexpr uint32_t EffectShift = 12;
+      static constexpr uint32_t VolumeShift = 9;
+      static constexpr uint32_t WaveformShift = 6;
+      
       //TODO: endianness is a fail here
       uint16_t value;
 
       bool useSfx() const { return value & 0x8000; }
-      Effect effect() const { return Effect((value >> 12) & 0b111); }
-      Waveform waveform() const { return Waveform((value >> 6) & 0b111); }
-      volume_t volume() const { return (value >> 9) & 0b111; }
-      pitch_t pitch() const { return value & 0x111111; }
+      Effect effect() const { return Effect((value & EffectMask) >> EffectShift); }
+      Waveform waveform() const { return Waveform((value & WaveformMask) >> WaveformShift); }
+      volume_t volume() const { return (value & VolumeMask) >> VolumeShift; }
+      pitch_t pitch() const { return value & PitchMask; }
+      
+      void setPitch(pitch_t pitch) { value = (value & ~PitchMask) | pitch; }
+      void setVolume(volume_t volume) { value = (value & ~VolumeMask) | (volume << VolumeShift); }
+      void setEffect(Effect effect) { value = (value & ~EffectMask) | (uint16_t(effect) << EffectShift); }
+      void setWaveform(Waveform waveform) { value = (value & ~WaveformMask) | (uint16_t(waveform) << WaveformShift); }
     };
 
     struct Sound
@@ -43,6 +73,13 @@ namespace retro8
       uint8_t speed; // 1 note = 1/128 sec * speed
       uint8_t loopStart;
       uint8_t loopEnd;
+    };
+
+    struct SoundState
+    {
+      const Sound* sound;
+      uint32_t sample;
+      uint32_t position; // absolute
     };
     
     class DSP
@@ -77,6 +114,8 @@ namespace retro8
 
       void resume();
       void pause();
+
+      void renderSounds(int16_t* dest, size_t samples);
     };
   }
 }

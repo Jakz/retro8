@@ -156,16 +156,16 @@ DSP dsp(44100);
 constexpr float PULSE_WAVE_DEFAULT_DUTY = 1 / 3.0f;
 constexpr float ORGAN_DEFAULT_COEFFICIENT = 0.5f;
 
-enum Note { C, CS, D, DS, E, F, FS, G, GS, A, AS, B };
-const std::array<float, 12> NoteTable = {
-  130.81f, 138.59f, 146.83f, 155.56f, 164.81f, 174.61f, 185.00f, 196.00, 207.65, 220.0, 233.08, 246.94
-};
-
 size_t position = 0;
 int16_t* rendered = nullptr;
 
 void audio_callback(void* data, uint8_t* cbuffer, int length)
 {
+  APU* apu = static_cast<APU*>(data);
+  int16_t* buffer = reinterpret_cast<int16_t*>(cbuffer);
+  apu->renderSounds(buffer, length / sizeof(int16_t));
+  return;
+  
   if (!rendered)
   {
     rendered = new int16_t[44100 * 3];
@@ -175,7 +175,7 @@ void audio_callback(void* data, uint8_t* cbuffer, int length)
 
   }
   
-  //APU* apu = static_cast<APU*>(data);
+  //
   //int16_t* buffer = reinterpret_cast<int16_t*>(cbuffer);
 
   if (position < 44100 * 3)
@@ -214,12 +214,69 @@ void APU::init()
   }
 }
 
+Sound ssound;
+SoundState sstate;
+
 void APU::resume()
 {
+  ssound.speed = 32;
+  ssound.samples[0].setPitch(Note::pitch(Tone::E, 2));
+  ssound.samples[1].setPitch(Note::pitch(Tone::E, 2));
+  ssound.samples[2].setPitch(Note::pitch(Tone::F, 2));
+  ssound.samples[3].setPitch(Note::pitch(Tone::G, 2));
+  ssound.samples[4].setPitch(Note::pitch(Tone::G, 2));
+  ssound.samples[5].setPitch(Note::pitch(Tone::F, 2));
+  ssound.samples[6].setPitch(Note::pitch(Tone::E, 2));
+  ssound.samples[7].setPitch(Note::pitch(Tone::D, 2));
+  ssound.samples[8].setPitch(Note::pitch(Tone::C, 2));
+  ssound.samples[9].setPitch(Note::pitch(Tone::C, 2));
+  ssound.samples[10].setPitch(Note::pitch(Tone::D, 2));
+  ssound.samples[11].setPitch(Note::pitch(Tone::E, 2));
+  ssound.samples[12].setPitch(Note::pitch(Tone::E, 2));
+  ssound.samples[13].setPitch(Note::pitch(Tone::D, 2));
+
+
+  for (size_t i = 0; i < ssound.samples.size(); ++i)
+  {
+    ssound.samples[i].setVolume(7);
+    ssound.samples[i].setWaveform(Waveform::ORGAN);
+    printf("%d ", Note::frequency(ssound.samples[i].pitch()));
+  }
+
+  sstate.sound = &ssound;
+  sstate.position = 0;
+  sstate.sample = 0;
+  
   SDL_PauseAudioDevice(device, false);
 }
 
 void APU::close()
 {
   SDL_CloseAudioDevice(device);
+}
+
+
+void APU::renderSounds(int16_t* dest, size_t samples)
+{
+  constexpr size_t rate = 44100;
+  size_t samplePerTick = (44100 / 128) * (sstate.sound->speed + 1);
+
+  while (samples > 0)
+  {
+    /* generate the maximum amount of samples available for same note */
+    // TODO: optimize if next note is equal to current
+    size_t available = std::min(samples, samplePerTick - (sstate.position % samplePerTick));
+    const SoundSample& sample = sstate.sound->samples[sstate.sample];
+
+    /* render samples */
+    dsp.squareWave(Note::frequency(sample.pitch()), (4096 / 8) * sample.volume(), 0, sstate.position, dest, samples);
+
+    samples -= available;
+    dest += available;
+    sstate.position += available;
+    sstate.sample = sstate.position / samplePerTick;
+  }
+
+
+
 }

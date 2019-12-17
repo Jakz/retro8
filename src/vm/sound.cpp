@@ -159,40 +159,12 @@ DSP dsp(44100);
 constexpr float PULSE_WAVE_DEFAULT_DUTY = 1 / 3.0f;
 constexpr float ORGAN_DEFAULT_COEFFICIENT = 0.5f;
 
-size_t position = 0;
-int16_t* rendered = nullptr;
 
 void audio_callback(void* data, uint8_t* cbuffer, int length)
 {
   APU* apu = static_cast<APU*>(data);
   int16_t* buffer = reinterpret_cast<int16_t*>(cbuffer);
   apu->renderSounds(buffer, length / sizeof(int16_t));
-  return;
-  
-  if (!rendered)
-  {
-    rendered = new int16_t[44100 * 3];
-    dsp.squareWave(440, 4096, 0, 0, rendered, 44100 * 3);
-    dsp.fadeIn(4096, rendered, 44100);
-    dsp.fadeOut(4096, rendered + 88200, 44100);
-
-  }
-  
-  //
-  //int16_t* buffer = reinterpret_cast<int16_t*>(cbuffer);
-
-  if (position < 44100 * 3)
-  {
-    size_t max = std::min((44100 * 3 - position) * 2, size_t(length));
-    memcpy(cbuffer, rendered + position, max);
-    position += max / sizeof(int16_t);
-  }
-  else
-    memset(cbuffer, 0, length);
-
-  //dsp.triangleWave(NoteTable[A]*2, 4096, 0, pos, buffer, length / sizeof(int16_t));
-  //dsp.noise(NoteTable[A] * 2, 4096, pos, buffer, length / sizeof(int16_t));
-  //pos += length / sizeof(int16_t);
   return;
 }
 
@@ -472,6 +444,8 @@ void APU::renderSounds(int16_t* dest, size_t totalSamples)
         samples -= available;
         buffer += available;
         channel.position += available;
+
+        auto oldSampel = channel.sample;
         channel.sample = channel.position / samplePerTick;
 
         updateChannel(channel, music);

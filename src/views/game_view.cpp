@@ -166,12 +166,12 @@ else
   dest = { 0, 0, 320, 240 };
 #endif
 
+  SDL_RenderCopy(renderer, _outputTexture, nullptr, &dest);
+
   text(_path.c_str(), 10, 10);
   char buffer[16];
   sprintf(buffer, "%.0f/%c0", 1000.0f / manager->lastFrameTicks(), machine.code().require60fps() ? '6' : '3');
   text(buffer, 10, 22);
-
-  SDL_RenderCopy(renderer, _outputTexture, nullptr, &dest);
 
 #if DEBUGGER
   {

@@ -38,13 +38,14 @@ namespace retro8
     {
     private:
       constexpr static std::array<float, 12> frequencies = {
+        //16.35, 17.32f, 18.35f, 19.45f, 20.60f, 21.83f, 23.12f, 24.50f, 25.96f, 27.50f, 29.14f, 30.87f
         130.81f, 138.59f, 146.83f, 155.56f, 164.81f, 174.61f, 185.00f, 196.00, 207.65, 220.0, 233.08, 246.94
       };
 
     public:
       static pitch_t pitch(Tone tone, int32_t octave = 1) { return pitch_t(tone) + octave * 12; }
       static frequency_t frequency(Tone tone, int32_t octave = 1) { return frequencies[size_t(tone)] * octave; };
-      static frequency_t frequency(pitch_t pitch) { return frequencies[pitch % 12] * (1 + pitch / 12); }
+        static frequency_t frequency(pitch_t pitch) { return frequencies[pitch % 12] / 2 * (1 << (pitch / 12)); }
     };
 
     struct SoundSample

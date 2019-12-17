@@ -108,7 +108,7 @@ void GameView::render()
     retro8::io::Loader loader;
 
     if (_path.empty())
-      _path = "get-out.png";
+      _path = "mario.png";
 
     loader.load(_path, machine);
 

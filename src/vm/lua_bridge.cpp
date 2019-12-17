@@ -606,7 +606,12 @@ namespace sound
 {
   int music(lua_State* L)
   {
-    //TODO: implement
+    sfx::music_index_t index = lua_tonumber(L, 1);
+    int32_t fadeMs = lua_to_or_default(L, number, 2, 1);
+    int32_t mask = lua_to_or_default(L, number, 3, 0);
+
+    machine.sound().music(index, fadeMs, mask);
+
     return 0;
   }
 

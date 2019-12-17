@@ -232,7 +232,14 @@ void APU::close()
 void APU::play(sound_index_t index, channel_index_t channel, uint32_t start, uint32_t end)
 {
   queueMutex.lock();
-  queue.push_back({ index, channel, start, end });
+  queue.emplace_back(index, channel, start, end);
+  queueMutex.unlock();
+}
+
+void APU::music(music_index_t index, int32_t fadeMs, int32_t mask)
+{
+  queueMutex.lock();
+  queue.emplace_back(index, fadeMs, mask);
   queueMutex.unlock();
 }
 
@@ -242,49 +249,80 @@ void APU::handleCommands()
   {
     for (Command& c : queue)
     { 
-      /* stop sound on channel*/
-      if (c.index == -1)
+      if (!c.isMusic)
       {
-        assert(c.channel >= 0 && c.channel <= channels.size());
-        channels[c.channel].sound = nullptr;
-        continue;
+        auto& s = c.sound;
+        
+        /* stop sound on channel*/
+        if (s.index == -1)
+        {
+          assert(s.channel >= 0 && s.channel <= channels.size());
+          channels[s.channel].sound = nullptr;
+          continue;
+        }
+        /* stop sound from looping */
+        else if (s.index == -2)
+        {
+          continue;
+        }
+        /* stop sound on all channels that are playing it*/
+        else if (s.channel == -2)
+        {
+          for (auto& chan : channels)
+            if (chan.soundIndex == s.index)
+              chan.sound = nullptr;
+          continue;
+        }
+        /* find first available channel*/
+        else if (s.channel == -1)
+          for (size_t i = 0; i < channels.size(); ++i)
+            if (!channels[i].sound)
+            {
+              s.channel = i;
+              break;
+            }
+
+
+        if (s.channel >= 0 && s.channel < channels.size() && s.index >= 0 && s.index <= SOUND_COUNT)
+        {
+          /* overtaking channel */
+          auto& channel = channels[s.channel];
+
+          channel.soundIndex = s.index;
+          channel.sound = memory.sound(s.index);
+          channel.end = s.end;
+          channel.sample = s.start;
+
+          size_t samplePerTick = (44100 / 128) * (channel.sound->speed + 1);
+
+          channel.position = s.start*samplePerTick;
+        }
       }
-      /* stop sound from looping */
-      else if (c.index == -2)
+      else
       {
-        continue;
-      }
-      /* stop sound on all channels that are playing it*/
-      else if (c.channel == -2)
-      {
-        for (auto& chan : channels)
-          if (chan.soundIndex == c.index)
-            chan.sound = nullptr;
-        continue;
-      }
-      /* find first available channel*/
-      else if (c.channel == -1)
-        for (size_t i = 0; i < channels.size(); ++i)
-          if (!channels[i].sound)
+        const auto& m = c.music;
+
+        if (m.index == -1)
+          mstate.music = nullptr;
+        else
+        {
+          mstate.pattern = m.index;
+          mstate.music = memory.music(m.index);
+          mstate.channelMask = m.mask;
+
+          for (size_t i = 0; i < CHANNEL_COUNT; ++i)
           {
-            c.channel = i;
-            break;
+            if (mstate.music->isChannelEnabled(i))
+            {
+              mstate.channels[i].sound = memory.sound(mstate.music->sound(i));
+              mstate.channels[i].sample = 0;
+              mstate.channels[i].position = 0;
+              mstate.channels[i].end = 31; //TODO: fix according to behavior
+            }
+            else
+              mstate.channels[i].sound = nullptr;
           }
-
-
-      if (c.channel >= 0 && c.channel < channels.size() && c.index >= 0 && c.index <= SOUND_COUNT)
-      {
-        /* overtaking channel */
-        auto& channel = channels[c.channel];
-
-        channel.soundIndex = c.index;
-        channel.sound = memory.sound(c.index);
-        channel.end = c.end;
-        channel.sample = c.start;
-
-        size_t samplePerTick = (44100 / 128) * (channel.sound->speed + 1);
-
-        channel.position = c.start*samplePerTick;
+        }
       }
     }
 
@@ -297,18 +335,95 @@ void APU::handleCommands()
 
 void APU::updateMusic()
 {
-  if (music.music)
+  if (mstate.music)
   {
     for (channel_index_t i = 0; i < CHANNEL_COUNT; ++i)
     {
       /* will use channel if channel is forced or there's no sound currently playing there */
-      bool willUseChannel = ((music.channelMask & (1 << i)) != 0) || !channels[i].sound;
+      bool willUseChannel = ((mstate.channelMask & (1 << i)) != 0) || !channels[i].sound;
 
       
     }
 
   }
   
+}
+
+void APU::updateChannel(SoundState& channel, const Music* music)
+{
+  if (!music)
+  {
+    if (channel.sample >= channel.end)
+      channel.sound = nullptr;
+  }
+  else
+  {
+    /* sound is ended, behavior depends on flag for music*/
+    if (channel.sample >= channel.end)
+    {
+      if (music->isStop())
+        this->mstate.music = nullptr;
+      else if (music->isLoopEnd() || this->mstate.pattern == MUSIC_COUNT - 1)
+      {
+        music_index_t i = this->mstate.pattern - 1;
+        const Music* next = nullptr;
+
+        while (i >= 0)
+        {
+          next = memory.music(i);
+          if (next->isLoopBegin() || i == 0)
+            break;
+
+          --i;
+        }
+
+        this->mstate.pattern = i;
+        this->mstate.music = next;
+      }
+    }
+    else
+    {
+      channel.sound = nullptr;
+      
+      ++this->mstate.pattern;
+      this->mstate.music = memory.music(this->mstate.pattern);
+    }
+  }
+}
+
+void APU::renderSound(const SoundState& channel, int16_t* buffer, size_t samples)
+{
+  const SoundSample& sample = channel.sound->samples[channel.sample];
+
+  constexpr int16_t maxVolume = 4096;
+  const int16_t volume = (maxVolume / 8) * sample.volume();
+  const frequency_t frequency = Note::frequency(sample.pitch());
+  
+  /* render samples */
+  switch (sample.waveform())
+  {
+  case Waveform::SQUARE:
+    dsp.squareWave(frequency, volume, 0, channel.position, buffer, samples);
+    break;
+  case Waveform::TILTED_SAW:
+    dsp.tiltedSawtoothWave(frequency, volume, 0, 0.85f, channel.position, buffer, samples);
+    break;
+  case Waveform::SAW:
+    dsp.sawtoothWave(frequency, volume, 0, channel.position, buffer, samples);
+    break;
+  case Waveform::TRIANGLE:
+    dsp.triangleWave(frequency, volume, 0, channel.position, buffer, samples);
+    break;
+  case Waveform::PULSE:
+    dsp.pulseWave(frequency, volume, 0, 1 / 3.0f, channel.position, buffer, samples);
+    break;
+  case Waveform::ORGAN:
+    dsp.organWave(frequency, volume, 0, 0.5f, channel.position, buffer, samples);
+    break;
+  case Waveform::NOISE:
+    dsp.noise(frequency, volume, channel.position, buffer, samples);
+    break;
+  }
 }
 
 void APU::renderSounds(int16_t* dest, size_t totalSamples)
@@ -320,60 +435,30 @@ void APU::renderSounds(int16_t* dest, size_t totalSamples)
 
   memset(dest, 0, sizeof(int16_t)*totalSamples);
 
-  for (SoundState& state : channels)
+  for (size_t i = 0; i < CHANNEL_COUNT; ++i)
   {
-    if (state.sound)
+    int16_t* buffer = dest;
+    size_t samples = totalSamples;
+
+    SoundState& channel = channels[i].sound ? channels[i] : mstate.channels[i];
+    const Music* music = &channel == &this->mstate.channels[i] ? this->mstate.music : nullptr; //TODO: crappy comparison
+    
+    if (channel.sound)
     {
-      int16_t* buffer = dest;
-      size_t samples = totalSamples;
-      size_t samplePerTick = (44100 / 128) * (state.sound->speed + 1);
-
-
-      while (samples > 0 && state.sound)
+      const size_t samplePerTick = (44100 / 128) * (channel.sound->speed + 1);
+      while (samples > 0 && channel.sound)
       {
         /* generate the maximum amount of samples available for same note */
         // TODO: optimize if next note is equal to current
-        size_t available = std::min(samples, samplePerTick - (state.position % samplePerTick));
-
-        const SoundSample& sample = state.sound->samples[state.sample];
-
-        const int16_t volume = (maxVolume / 8) * sample.volume();
-        const frequency_t frequency = Note::frequency(sample.pitch());
-
-        /* render samples */
-        switch (sample.waveform())
-        {
-        case Waveform::SQUARE:
-          dsp.squareWave(frequency, volume, 0, state.position, buffer, samples);
-          break;
-        case Waveform::TILTED_SAW:
-          dsp.tiltedSawtoothWave(frequency, volume, 0, 0.85f, state.position, buffer, samples);
-          break;
-        case Waveform::SAW:
-          dsp.sawtoothWave(frequency, volume, 0, state.position, buffer, samples);
-          break;
-        case Waveform::TRIANGLE:
-          dsp.triangleWave(frequency, volume, 0, state.position, buffer, samples);
-          break;
-        case Waveform::PULSE:
-          dsp.pulseWave(frequency, volume, 0, 1/3.0f, state.position, buffer, samples);
-          break;
-        case Waveform::ORGAN:
-          dsp.organWave(frequency, volume, 0, 0.5f, state.position, buffer, samples);
-          break;
-        case Waveform::NOISE:
-          dsp.noise(frequency, volume, state.position, buffer, samples);
-          break;
-        }
-        
+        size_t available = std::min(samples, samplePerTick - (channel.position % samplePerTick));
+        renderSound(channel, buffer, available);
 
         samples -= available;
         buffer += available;
-        state.position += available;
-        state.sample = state.position / samplePerTick;
+        channel.position += available;
+        channel.sample = channel.position / samplePerTick;
 
-        if (state.sample >= state.end)
-          state.sound = nullptr;
+        updateChannel(channel, music);
       }
     }
   }

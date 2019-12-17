@@ -103,7 +103,7 @@ namespace retro8
       inline bool isLoopEnd() const { return (indices[1] & LOOP_FLAG) != 0; }
       inline bool isStop() const { return (indices[2] & LOOP_FLAG) != 0; }
 
-      inline bool isChannelEnabled(channel_index_t channel) { return (indices[channel] & SOUND_ON_FLAG) != 0; }
+      inline bool isChannelEnabled(channel_index_t channel) const { return (indices[channel] & SOUND_ON_FLAG) != 0; }
       sound_index_t sound(channel_index_t channel) const { return indices[channel] & SOUND_INDEX_MASK; }
     };
 
@@ -126,7 +126,7 @@ namespace retro8
     struct MusicState
     {
       std::array<SoundState, 4> channels;
-      Music* music;
+      const Music* music;
       music_index_t pattern;
       uint8_t channelMask;
     };
@@ -162,10 +162,28 @@ namespace retro8
       
       struct Command
       {
-        sound_index_t index;
-        channel_index_t channel;
-        uint32_t start;
-        uint32_t end;
+        bool isMusic;
+
+        union
+        {
+          struct
+          {
+            sound_index_t index;
+            channel_index_t channel;
+            uint32_t start;
+            uint32_t end;
+          } sound;
+
+          struct
+          {
+            music_index_t index;
+            int32_t fadeMs;
+            int32_t mask;
+          } music;
+        };
+
+        Command(sound_index_t index, channel_index_t channel, uint32_t start, uint32_t end) : isMusic(false), sound({ index, channel, start, end }) { }
+        Command(music_index_t index, int32_t fadeMs, int32_t mask) : isMusic(true), music({ index, fadeMs, mask }) { }
       };
 
 
@@ -174,7 +192,7 @@ namespace retro8
     
       
       std::array<SoundState, CHANNEL_COUNT> channels;
-      MusicState music;
+      MusicState mstate;
 
       std::mutex queueMutex;
       std::vector<Command> queue;
@@ -182,6 +200,8 @@ namespace retro8
       void handleCommands();
 
       void updateMusic();
+      void renderSound(const SoundState& sound, int16_t* buffer, size_t samples);
+      void updateChannel(SoundState& channel, const Music* music);
 
     public:
       APU(Memory& memory) : memory(memory) { }
@@ -193,6 +213,7 @@ namespace retro8
       void pause();
 
       void play(sound_index_t index, channel_index_t channel, uint32_t start, uint32_t end);
+      void music(music_index_t index, int32_t fadeMs, int32_t mask);
 
       void renderSounds(int16_t* dest, size_t samples);
     };

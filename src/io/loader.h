@@ -9,7 +9,7 @@ namespace retro8
 {
   namespace io
   {
-    class LoaderP8
+    class Loader
     {
     private:
       int valueForHexDigit(char c);

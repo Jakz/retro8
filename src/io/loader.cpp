@@ -1,5 +1,7 @@
 #include "loader.h"
 
+#include "stegano.h"
+
 #include <fstream>
 #include <algorithm>
 #include <iterator>
@@ -11,41 +13,50 @@ using namespace retro8::io;
 
 
 
-int LoaderP8::valueForHexDigit(char c)
+int Loader::valueForHexDigit(char c)
 {
   int v = (c >= 'A') ? (c >= 'a') ? (c - 'a' + 10) : (c - 'A' + 10) : (c - '0');
   assert(v >= 0 && v <= 0xf);
   return v;
 }
 
-color_t LoaderP8::colorFromDigit(char d)
+color_t Loader::colorFromDigit(char d)
 {
   return static_cast<color_t>(valueForHexDigit(d));
 }
 
-sprite_index_t LoaderP8::spriteIndexFromString(const char* c)
+sprite_index_t Loader::spriteIndexFromString(const char* c)
 {
   int h = valueForHexDigit(c[0]);
   int l = valueForHexDigit(c[1]);
   return (h << 4) | l;
 }
 
-uint8_t LoaderP8::valueForUint8(const char* c)
+uint8_t Loader::valueForUint8(const char* c)
 {
   int h = valueForHexDigit(c[0]);
   int l = valueForHexDigit(c[1]);
   return (h << 4) | l;
 }
 
-retro8::sprite_flags_t LoaderP8::spriteFlagsFromString(const char* c)
+retro8::sprite_flags_t Loader::spriteFlagsFromString(const char* c)
 {
   int h = valueForHexDigit(c[0]);
   int l = valueForHexDigit(c[1]);
   return (h << 4) | l;
 }
 
-void LoaderP8::load(const std::string& path, Machine& m)
-{
+void Loader::load(const std::string& path, Machine& m)
+{ 
+  /* if it's a PNG we should use other loader */
+  if (path.length() >= 4 && path.substr(path.length() - 4) == ".png")
+  {
+    Stegano stegano;
+    stegano.load(path, m);
+    return;
+  }
+  
+  
   std::vector<std::string> lines;
 
   std::ifstream input(path);
@@ -192,7 +203,7 @@ void LoaderP8::load(const std::string& path, Machine& m)
             if (index < UNUSED_CHANNEL)
               music->setSound(i, index);
             else
-              assert(index == UNUSED_CHANNEL + i);
+              assert(index == UNUSED_CHANNEL + i + 1);
           }
 
           ++msc;

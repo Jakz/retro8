@@ -24,6 +24,7 @@ namespace retro8
       uint8_t assembleByte(const uint32_t v);
     public:
       void load(const PngData& data, Machine& dest);
+      void load(const std::string& path, Machine& dest);
     };
   }
 }

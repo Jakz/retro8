@@ -105,10 +105,10 @@ void GameView::render()
 
     machine.code().loadAPI();
 
-    retro8::io::LoaderP8 loader;
+    retro8::io::Loader loader;
 
     if (_path.empty())
-      _path = "breakout_hero.p8";
+      _path = "get-out.png";
 
     loader.load(_path, machine);
 
@@ -168,7 +168,7 @@ else
 
   text(_path.c_str(), 10, 10);
   char buffer[16];
-  sprintf(buffer, "%.0f", 1000.0f / manager->lastFrameTicks());
+  sprintf(buffer, "%.0f/%c0", 1000.0f / manager->lastFrameTicks(), machine.code().require60fps() ? '6' : '3');
   text(buffer, 10, 22);
 
   SDL_RenderCopy(renderer, _outputTexture, nullptr, &dest);

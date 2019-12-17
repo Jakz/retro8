@@ -362,10 +362,18 @@ void APU::updateChannel(SoundState& channel, const Music* music)
     if (channel.sample >= channel.end)
     {
       if (music->isStop())
-        this->mstate.music = nullptr;
-      else if (music->isLoopEnd() || this->mstate.pattern == MUSIC_COUNT - 1)
       {
-        music_index_t i = this->mstate.pattern - 1;
+        this->mstate.music = nullptr;
+        for (auto& channel : mstate.channels)
+          channel.sound = nullptr;
+        return;
+      }
+      
+      ++mstate.pattern;
+      
+      if (music->isLoopEnd() || mstate.pattern == MUSIC_COUNT)
+      {
+        music_index_t i = mstate.pattern - 1;
         const Music* next = nullptr;
 
         while (i >= 0)
@@ -377,16 +385,24 @@ void APU::updateChannel(SoundState& channel, const Music* music)
           --i;
         }
 
-        this->mstate.pattern = i;
-        this->mstate.music = next;
+        mstate.pattern = i;
+        mstate.music = next;
       }
-    }
-    else
-    {
-      channel.sound = nullptr;
-      
-      ++this->mstate.pattern;
-      this->mstate.music = memory.music(this->mstate.pattern);
+
+      mstate.music = memory.music(mstate.pattern);
+
+      for (size_t i = 0; i < CHANNEL_COUNT; ++i)
+      {
+        if (mstate.music->isChannelEnabled(i))
+        {
+          mstate.channels[i].sound = memory.sound(mstate.music->sound(i));
+          mstate.channels[i].sample = 0;
+          mstate.channels[i].position = 0;
+          mstate.channels[i].end = 31; //TODO: fix according to behavior
+        }
+        else
+          mstate.channels[i].sound = nullptr;
+      }
     }
   }
 }

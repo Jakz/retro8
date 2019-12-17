@@ -203,7 +203,7 @@ void Loader::load(const std::string& path, Machine& m)
             if (index < UNUSED_CHANNEL)
               music->setSound(i, index);
             else
-              assert(index == UNUSED_CHANNEL + i + 1);
+              assert(true || (index == UNUSED_CHANNEL + i + 1));
           }
 
           ++msc;

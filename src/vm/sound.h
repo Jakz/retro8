@@ -85,8 +85,8 @@ namespace retro8
     struct Music
     {
     private:
-      constexpr static uint8_t SOUND_INDEX_MASK = 0xb00111111;
-      constexpr static uint8_t CONFIG_MASK = 0xb11000000;
+      constexpr static uint8_t SOUND_INDEX_MASK = 0b00111111;
+      constexpr static uint8_t CONFIG_MASK = 0b11000000;
       constexpr static uint8_t SOUND_ON_FLAG = 0b01000000;
       constexpr static uint8_t LOOP_FLAG = 0b10000000;
 

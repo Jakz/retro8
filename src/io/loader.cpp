@@ -65,7 +65,7 @@ void LoaderP8::load(const std::string& path, Machine& m)
   //TODO: not efficient but for now it's fine
   std::stringstream code;
 
-  coord_t sy = 0, my = 0, fy = 0, snd = 0;
+  coord_t sy = 0, my = 0, fy = 0, snd = 0, msc = 0;
 
   static constexpr size_t DIGITS_PER_PIXEL_ROW = 128;
   static constexpr size_t BYTES_PER_GFX_ROW = DIGITS_PER_PIXEL_ROW / 2;
@@ -74,6 +74,7 @@ void LoaderP8::load(const std::string& path, Machine& m)
   static constexpr size_t DIGITS_PER_SPRITE_FLAGS_ROW = 128*2;
 
   static constexpr size_t DIGITS_PER_SOUND = 168;
+  static constexpr size_t DIGITS_PER_MUSIC_PATTERN = 2 + 1 + 8;
 
 
   for (auto& line : lines)
@@ -167,7 +168,41 @@ void LoaderP8::load(const std::string& path, Machine& m)
         break;
 
       }
+      case State::MUSIC:
+      {
+        const char* p = line.c_str();
+
+        if (!line.empty())
+        {
+          sfx::Music* music = m.memory().music(msc);
+
+          /* XX AABBCCDD*/
+          constexpr sfx::sound_index_t UNUSED_CHANNEL = 0x40;
+
+          uint8_t flags = valueForUint8(p);
+
+          if (flags & 0b1) music->markLoopBegin();
+          else if (flags & 0b10) music->markLoopEnd();
+          else if (flags & 0b100) music->markStop();
+
+          for (sfx::channel_index_t i = 0; i < sfx::APU::CHANNEL_COUNT; ++i)
+          {
+            sfx::sound_index_t index = valueForUint8(p + 3 + 2 * i);
+
+            if (index < UNUSED_CHANNEL)
+              music->setSound(i, index);
+            else
+              assert(index == UNUSED_CHANNEL + i);
+          }
+
+          ++msc;
+
+        }
+        
+        break;
       }
+      }
+
     }
   }
 

@@ -274,6 +274,7 @@ void APU::handleCommands()
 
       if (c.channel >= 0 && c.channel < channels.size() && c.index >= 0 && c.index <= SOUND_COUNT)
       {
+        /* overtaking channel */
         auto& channel = channels[c.channel];
 
         channel.soundIndex = c.index;
@@ -292,6 +293,22 @@ void APU::handleCommands()
   }
 
   /* stop sound on channel*/
+}
+
+void APU::updateMusic()
+{
+  if (music.music)
+  {
+    for (channel_index_t i = 0; i < CHANNEL_COUNT; ++i)
+    {
+      /* will use channel if channel is forced or there's no sound currently playing there */
+      bool willUseChannel = ((music.channelMask & (1 << i)) != 0) || !channels[i].sound;
+
+      
+    }
+
+  }
+  
 }
 
 void APU::renderSounds(int16_t* dest, size_t totalSamples)

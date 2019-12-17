@@ -23,6 +23,7 @@ protected:
 
   bool willQuit;
   u32 ticks;
+  float _lastFrameTicks;
 
   u32 frameRate;
   float ticksPerFrame;
@@ -40,6 +41,8 @@ public:
     this->frameRate = frameRate;
     this->ticksPerFrame = 1000 / (float)frameRate;
   }
+
+  float lastFrameTicks() const { return _lastFrameTicks; }
 
   bool init();
   void deinit();
@@ -111,14 +114,12 @@ void SDL<EventHandler, Renderer>::capFPS()
   u32 ticks = SDL_GetTicks();
   u32 elapsed = ticks - SDL::ticks;
 
-  //printf("Ticks: %u, waiting %f ticks, aticks: %u\n", elapsed, TICKS_PER_FRAME - elapsed, Gfx::fticks);
-
-  u32 frameTime = elapsed;
+  _lastFrameTicks = elapsed;
 
   if (elapsed < ticksPerFrame)
   {
     SDL_Delay(ticksPerFrame - elapsed);
-    frameTime = ticksPerFrame;
+    _lastFrameTicks = ticksPerFrame;
   }
 
   SDL::ticks = SDL_GetTicks();

@@ -68,6 +68,7 @@ namespace retro8
     integral_t* cartData(index_t idx) { return as<integral_t>(address::CART_DATA + idx * sizeof(integral_t)); } //TODO: ENDIANNESS!!
 
     sfx::Sound* sound(sfx::sound_index_t i) { return as<sfx::Sound>(address::SOUNDS + sizeof(sfx::Sound)*i); }
+    sfx::Music* music(sfx::music_index_t i) { return as<sfx::Music>(address::MUSIC + sizeof(sfx::Music)*i); }
 
     sprite_flags_t* spriteFlagsFor(sprite_index_t index)
     {

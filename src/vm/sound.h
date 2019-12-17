@@ -21,6 +21,7 @@ namespace retro8
     using frequency_t = int32_t;
     using channel_index_t = int32_t;
     using sound_index_t = int32_t;
+    using music_index_t = int32_t;
     
     enum class Waveform
     {
@@ -60,11 +61,11 @@ namespace retro8
       //TODO: endianness is a fail here
       uint16_t value;
 
-      bool useSfx() const { return value & 0x8000; }
-      Effect effect() const { return Effect((value & EffectMask) >> EffectShift); }
-      Waveform waveform() const { return Waveform((value & WaveformMask) >> WaveformShift); }
-      volume_t volume() const { return (value & VolumeMask) >> VolumeShift; }
-      pitch_t pitch() const { return value & PitchMask; }
+      inline bool useSfx() const { return value & 0x8000; }
+      inline Effect effect() const { return Effect((value & EffectMask) >> EffectShift); }
+      inline Waveform waveform() const { return Waveform((value & WaveformMask) >> WaveformShift); }
+      inline volume_t volume() const { return (value & VolumeMask) >> VolumeShift; }
+      inline pitch_t pitch() const { return value & PitchMask; }
       
       void setPitch(pitch_t pitch) { value = (value & ~PitchMask) | pitch; }
       void setVolume(volume_t volume) { value = (value & ~VolumeMask) | (volume << VolumeShift); }
@@ -83,7 +84,27 @@ namespace retro8
 
     struct Music
     {
-      uint8_t dummy[4];
+    private:
+      constexpr static uint8_t SOUND_INDEX_MASK = 0xb00111111;
+      constexpr static uint8_t CONFIG_MASK = 0xb11000000;
+      constexpr static uint8_t SOUND_ON_FLAG = 0b01000000;
+      constexpr static uint8_t LOOP_FLAG = 0b10000000;
+
+      std::array<uint8_t, 4> indices;
+
+    public:
+      
+      void setSound(channel_index_t channel, sound_index_t index) { indices[channel] = (indices[channel] & CONFIG_MASK) | index | SOUND_ON_FLAG; }
+      void markLoopBegin() { indices[0] |= LOOP_FLAG; }
+      void markLoopEnd() { indices[1] |= LOOP_FLAG; }
+      void markStop() { indices[2] |= LOOP_FLAG; }
+
+      inline bool isLoopBegin() const { return (indices[0] & LOOP_FLAG) != 0; }
+      inline bool isLoopEnd() const { return (indices[1] & LOOP_FLAG) != 0; }
+      inline bool isStop() const { return (indices[2] & LOOP_FLAG) != 0; }
+
+      inline bool isChannelEnabled(channel_index_t channel) { return (indices[channel] & SOUND_ON_FLAG) != 0; }
+      sound_index_t sound(channel_index_t channel) const { return indices[channel] & SOUND_INDEX_MASK; }
     };
 
     using sound_t = Sound;
@@ -100,6 +121,14 @@ namespace retro8
       uint32_t sample;
       uint32_t position; // absolute
       uint32_t end;
+    };
+
+    struct MusicState
+    {
+      std::array<SoundState, 4> channels;
+      Music* music;
+      music_index_t pattern;
+      uint8_t channelMask;
     };
     
     class DSP
@@ -125,6 +154,10 @@ namespace retro8
 
     class APU
     {
+    public:
+      static constexpr size_t CHANNEL_COUNT = 4;
+
+    private:
       retro8::Memory& memory;
       
       struct Command
@@ -135,16 +168,20 @@ namespace retro8
         uint32_t end;
       };
 
-      static constexpr size_t CHANNEL_COUNT = 4;
 
       SDL_AudioSpec spec;
       SDL_AudioDeviceID device;
     
+      
       std::array<SoundState, CHANNEL_COUNT> channels;
+      MusicState music;
+
       std::mutex queueMutex;
       std::vector<Command> queue;
 
       void handleCommands();
+
+      void updateMusic();
 
     public:
       APU(Memory& memory) : memory(memory) { }

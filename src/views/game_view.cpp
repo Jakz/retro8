@@ -10,7 +10,8 @@ namespace r8 = retro8;
 retro8::Machine machine;
 
 
-GameView::GameView(ViewManager* manager) : manager(manager), _paused(false)
+GameView::GameView(ViewManager* manager) : manager(manager), 
+_paused(false), _showFPS(false), _showCartridgeName(false)
 {
 }
 
@@ -151,10 +152,6 @@ void GameView::render()
     SDL_UpdateTexture(_outputTexture, nullptr, _output->pixels, _output->pitch);
   }
 
-
-
-  text(_path, 2, 2);
-
 SDL_Rect dest;
   //SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, machine.screen());
 #ifdef _WIN32
@@ -168,6 +165,11 @@ else if (scale == Scale::SCALED_ASPECT_2x)
 else
   dest = { 0, 0, 320, 240 };
 #endif
+
+  text(_path.c_str(), 10, 10);
+  char buffer[16];
+  sprintf(buffer, "%.0f", 1000.0f / manager->lastFrameTicks());
+  text(buffer, 10, 22);
 
   SDL_RenderCopy(renderer, _outputTexture, nullptr, &dest);
 
@@ -213,10 +215,8 @@ else
       SDL_RenderCopy(renderer, texture, nullptr, &destr);
       SDL_DestroyTexture(texture);
       SDL_FreeSurface(palettes);
-
     }
 
-    /* palette */
 
     {
       /*static SDL_Surface* tilemap = nullptr;
@@ -256,12 +256,13 @@ else
 
 void GameView::text(const std::string& text, int32_t x, int32_t y)
 {
+  constexpr float scale = 2.0;
   constexpr int32_t GLYPHS_PER_ROW = 16;
   
   for (size_t i = 0; i < text.length(); ++i)
   {
-    SDL_Rect src = { 8 * (i % GLYPHS_PER_ROW), 8 * (i / GLYPHS_PER_ROW), 4, 6 };
-    SDL_Rect dest = { x + 4 * i, y, 4, 6 };
+    SDL_Rect src = { 8 * (text[i] % GLYPHS_PER_ROW), 8 * (text[i] / GLYPHS_PER_ROW), 4, 6 };
+    SDL_Rect dest = { x + 4 * i * scale, y, 4 * scale, 6 * scale };
     SDL_RenderCopy(manager->renderer(), _font, &src, &dest);
   }
 }

@@ -35,7 +35,9 @@ namespace ui
 
     bool _paused;
 
-    void rasterize();
+    bool _showFPS;
+    bool _showCartridgeName;
+
     void render();
     void update();
 

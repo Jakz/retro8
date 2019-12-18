@@ -142,7 +142,7 @@ namespace retro8
 
       //TODO: %16 to make it wrap around, is it intended behavior? mandel.
       color_t get(color_t i) const { return color_t(colors[i] & 0x0F); }
-      void set(color_t i, color_t color) { colors[i] |= color | (colors[i] & 0x10); }
+      void set(color_t i, color_t color) { colors[i] = color | (colors[i] & 0x10); }
       color_t operator[](color_t i) { return get(i); }
       bool transparent(color_t i) const { return (colors[i] & 0x10) != 0; }
       void transparent(color_t i, bool f) { colors[i] = f ? (colors[i] | 0x10) : (colors[i] & 0x0f); }

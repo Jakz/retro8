@@ -142,7 +142,7 @@ int spr(lua_State* L)
   if (lua_gettop(L) > 3)
   {
     assert(lua_gettop(L) >= 5);
-    
+
     real_t w = lua_tonumber(L, 4);
     real_t h = lua_tonumber(L, 5);
     bool fx = false, fy = false;
@@ -152,7 +152,7 @@ int spr(lua_State* L)
 
     if (lua_gettop(L) >= 7)
       fy = lua_toboolean(L, 7);
-   
+
     machine.spr(idx, x, y, w, h, fx, fy);
   }
   else
@@ -342,8 +342,9 @@ namespace debug
 
   int breakpoint(lua_State* L)
   {
+#if _WIN32
     __debugbreak();
-
+#endif
     return 0;
   }
 }
@@ -683,7 +684,7 @@ namespace platform
     return 1;
   }
 
-  
+
   int btn(lua_State* L)
   {
     /* we're asking for a specific button*/
@@ -762,7 +763,7 @@ namespace platform
   int dget(lua_State* L)
   {
     index_t idx = lua_tonumber(L, 1);
-    
+
     lua_pushnumber(L, *machine.memory().cartData(idx));
 
     return 1;
@@ -770,7 +771,7 @@ namespace platform
 
   int flip(lua_State* L)
   {
-    //TODO: this call should syncronize to 30fps, at the moment it just 
+    //TODO: this call should syncronize to 30fps, at the moment it just
     // returns producing a lot of flips in non synchronized code (eg. _init() busy loop)
     machine.flip();
 
@@ -874,7 +875,7 @@ void Code::loadAPI()
   {
     L = luaL_newstate();
   }
-  
+
   std::ifstream apiFile("api.lua");
   std::string api((std::istreambuf_iterator<char>(apiFile)), std::istreambuf_iterator<char>());
 
@@ -887,10 +888,10 @@ void Code::printError(const char* where)
   //for (int i = 1; i < lua_gettop(L); ++i)
   {
     std::cout << "Error on " << where << std::endl;
-   
+
     //luaL_traceback(L, L, NULL, 1);
     //printf("%s\n", lua_tostring(L, -1));
-    
+
     if (lua_isstring(L, -1))
     {
       const char* message = lua_tostring(L, -1);

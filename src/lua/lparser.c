@@ -1414,7 +1414,7 @@ static void forstat (LexState *ls, int line) {
 }
 
 
-void retstat(LexState* ls);
+static void retstat(LexState* ls);
 
 static void inline_if(LexState* ls, expdesc* v)
 {
@@ -1431,7 +1431,7 @@ static void inline_if(LexState* ls, expdesc* v)
   enterblock(fs, &bl, 0);
   jf = v->f;
 
-  /* handling return manually because otherwise any valid LHS 
+  /* handling return manually because otherwise any valid LHS
   would be parsed as return value for return statement */
   if (ls->t.token == TK_RETURN)
     retstat(ls);

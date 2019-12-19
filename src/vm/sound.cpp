@@ -156,9 +156,13 @@ DSP dsp(44100);
 
 // C C# D D# E F F# G G# A A# B
 
+constexpr std::array<float, 12> Note::frequencies;
+
 constexpr float PULSE_WAVE_DEFAULT_DUTY = 1 / 3.0f;
 constexpr float ORGAN_DEFAULT_COEFFICIENT = 0.5f;
 
+size_t position = 0;
+int16_t* rendered = nullptr;
 
 void audio_callback(void* data, uint8_t* cbuffer, int length)
 {
@@ -172,7 +176,7 @@ void APU::init()
 {
   static_assert(sizeof(SoundSample) == 2, "Must be 2 bytes");
   static_assert(sizeof(Sound) == 68, "Must be 68 bytes");
-  
+
   SDL_AudioSpec wantSpec;
   wantSpec.freq = 44100;
   wantSpec.format = AUDIO_S16SYS;
@@ -182,7 +186,7 @@ void APU::init()
   wantSpec.callback = audio_callback;
 
   for (auto& channel : channels) channel.sound = nullptr;
-  
+
   device = SDL_OpenAudioDevice(NULL, 0, &wantSpec, &spec, 0);
 
   if (!device)
@@ -225,11 +229,11 @@ void APU::handleCommands()
   if (queueMutex.try_lock())
   {
     for (Command& c : queue)
-    { 
+    {
       if (!c.isMusic)
       {
         auto& s = c.sound;
-        
+
         /* stop sound on channel*/
         if (s.index == -1)
         {
@@ -319,11 +323,11 @@ void APU::updateMusic()
       /* will use channel if channel is forced or there's no sound currently playing there */
       bool willUseChannel = ((mstate.channelMask & (1 << i)) != 0) || !channels[i].sound;
 
-      
+
     }
 
   }
-  
+
 }
 
 void APU::updateChannel(SoundState& channel, const Music* music)
@@ -345,9 +349,9 @@ void APU::updateChannel(SoundState& channel, const Music* music)
           channel.sound = nullptr;
         return;
       }
-      
+
       ++mstate.pattern;
-      
+
       if (music->isLoopEnd() || mstate.pattern == MUSIC_COUNT)
       {
         music_index_t i = mstate.pattern - 1;
@@ -391,7 +395,7 @@ void APU::renderSound(const SoundState& channel, int16_t* buffer, size_t samples
   constexpr int16_t maxVolume = 4096;
   const int16_t volume = (maxVolume / 8) * sample.volume();
   const frequency_t frequency = Note::frequency(sample.pitch());
-  
+
   /* render samples */
   switch (sample.waveform())
   {
@@ -421,14 +425,12 @@ void APU::renderSound(const SoundState& channel, int16_t* buffer, size_t samples
 
 void APU::renderSounds(int16_t* dest, size_t totalSamples)
 {
-  memset(dest, 0, sizeof(int16_t)*totalSamples);
-
-  //return;
-  
   handleCommands();
-  
+
   constexpr size_t rate = 44100;
   constexpr int16_t maxVolume = 4096;
+
+  memset(dest, 0, sizeof(int16_t)*totalSamples);
 
   for (size_t i = 0; i < CHANNEL_COUNT; ++i)
   {
@@ -437,7 +439,7 @@ void APU::renderSounds(int16_t* dest, size_t totalSamples)
 
     SoundState& channel = channels[i].sound ? channels[i] : mstate.channels[i];
     const Music* music = &channel == &this->mstate.channels[i] ? this->mstate.music : nullptr; //TODO: crappy comparison
-    
+
     if (channel.sound)
     {
       const size_t samplePerTick = (44100 / 128) * (channel.sound->speed + 1);
@@ -451,8 +453,6 @@ void APU::renderSounds(int16_t* dest, size_t totalSamples)
         samples -= available;
         buffer += available;
         channel.position += available;
-
-        auto oldSampel = channel.sample;
         channel.sample = channel.position / samplePerTick;
 
         updateChannel(channel, music);

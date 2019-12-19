@@ -1,7 +1,3 @@
-!(projects/screenshots/screenshot1.png)
-!(projects/screenshots/screenshot2.png)
-!(projects/screenshots/screenshot3.png)
-
 ## Introduction
 
 This is an attempt to have an open source reimplementation of PICO-8 fantasy console to be used on Desktop platforms but especially wherever you want to compile it.
@@ -25,3 +21,9 @@ Many demos already work and even some full games.
 - Some Lua language extensions have been implemented
 
 The dreaded missing features are Lua extensions hard to add to the existing parsing, like compound (`+=`) operators which currently don't work on subexpressions (like `foo.x += 3`) or inline `if` which gives problems with `return` statements.
+
+## Screenshots
+
+![](projects/screenshots/screenshot1.png)
+![](projects/screenshots/screenshot2.png)
+![](projects/screenshots/screenshot3.png)

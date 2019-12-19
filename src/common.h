@@ -52,6 +52,8 @@ private:
 #define SOUND_ENABLED true
 
 
+#define LOGD(x , ...) printf(x"\n", __VA_ARGS__)
+
 #ifdef _WIN32
 #define MOUSE_ENABLED true
 #define WINDOW_SCALE 1

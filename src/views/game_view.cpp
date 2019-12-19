@@ -1,7 +1,8 @@
 #include "main_view.h"
 
 #include "io/loader.h"
-#include "io/stegano.h"
+
+#include <future>
 
 using namespace ui;
 namespace r8 = retro8;
@@ -108,10 +109,9 @@ void GameView::render()
     retro8::io::Loader loader;
 
     if (_path.empty())
-      _path = "mario.p8";
+      _path = "celeste.p8";
 
     loader.load(_path, machine);
-
 
     /*SDL_Surface* surface = IMG_Load("pico-man.p8.png");
     r8::io::PngData pngData = { static_cast<const uint32_t*>(surface->pixels), surface->h * surface->w };
@@ -120,11 +120,19 @@ void GameView::render()
     r8::io::Stegano stegano;
     stegano.load(pngData, machine);*/
 
-    manager->setFrameRate(machine.code().require60fps() ? 60 : 30);
-
+    int32_t fps = machine.code().require60fps() ? 60 : 30;
+    manager->setFrameRate(fps);
 
     if (machine.code().hasInit())
-      machine.code().init();
+    {
+      LOGD("Cartridge has _init() function, calling it.");
+
+      /* init is launched on a different thread because some developers are using busy loops and manual flips */
+      _initFuture = std::async([]() {
+        machine.code().init();
+        LOGD("_init() function completed execution.");
+      });
+    }
 
     machine.sound().init();
     machine.sound().resume();
@@ -147,8 +155,12 @@ void GameView::render()
 
   if (!_paused)
   {
-    update();
-    machine.flip();
+    if (!_initFuture.valid() || _initFuture.wait_for(std::chrono::nanoseconds(0)) == std::future_status::ready)
+    {
+      update();
+      machine.flip();
+    }
+
     SDL_UpdateTexture(_outputTexture, nullptr, _output->pixels, _output->pitch);
   }
 
@@ -267,6 +279,8 @@ void GameView::text(const std::string& text, int32_t x, int32_t y)
   }
 }
 
+//int32_t lastButtonFrame[6];
+
 void GameView::handleKeyboardEvent(const SDL_Event& event)
 {
   switch (event.key.keysym.sym)
@@ -297,6 +311,14 @@ void GameView::handleKeyboardEvent(const SDL_Event& event)
   case SDLK_p:
     if (event.type == SDL_KEYDOWN)
       _paused = !_paused;
+
+#if SOUND_ENABLED
+    if (_paused)
+      machine.sound().pause();
+    else
+      machine.sound().resume();
+#endif
+
     break;
 
 

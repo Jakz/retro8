@@ -439,6 +439,18 @@ namespace math
     return 1;
   }
 
+  int atan2(lua_State* L)
+  {
+    assert(lua_isnumber(L, 1));
+    //TODO: check if behavior is same as PICO-8
+    real_t dx = lua_tonumber(L, 1);
+    real_t dy = lua_tonumber(L, 2);
+    real_t value = ::atan2(dx, -dy);
+    lua_pushnumber(L, value);
+
+    return 1;
+  }
+
   int srand(lua_State* L)
   {
     assert(lua_gettop(L) == 1);
@@ -636,13 +648,14 @@ namespace string
     size_t s = lua_tonumber(L, 2);
     size_t e = lua_to_or_default(L, number, 3, -1);
 
+    size_t rs = s, re = e;
     if (s < 0)
       s = v.length() - s + 1;
     if (e < 0)
       e = v.length() - e + 1;
 
     assert(s <= e);
-    lua_pushstring(L, v.substr(s, e - s + 1).c_str());
+    lua_pushstring(L, v.substr(s - 1, e - s + 1).c_str());
 
     return 1;
   }
@@ -650,6 +663,27 @@ namespace string
 
 namespace platform
 {
+  int poke(lua_State* L)
+  {
+    address_t addr = lua_tonumber(L, 1);
+    uint8_t byte = lua_tonumber(L, 2);
+
+    machine.memory().base()[addr] = byte;
+
+    return 0;
+  }
+
+  int peek(lua_State* L)
+  {
+    address_t addr = lua_tonumber(L, 1);
+    uint8_t value = machine.memory().base()[addr];
+
+    lua_pushnumber(L, value);
+
+    return 1;
+  }
+
+  
   int btn(lua_State* L)
   {
     /* we're asking for a specific button*/
@@ -703,7 +737,7 @@ namespace platform
     switch (s)
     {
     case Stat::FRAME_RATE: lua_pushnumber(L, machine.code().require60fps() ? 60 : 30); break;
-      default: lua_pushnumber(L, 0);
+    default: lua_pushnumber(L, 0);
 
     }
 
@@ -736,9 +770,23 @@ namespace platform
 
   int flip(lua_State* L)
   {
+    //TODO: this call should syncronize to 30fps, at the moment it just 
+    // returns producing a lot of flips in non synchronized code (eg. _init() busy loop)
     machine.flip();
 
     return 0;
+  }
+
+  int extcmd(lua_State* L)
+  {
+    //TODO: implement
+    return 0;
+  }
+
+  int time(lua_State* L)
+  {
+    lua_pushnumber(L, SDL_GetTicks() / 1000.0f);
+    return 1;
   }
 }
 
@@ -771,11 +819,12 @@ void lua::registerFunctions(lua_State* L)
   lua_register(L, "fget", sprites::fget);
   lua_register(L, "sspr", sprites::sspr);
 
-  lua_register(L, "__debug", debug::debugprint);
+  lua_register(L, "__debugprint", debug::debugprint);
   lua_register(L, "__breakpoint", debug::breakpoint);
 
   lua_register(L, "cos", math::cos);
   lua_register(L, "sin", math::sin);
+  lua_register(L, "atan2", math::atan2);
   lua_register(L, "srand", math::srand);
   lua_register(L, "rnd", math::rnd);
   lua_register(L, "flr", math::flr);
@@ -801,10 +850,14 @@ void lua::registerFunctions(lua_State* L)
 
   lua_register(L, "btn", platform::btn);
   lua_register(L, "btnp", platform::btnp);
+  lua_register(L, "time", platform::time);
+  lua_register(L, "extcmd", platform::extcmd);
   lua_register(L, "stat", platform::stat);
   lua_register(L, "cartdata", platform::cartdata);
   lua_register(L, "dset", platform::dset);
   lua_register(L, "dget", platform::dget);
+  lua_register(L, "poke", platform::poke);
+  lua_register(L, "peek", platform::peek);
 
   lua_register(L, "flip", platform::flip);
 }

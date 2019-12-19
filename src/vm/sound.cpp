@@ -196,6 +196,11 @@ void APU::resume()
   SDL_PauseAudioDevice(device, false);
 }
 
+void APU::pause()
+{
+  SDL_PauseAudioDevice(device, true);
+}
+
 void APU::close()
 {
   SDL_CloseAudioDevice(device);
@@ -416,12 +421,14 @@ void APU::renderSound(const SoundState& channel, int16_t* buffer, size_t samples
 
 void APU::renderSounds(int16_t* dest, size_t totalSamples)
 {
+  memset(dest, 0, sizeof(int16_t)*totalSamples);
+
+  //return;
+  
   handleCommands();
   
   constexpr size_t rate = 44100;
   constexpr int16_t maxVolume = 4096;
-
-  memset(dest, 0, sizeof(int16_t)*totalSamples);
 
   for (size_t i = 0; i < CHANNEL_COUNT; ++i)
   {

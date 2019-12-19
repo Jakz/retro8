@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <streambuf>
+#include <future>
 
 #include "lua/lua.hpp"
 
@@ -32,6 +33,8 @@ namespace ui
     SDL_Texture* _font;
 
     std::string _path;
+
+    std::future<void> _initFuture;
 
     bool _paused;
 

@@ -1,3 +1,7 @@
+!(projects/screenshots/screenshot1.png)
+!(projects/screenshots/screenshot2.png)
+!(projects/screenshots/screenshot3.png)
+
 ## Introduction
 
 This is an attempt to have an open source reimplementation of PICO-8 fantasy console to be used on Desktop platforms but especially wherever you want to compile it.
@@ -6,7 +10,7 @@ It was born as an attempt to make PICO-8 games playable on OpenDingux devices (G
 
 ## Implementation
 
-The emulator is written in C++11 and embeds Lua source code (to allow extensions to the language that PICO-8 has). It currently requires SDL2 but a SDL1.2 will be made too.
+The emulator is written in C++11 and embeds Lua source code (to allow extensions to the language that PICO-8 has). It currently requires SDL2 but a SDL1.2 backend will be made too.
 
 ## Status
 

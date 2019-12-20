@@ -11,7 +11,7 @@ namespace r8 = retro8;
 retro8::Machine machine;
 
 
-GameView::GameView(ViewManager* manager) : manager(manager), 
+GameView::GameView(ViewManager* manager) : manager(manager),
 _paused(false), _showFPS(false), _showCartridgeName(false)
 {
 }
@@ -125,10 +125,9 @@ void GameView::render()
 
     if (machine.code().hasInit())
     {
-      LOGD("Cartridge has _init() function, calling it.");
-
       /* init is launched on a different thread because some developers are using busy loops and manual flips */
-      _initFuture = std::async([]() {
+      _initFuture = std::async(std::launch::async, []() {
+        LOGD("Cartridge has _init() function, calling it.");
         machine.code().init();
         LOGD("_init() function completed execution.");
       });
@@ -232,9 +231,9 @@ else
 
     {
       /*static SDL_Surface* tilemap = nullptr;
-      
+
       if (!tilemap)
-      {        
+      {
         tilemap = SDL_CreateRGBSurface(0, 1024, 512, 32, 0x00000000, 0x00ff0000, 0x0000ff00, 0x000000ff);
         SDL_FillRect(tilemap, nullptr, 0x00000000);
         uint32_t* base = static_cast<uint32_t*>(tilemap->pixels);
@@ -270,7 +269,7 @@ void GameView::text(const std::string& text, int32_t x, int32_t y)
 {
   constexpr float scale = 2.0;
   constexpr int32_t GLYPHS_PER_ROW = 16;
-  
+
   for (size_t i = 0; i < text.length(); ++i)
   {
     SDL_Rect src = { 8 * (text[i] % GLYPHS_PER_ROW), 8 * (text[i] / GLYPHS_PER_ROW), 4, 6 };

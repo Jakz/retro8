@@ -10,6 +10,13 @@ namespace lua
 
   class Code
   {
+  public:
+    struct Result
+    {
+      bool success;
+      std::string error;
+    };  
+  
   private:
     lua_State* L;
 

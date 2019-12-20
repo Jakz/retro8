@@ -6,9 +6,11 @@
 #include "catch.hpp"
 
 #include "vm/machine.h"
+#include "io/loader.h"
 #include "lua/lua.hpp"
 
 #include <unordered_set>
+#include <filesystem>
 
 using namespace retro8;
 using namespace retro8::gfx;
@@ -149,12 +151,53 @@ TEST_CASE("lua language modifications")
   }
 
   lua_close(L);
+}
+
+TEST_CASE("cartridge testing")
+{
+  retro8::io::Loader loader;
+
+  namespace fs = std::filesystem;
+  std::error_code ec;
+  
+  for (const auto& p : fs::directory_iterator("cartridges", ec))
+  {
+    const auto& path = p.path();
+
+    if (fs::is_regular_file(path) && path.extension() == ".p8")
+    {
+      SECTION(std::string("Test on source file ") + path.filename().generic_u8string())
+      {
+        lua_State* L = luaL_newstate();
+
+        std::string code = loader.load(path.generic_u8string());
+        int status = luaL_loadbufferx(L, code.c_str(), code.length(), path.filename().generic_u8string().c_str(), nullptr);
+
+        if (status)
+        {
+          const char* message = "unknown error";
+          if (lua_isstring(L, -1))
+            message = lua_tostring(L, -1);
+          FAIL("Error: " << message);
+        }
+
+        lua_close(L);
+      }
+    }
+  }
 
 }
 
-int testMain(int argc, char* argv[])
+int testMain(int rargc, char* rargv[])
 {
-  int result = Catch::Session().run(argc, argv);
+  Catch::Session session;
+
+  const char* argv2[] = { "retro8", "--success" };
+
+  int argc = rargc;
+  const char** argv = const_cast<const char**>(rargv);
+
+  int result = session.run(argc, argv);
   return result;
 }
 

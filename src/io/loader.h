@@ -20,6 +20,7 @@ namespace retro8
 
     public:
       void load(const std::string& path, Machine& dest);
+      std::string load(const std::string& path);
     };
   }
 }

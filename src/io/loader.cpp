@@ -46,6 +46,38 @@ retro8::sprite_flags_t Loader::spriteFlagsFromString(const char* c)
   return (h << 4) | l;
 }
 
+std::string Loader::load(const std::string& path)
+{
+  std::vector<std::string> lines;
+
+  std::ifstream input(path);
+  assert(input.good());
+  
+  for (std::string line; std::getline(input, line); /**/)
+    lines.push_back(line);
+
+  for (auto& line : lines)
+    if (!line.empty() && line.back() == '\r')
+      line.resize(line.length() - 1);
+
+  std::stringstream code;
+  bool started = false;
+
+  for (auto& line : lines)
+  {
+    if (line == "__lua__")
+      started = true;
+    else if (line[0] == '_' && line[1] == '_')
+      return code.str();
+    else if (started)
+      code << line << std::endl;
+  }
+
+  assert(false);
+
+  return "";
+}
+
 void Loader::load(const std::string& path, Machine& m)
 { 
   /* if it's a PNG we should use other loader */

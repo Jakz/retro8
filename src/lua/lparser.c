@@ -589,6 +589,8 @@ static int block_follow (LexState *ls, int withuntil) {
     case TK_ELSE: case TK_ELSEIF:
     case TK_END: case TK_EOS:
       return 1;
+    case TK_EOL:
+      return ls->ignorenewline ? 0 : 1;
     case TK_UNTIL: return withuntil;
     default: return 0;
   }
@@ -1431,19 +1433,22 @@ static void inline_if(LexState* ls, expdesc* v)
   enterblock(fs, &bl, 0);
   jf = v->f;
 
-  /* handling return manually because otherwise any valid LHS
-  would be parsed as return value for return statement */
-  if (ls->t.token == TK_RETURN)
-    retstat(ls);
-  else
-    statlist(ls);  /* parse true block */
+  ls->ignorenewline = 0;
+  statlist(ls);  /* parse true block */
+  ls->ignorenewline = 1;
+  while (testnext(ls, TK_EOL));
 
   leaveblock(fs);
 
   luaK_patchtohere(fs, jf);
 
   if (testnext(ls, TK_ELSE))
+  {
+    ls->ignorenewline = 0;
     block(ls);  /* 'else' part */
+    ls->ignorenewline = 1;
+    while (testnext(ls, TK_EOL));
+  }
 }
 
 static int test_then_block (LexState *ls, int *escapelist) {
@@ -1590,7 +1595,7 @@ static void retstat (LexState *ls) {
   FuncState *fs = ls->fs;
   expdesc e;
   int first, nret;  /* registers with returned values */
-  if (block_follow(ls, 1) || ls->t.token == ';')
+  if (block_follow(ls, 1) || ls->t.token == ';' || (ls->t.token == TK_EOL && !ls->ignorenewline))
     first = nret = 0;  /* return no values */
   else {
     nret = explist(ls, &e);  /* optional return values */

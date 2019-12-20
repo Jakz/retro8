@@ -33,7 +33,7 @@ enum RESERVED {
   TK_IDIV, TK_CONCAT, TK_DOTS, TK_EQ, TK_GE, TK_LE, TK_NE, TK_NE2,
   TK_ASSADD, TK_ASSSUB, TK_ASSMUL, TK_ASSDIV, TK_ASSMOD,
   TK_SHL, TK_SHR,
-  TK_DBCOLON, TK_EOS,
+  TK_DBCOLON, TK_EOS, TK_EOL,
   TK_FLT, TK_INT, TK_NAME, TK_STRING
 };
 
@@ -57,6 +57,7 @@ typedef struct Token {
 /* state of the lexer plus state of the parser when shared by all
    functions */
 typedef struct LexState {
+  int ignorenewline;
   int current;  /* current character (charint) */
   int linenumber;  /* input line counter */
   int lastline;  /* line of last token 'consumed' */

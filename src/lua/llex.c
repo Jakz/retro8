@@ -44,7 +44,7 @@ static const char *const luaX_tokens [] = {
     "return", "then", "true", "until", "while",
     "//", "..", "...", "==", ">=", "<=", "~=", "!=",
     "+=", "-=", "*=", "/=",
-    "<<", ">>", "::", "<eof>",
+    "<<", ">>", "::", "<eof>", "<eol>"
     "<number>", "<integer>", "<name>", "<string>"
 };
 
@@ -172,6 +172,7 @@ void luaX_setinput (lua_State *L, LexState *ls, ZIO *z, TString *source,
   ls->lastline = 1;
   ls->source = source;
   ls->envn = luaS_newliteral(L, LUA_ENV);  /* get env name */
+  ls->ignorenewline = 1;
   luaZ_resizebuffer(ls->L, ls->buff, LUA_MINBUFFER);  /* initialize buffer */
 }
 
@@ -432,7 +433,9 @@ static int llex (LexState *ls, SemInfo *seminfo) {
     switch (ls->current) {
       case '\n': case '\r': {  /* line breaks */
         inclinenumber(ls);
-        break;
+        if (ls->ignorenewline)
+          break;
+        return TK_EOL;
       }
       case ' ': case '\f': case '\t': case '\v': {  /* spaces */
         next(ls);

@@ -162,6 +162,16 @@ int spr(lua_State* L)
   return 0;
 }
 
+int sget(lua_State* L)
+{
+  int x = lua_tonumber(L, 1);
+  int y = lua_tonumber(L, 2);
+
+  lua_pushnumber(L, machine.memory().spriteSheet(x, y)->get(x));
+
+  return 1;
+}
+
 int pal(lua_State* L)
 {
   /* no arguments, reset palette */
@@ -297,7 +307,7 @@ int print(lua_State* L)
   }
   else if (lua_gettop(L) >= 3)
   {
-    int x = lua_tonumber(L, 2); //TODO: these are optional
+    int x = lua_tonumber(L, 2);
     int y = lua_tonumber(L, 3);
     int c = lua_gettop(L) == 4 ? lua_tonumber(L, 4) : machine.memory().penColor()->low();
 
@@ -684,6 +694,17 @@ namespace platform
     return 1;
   }
 
+  int memset(lua_State* L)
+  {
+    address_t addr = lua_tonumber(L, 1);
+    uint8_t value = lua_tonumber(L, 2);
+    int32_t length = lua_tonumber(L, 3);
+
+    std::memset(machine.memory().base() + addr, 0, length);
+
+    return 0;
+  }
+
 
   int btn(lua_State* L)
   {
@@ -784,6 +805,12 @@ namespace platform
     return 0;
   }
 
+  int menuitem(lua_State* L)
+  {
+    //TODO: implement
+    return 0;
+  }
+
   int time(lua_State* L)
   {
     lua_pushnumber(L, SDL_GetTicks() / 1000.0f);
@@ -812,6 +839,7 @@ void lua::registerFunctions(lua_State* L)
   lua_register(L, "map", map);
   lua_register(L, "mget", mget);
   lua_register(L, "mset", mset);
+  lua_register(L, "sget", sget);
 
   lua_register(L, "print", print);
   lua_register(L, "cursor", cursor);
@@ -853,12 +881,14 @@ void lua::registerFunctions(lua_State* L)
   lua_register(L, "btnp", platform::btnp);
   lua_register(L, "time", platform::time);
   lua_register(L, "extcmd", platform::extcmd);
+  lua_register(L, "menuitem", platform::menuitem);
   lua_register(L, "stat", platform::stat);
   lua_register(L, "cartdata", platform::cartdata);
   lua_register(L, "dset", platform::dset);
   lua_register(L, "dget", platform::dget);
   lua_register(L, "poke", platform::poke);
   lua_register(L, "peek", platform::peek);
+  lua_register(L, "memset", platform::memset);
 
   lua_register(L, "flip", platform::flip);
 }

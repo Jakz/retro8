@@ -633,7 +633,7 @@ namespace sound
     sfx::sound_index_t index = lua_tonumber(L, 1);
     sfx::channel_index_t channel = lua_to_or_default(L, number, 2, -1);
     int32_t start = lua_to_or_default(L, number, 3, 0);
-    int32_t end = lua_to_or_default(L, number, 3, 31); //TODO: actual length
+    int32_t end = lua_to_or_default(L, number, 3, machine.memory().sound(index)->length());
 
     machine.sound().play(index, channel, start, end);
 

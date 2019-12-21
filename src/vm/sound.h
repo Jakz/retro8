@@ -81,6 +81,17 @@ namespace retro8
       uint8_t speed; // 1 note = 1/128 sec * speed
       uint8_t loopStart;
       uint8_t loopEnd;
+
+      int32_t length() const
+      {        
+        for (int32_t l = samples.size() - 1; l > 0; --l)
+        {
+          if (samples[l].volume() > 0)
+            return l;
+        }
+
+        return 1;
+      }
     };
 
     struct Music

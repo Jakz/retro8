@@ -1181,9 +1181,7 @@ static void assignment (LexState *ls, struct LHS_assign *lh, int nvars) {
   else {  /* assignment -> '=' explist */
     int nexps;
 
-    BinOpr op = op_for_compound_assign(ls->t);
-
-    if (op == OPR_NOBINOPR && ls->t.token != '=')
+    if (ls->t.token != '=')
       luaX_syntaxerror(ls, luaO_pushfstring(ls->L, "expected assignment operator"));
 
     luaX_next(ls);
@@ -1194,20 +1192,38 @@ static void assignment (LexState *ls, struct LHS_assign *lh, int nvars) {
     else {
       luaK_setoneret(ls->fs, &e);  /* close last expression */
 
-      if (op != OPR_NOBINOPR)
+      /*if (op != OPR_NOBINOPR)
       {
         expdesc ec = lh->v;
         luaK_infix(ls->fs, op, &ec);
         luaK_posfix(ls->fs, op, &ec, &e, ls->linenumber);
         luaK_storevar(ls->fs, &lh->v, &ec);
       }
-      else
+      else*/
         luaK_storevar(ls->fs, &lh->v, &e);
       return;  /* avoid default */
     }
   }
   init_exp(&e, VNONRELOC, ls->fs->freereg-1);  /* default assignment */
   luaK_storevar(ls->fs, &lh->v, &e);
+}
+
+static void compound_assign_op(LexState *ls, expdesc *v) {
+  int line;
+  FuncState *fs = ls->fs;
+  expdesc e = *v, v2;
+  BinOpr op = op_for_compound_assign(ls->t);
+  luaK_reserveregs(fs, fs->freereg - fs->nactvar); /* reserve all registers needed by the lvalue */
+  luaX_next(ls);
+  line = ls->linenumber;
+  enterlevel(ls);
+  luaK_infix(fs, op, &e);
+  expr(ls, &v2);
+  luaK_posfix(fs, op, &e, &v2, line);
+  leavelevel(ls);
+  luaK_exp2nextreg(fs, &e);
+  luaK_setoneret(ls->fs, &e);
+  luaK_storevar(ls->fs, v, &e);
 }
 
 
@@ -1579,10 +1595,16 @@ static void exprstat (LexState *ls) {
   struct LHS_assign v;
   suffixedexp(ls, &v.v);
 
-  if (ls->t.token == '=' || ls->t.token == ',' || op_for_compound_assign(ls->t) != OPR_NOBINOPR) { /* stat -> assignment ? */
+  if (ls->t.token == '=' || ls->t.token == ',') { /* stat -> assignment ? */
     v.prev = NULL;
     assignment(ls, &v, 1);
   }
+  else if (op_for_compound_assign(ls->t) != OPR_NOBINOPR)
+  {
+    v.prev = NULL;
+    compound_assign_op(ls, &v.v);
+  }
+
   else {  /* stat -> func */
     check_condition(ls, v.v.k == VCALL, "syntax error");
     SETARG_C(getinstruction(fs, &v.v), 1);  /* call statement uses no results */

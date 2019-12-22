@@ -546,6 +546,46 @@ static int llex (LexState *ls, SemInfo *seminfo) {
       case '5': case '6': case '7': case '8': case '9': {
         return read_numeral(ls, seminfo);
       }
+      /* special glyphs */
+      case 0xE2:
+      case 0xF0:
+      {
+        
+        static char down_arrow[]  = { 0xe2, 0xac, 0x87, 0xef, 0xb8, 0x8f };
+        static char up_arrow[]    = { 0xe2, 0xac, 0x86, 0xef, 0xb8, 0x8f };
+        static char left_arrow[]  = { 0xe2, 0xac, 0x85, 0xef, 0xb8, 0x8f };
+        static char right_arrow[] = { 0xe2, 0x9e, 0xa1, 0xef, 0xb8, 0x8f };
+        static char x_button[]    = { 0xe2, 0x9d, 0x8e };
+        static char o_button[] = { 0xf0, 0x9f, 0x85, 0xbe, 0xef, 0xb8, 0x8f };
+
+        static size_t lengths[] = { 6, 6, 6, 6, 3, 7 };
+        static const char* keys[] = { down_arrow, up_arrow, left_arrow, right_arrow, x_button, o_button };
+        static const int value[] = { 3, 2, 0, 1,5, 4 };
+
+        int anyValid = 1;
+
+        do
+        {
+          save_and_next(ls);
+
+          anyValid = 0;
+          for (int i = 0; i < sizeof(keys) / sizeof(keys[0]); ++i)
+          {
+            if (memcmp(ls->buff->buffer, keys[i], ls->buff->n) == 0)
+            {
+              if (ls->buff->n == lengths[i])
+              {
+                seminfo->i = value[i];
+                return TK_INT;
+              }
+              else
+                anyValid = 1;
+            }
+          }
+        } while (anyValid);
+
+      }
+
       case EOZ: {
         return TK_EOS;
       }

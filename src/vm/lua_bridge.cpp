@@ -491,6 +491,18 @@ namespace math
     return 1;
   }
 
+  int ceil(lua_State* L)
+  {
+    assert(lua_isnumber(L, 1));
+
+    real_t value = lua_tonumber(L, 1);
+    lua_pushnumber(L, ::ceil(value));
+
+    return 1;
+  }
+
+
+
 #define FAIL_IF_NOT_NUMBER(i) do { if (!lua_isnumber(L, i)) { printf("Expected number but got %s\n", lua_typename(L, i)); assert(false); } } while (false)
 
   int min(lua_State* L)
@@ -667,6 +679,29 @@ namespace string
 
     assert(s <= e);
     lua_pushstring(L, v.substr(s - 1, e - s + 1).c_str());
+
+    return 1;
+  }
+
+  int tostr(lua_State* L)
+  {
+    //TODO implement
+    
+    switch (lua_type(L, 1))
+    {
+    case LUA_TBOOLEAN: lua_pushstring(L, lua_toboolean(L, 1) ? "true" : "false"); break;
+    default: lua_pushstring(L, "foo");
+    }
+
+    return 1;
+  }
+
+  int tonum(lua_State* L)
+  {
+    //TODO implement
+    const char* string = lua_tostring(L, 1);
+
+    lua_pushnumber(L, 0);
 
     return 1;
   }
@@ -857,6 +892,7 @@ void lua::registerFunctions(lua_State* L)
   lua_register(L, "srand", math::srand);
   lua_register(L, "rnd", math::rnd);
   lua_register(L, "flr", math::flr);
+  lua_register(L, "ceil", math::ceil);
   lua_register(L, "min", math::min);
   lua_register(L, "max", math::max);
   lua_register(L, "mid", math::mid);
@@ -876,6 +912,8 @@ void lua::registerFunctions(lua_State* L)
   lua_register(L, "sfx", ::sound::sfx);
 
   lua_register(L, "sub", string::sub);
+  lua_register(L, "tostr", string::tostr);
+  lua_register(L, "tonum", string::tonum);
 
   lua_register(L, "btn", platform::btn);
   lua_register(L, "btnp", platform::btnp);

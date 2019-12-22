@@ -267,21 +267,57 @@ void Machine::sspr(coord_t sx, coord_t sy, coord_t sw, coord_t sh, coord_t dx, c
 // TODO: add support for strange characters like symbols
 void Machine::print(const std::string& string, coord_t x, coord_t y, color_t color)
 {
-  for (const auto c : string)
+  struct SpecialGlyph
   {
-    const auto sprite = _font.glyph(c);
+    std::vector<uint8_t> encoding;
+    size_t index;
+  };
+
+  static const std::array<SpecialGlyph, 6> SpecialGlyphs = { {
+    { { 0xe2, 0xac, 0x87, 0xef, 0xb8, 0x8f }, 3 }, // down arrow
+    { { 0xe2, 0xac, 0x86, 0xef, 0xb8, 0x8f }, 20}, // up arrow
+    { { 0xe2, 0xac, 0x85, 0xef, 0xb8, 0x8f }, 11}, // left arrow
+    { { 0xe2, 0x9e, 0xa1, 0xef, 0xb8, 0x8f }, 17}, // right arrow
+    { { 0xf0, 0x9f, 0x85, 0xbe, 0xef, 0xb8, 0x8f }, 14 }, // o button
+    { { 0xe2, 0x9d, 0x8e }, 23 }, // x button
+  } };
+
+  static const std::array<uint8_t, 2> Prefixes = { 0xe2, 0xf0 };
+
+  for (size_t i = 0; i < string.length(); ++i)
+  {
+    auto c = string[i];
     
+    const bool isSpecial = std::find(Prefixes.begin(), Prefixes.end(), c) != Prefixes.end();
+
+    auto specialGlyph = std::find_if(SpecialGlyphs.begin(), SpecialGlyphs.end(), [&string, &i](const SpecialGlyph& glyph) {
+      return string.size() > i + glyph.encoding.size() && memcmp(&string[i], &glyph.encoding[0], glyph.encoding.size()) == 0; //TODO: memcpy is not best design ever
+    });
+
+    const gfx::sequential_sprite_t* sprite = nullptr;
+    coord_t width = gfx::GLYPH_WIDTH;
+
+
+    if (specialGlyph != SpecialGlyphs.end())
+    {
+      sprite = _font.specialGlyph(specialGlyph->index);
+      width = 8;
+      i += specialGlyph->encoding.size() - 1;
+    }
+    else
+      sprite = _font.glyph(c);
+
     if (sprite)
     {
       for (coord_t ty = 0; ty < gfx::GLYPH_HEIGHT; ++ty)
-        for (coord_t tx = 0; tx < gfx::GLYPH_WIDTH; ++tx)
+        for (coord_t tx = 0; tx < width; ++tx)
         {
           color_t fcolor = sprite->get(tx, ty);
           if (fcolor != 0)
             pset(x + tx, y + ty, color);
         }
 
-      x += 4;
+      x += width;
     }
   }
 }

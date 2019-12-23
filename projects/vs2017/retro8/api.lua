@@ -52,3 +52,19 @@ function del(t, v)
     end
   end
 end
+
+function cocreate(f)
+  return coroutine.create(f)
+end
+
+function yield()
+  coroutine.yield()
+end
+
+function coresume(f, ...)
+  coroutine.resume(f, table.unpack(arg))
+end
+
+function costatus()
+  return coroutine.status(f)
+end

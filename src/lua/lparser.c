@@ -1451,8 +1451,6 @@ static void inline_if(LexState* ls, expdesc* v)
 
   ls->ignorenewline = 0;
   statlist(ls);  /* parse true block */
-  ls->ignorenewline = 1;
-  while (testnext(ls, TK_EOL));
 
   leaveblock(fs);
 
@@ -1460,11 +1458,11 @@ static void inline_if(LexState* ls, expdesc* v)
 
   if (testnext(ls, TK_ELSE))
   {
-    ls->ignorenewline = 0;
     block(ls);  /* 'else' part */
-    ls->ignorenewline = 1;
-    while (testnext(ls, TK_EOL));
   }
+
+  ls->ignorenewline = 1;
+  while (testnext(ls, TK_EOL));
 }
 
 static int test_then_block (LexState *ls, int *escapelist) {

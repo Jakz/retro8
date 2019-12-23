@@ -943,6 +943,10 @@ void Code::loadAPI()
     L = luaL_newstate();
   }
 
+  luaopen_base(L);
+  luaopen_table(L);
+  luaopen_coroutine(L);
+
   std::ifstream apiFile("api.lua");
   std::string api((std::istreambuf_iterator<char>(apiFile)), std::istreambuf_iterator<char>());
 
@@ -972,9 +976,6 @@ void Code::initFromSource(const std::string& code)
 {
   if (!L)
     L = luaL_newstate();
-
-  luaopen_base(L);
-  luaopen_table(L);
 
   registerFunctions(L);
 

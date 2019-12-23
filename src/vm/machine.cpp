@@ -48,7 +48,7 @@ void Machine::pset(coord_t x, coord_t y, color_t color)
 
   if (x >= clip->x0 && x < clip->x1 && y >= clip->y0 && y < clip->y1)
   {
-    color = _memory.paletteAt(gfx::DRAW_PALETTE_INDEX)->get(color);
+    color = _memory.paletteAt(gfx::DRAW_PALETTE_INDEX)->get(color_t(color % gfx::COLOR_COUNT));
     _memory.screenData(x, y)->set(x, color);
   }
 }

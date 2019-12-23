@@ -24,6 +24,7 @@ namespace ui
   class GameView : public View
   {
   private:
+    uint32_t _frameCounter;
     Scale scale = Scale::UNSCALED;
 
     ViewManager* manager;
@@ -43,6 +44,18 @@ namespace ui
 
     void render();
     void update();
+
+    struct KeyStatus
+    {
+      enum class State { OFF, FIRST, WAITING, REPEATING } state;
+      retro8::button_t button;
+      uint32_t ticks;
+    };
+    std::array<KeyStatus, retro8::BUTTON_COUNT> keyStatus;
+
+ 
+    void manageKeyRepeat();
+    void manageKey(size_t index, bool pressed);
 
   public:
     GameView(ViewManager* manager);

@@ -24,6 +24,9 @@ namespace retro8
     ACTION2 = 0x0020,
   };
 
+  static constexpr size_t BUTTON_COUNT = 6;
+  static constexpr size_t PLAYER_COUNT = 1;
+
   using coord_t = int32_t;
   using amount_t = int32_t;
   using index_t = uint32_t;

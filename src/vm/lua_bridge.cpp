@@ -735,7 +735,8 @@ namespace platform
     uint8_t value = lua_tonumber(L, 2);
     int32_t length = lua_tonumber(L, 3);
 
-    std::memset(machine.memory().base() + addr, 0, length);
+    if (length > 0)
+      std::memset(machine.memory().base() + addr, 0, length);
 
     return 0;
   }
@@ -764,19 +765,17 @@ namespace platform
   {
     //TODO: check behavior
 
-    using bt_t = retro8::button_t;
-    bit_mask<bt_t> changedButtons = machine.state().buttons & ~machine.state().previousButtons;
-
     /* we're asking for a specific button*/
     if (lua_gettop(L) >= 1)
     {
+      using bt_t = retro8::button_t;
       static constexpr std::array<bt_t, 6> buttons = { bt_t::LEFT, bt_t::RIGHT, bt_t::UP, bt_t::DOWN, bt_t::ACTION1, bt_t::ACTION2 };
-      lua_pushboolean(L, changedButtons.isSet(buttons[(int)lua_tonumber(L, 1)]));
+      lua_pushboolean(L, machine.state().previousButtons.isSet(buttons[(int)lua_tonumber(L, 1)]));
     }
     /* push whole bitmask*/
     else
     {
-      lua_pushnumber(L, changedButtons.value);
+      lua_pushnumber(L, machine.state().previousButtons.value);
     }
 
     //TODO: finish for player?

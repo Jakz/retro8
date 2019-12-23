@@ -42,7 +42,7 @@ void GameView::render()
     /* initialize color table to current pixel format */
     r8::gfx::ColorTable::init(format);
 
-    printf("[SDL] Window pixel format: %s\n", SDL_GetPixelFormatName(format->format));
+    printf("Using renderer pixel format: %s\n", SDL_GetPixelFormatName(format->format));
 
     /* initialize main surface and its texture */
     _output = SDL_CreateRGBSurface(0, 128, 128, 32, format->Rmask, format->Gmask, format->Bmask, format->Amask);
@@ -56,10 +56,17 @@ void GameView::render()
     assert(_outputTexture);
     assert(_output);
 
+    for (uint32_t i = 0; i < keyStatus.size(); ++i)
+    {
+      keyStatus[i].button = retro8::button_t(1 << i);
+      keyStatus[i].state = KeyStatus::State::OFF;
+    }
+
+    _frameCounter = 0;
+
     //SDL_FreeFormat(format);
 
     // save previous button state for btnp function
-    machine.state().previousButtons = machine.state().buttons;
     machine.init(_output);
 
     namespace r8 = retro8;
@@ -69,56 +76,14 @@ void GameView::render()
     _font = SDL_CreateTextureFromSurface(manager->renderer(), font);
     SDL_FreeSurface(font);
 
-    /*SDL_Surface* surface = IMG_Load("hello_p8_gfx.png");
-    assert(surface);
-
-    static constexpr size_t SPRITES_PER_ROW = 16;
-
-    for (size_t s = 0; s < 32; ++s)
-    {
-      retro8::gfx::sprite_t* sprite = machine.memory().spriteAt(s);
-
-      r8::coord_t bx = (s % SPRITES_PER_ROW) * r8::gfx::SPRITE_WIDTH;
-      r8::coord_t by = (s / SPRITES_PER_ROW) * r8::gfx::SPRITE_HEIGHT;
-
-      for (retro8::coord_t y = 0; y < retro8::gfx::SPRITE_HEIGHT; ++y)
-        for (retro8::coord_t x = 0; x < retro8::gfx::SPRITE_WIDTH; ++x)
-        {
-          SDL_Color color;
-
-          if (SDL_ISPIXELFORMAT_INDEXED(surface->format->format))
-          {
-            color = surface->format->palette->colors[((uint8_t*)surface->pixels)[((y + by) * surface->w) + bx + x]];
-          }
-
-
-          retro8::color_t r8color = retro8::gfx::colorForRGB((color.r << 16 | color.g << 8 | color.b));
-          sprite->set(x, y, r8color);
-        }
-    }
-
-    SDL_FreeSurface(surface);*/
-
-    /*std::ifstream i("bounce.p8");
-    std::string str((std::istreambuf_iterator<char>(i)), std::istreambuf_iterator<char>());
-
-    code.initFromSource(str.c_str());*/
-
     machine.code().loadAPI();
 
     retro8::io::Loader loader;
 
     if (_path.empty())
-      _path = "cartridges/celeste.p8";
+      _path = "cartridges/pico-checkmate.p8";
 
     loader.load(_path, machine);
-
-    /*SDL_Surface* surface = IMG_Load("pico-man.p8.png");
-    r8::io::PngData pngData = { static_cast<const uint32_t*>(surface->pixels), surface->h * surface->w };
-    assert(surface->pitch == r8::io::Stegano::IMAGE_WIDTH * sizeof(uint32_t));
-    assert(surface->format->BytesPerPixel == 4);
-    r8::io::Stegano stegano;
-    stegano.load(pngData, machine);*/
 
     int32_t fps = machine.code().require60fps() ? 60 : 30;
     manager->setFrameRate(fps);
@@ -136,16 +101,10 @@ void GameView::render()
     machine.sound().init();
     machine.sound().resume();
 
-
-    /*for (int i = 0; i < 32; ++i)
-      machine.circ(64, 64, i+1, (r8::color_t)(i % 15 + 1));*/
-
-      //machine.circfill(64, 64, 13, r8::color_t::RED);
-      //machine.circ(64, 64, 13, r8::color_t::GREEN);
-
-
     init = true;
   }
+
+  manageKeyRepeat();
 
   auto* renderer = manager->renderer();
 
@@ -183,6 +142,8 @@ else
   char buffer[16];
   sprintf(buffer, "%.0f/%c0", 1000.0f / manager->lastFrameTicks(), machine.code().require60fps() ? '6' : '3');
   text(buffer, 10, 22);
+
+  ++_frameCounter;
 
 #if DEBUGGER
   {
@@ -278,64 +239,101 @@ void GameView::text(const std::string& text, int32_t x, int32_t y)
   }
 }
 
-//int32_t lastButtonFrame[6];
+void GameView::manageKeyRepeat()
+{
+  static constexpr uint32_t TICKS_FOR_FIRST_REPEAT = 15;
+  static constexpr uint32_t TICKS_REPEATING = 4;
+
+  /* manage key repeats */
+  const uint32_t ticks = _frameCounter;
+  for (KeyStatus& ks : keyStatus)
+  {
+    if (ks.state == KeyStatus::State::FIRST)
+    {
+      machine.state().previousButtons.set(ks.button);
+      ks.state = KeyStatus::State::WAITING;
+    }
+    else if (ks.state == KeyStatus::State::WAITING && (ticks - ks.ticks) >= TICKS_FOR_FIRST_REPEAT)
+    {
+      machine.state().previousButtons.set(ks.button);
+      ks.state = KeyStatus::State::REPEATING;
+      ks.ticks = ticks;
+    }
+    else if (ks.state == KeyStatus::State::REPEATING && (ticks - ks.ticks) >= TICKS_REPEATING)
+    {
+      machine.state().previousButtons.set(ks.button);
+      ks.ticks = ticks;
+    }
+    else
+      machine.state().previousButtons.reset(ks.button);
+  }
+}
+
+void GameView::manageKey(size_t index, bool pressed)
+{
+  machine.state().buttons.set(keyStatus[index].button, pressed);
+  keyStatus[index].ticks = _frameCounter;
+  keyStatus[index].state = pressed ? KeyStatus::State::FIRST : KeyStatus::State::OFF;
+}
 
 void GameView::handleKeyboardEvent(const SDL_Event& event)
 {
-  switch (event.key.keysym.sym)
+  if (!event.key.repeat)
   {
-  case SDLK_LEFT:
-    machine.state().buttons.set(retro8::button_t::LEFT, event.type == SDL_KEYDOWN);
-    break;
-  case SDLK_RIGHT:
-    machine.state().buttons.set(retro8::button_t::RIGHT, event.type == SDL_KEYDOWN);
-    break;
-  case SDLK_UP:
-    machine.state().buttons.set(retro8::button_t::UP, event.type == SDL_KEYDOWN);
-    break;
-  case SDLK_DOWN:
-    machine.state().buttons.set(retro8::button_t::DOWN, event.type == SDL_KEYDOWN);
-    break;
+    switch (event.key.keysym.sym)
+    {
+    case SDLK_LEFT:
+      manageKey(0, event.type == SDL_KEYDOWN);
+      break;
+    case SDLK_RIGHT:
+      manageKey(1, event.type == SDL_KEYDOWN);
+      break;
+    case SDLK_UP:
+      manageKey(2, event.type == SDL_KEYDOWN);
+      break;
+    case SDLK_DOWN:
+      manageKey(3, event.type == SDL_KEYDOWN);
+      break;
 
-  case SDLK_z:
-  case SDLK_LCTRL:
-    machine.state().buttons.set(retro8::button_t::ACTION1, event.type == SDL_KEYDOWN);
-    break;
+    case SDLK_z:
+    case SDLK_LCTRL:
+      manageKey(4, event.type == SDL_KEYDOWN);
+      break;
 
-  case SDLK_x:
-  case SDLK_LALT:
-    machine.state().buttons.set(retro8::button_t::ACTION2, event.type == SDL_KEYDOWN);
-    break;
+    case SDLK_x:
+    case SDLK_LALT:
+      manageKey(5, event.type == SDL_KEYDOWN);
+      break;
 
-  case SDLK_p:
-    if (event.type == SDL_KEYDOWN)
-      _paused = !_paused;
+    case SDLK_p:
+      if (event.type == SDL_KEYDOWN)
+        _paused = !_paused;
 
 #if SOUND_ENABLED
-    if (_paused)
-      machine.sound().pause();
-    else
-      machine.sound().resume();
+      if (_paused)
+        machine.sound().pause();
+      else
+        machine.sound().resume();
 #endif
-
-    break;
+      break;
 
 
 #ifndef _WIN32
-  case SDLK_TAB:
-    if (event.type == SDL_KEYDOWN)
-    {
-      if (scale == Scale::UNSCALED) scale = Scale::SCALED_ASPECT_2x;
-      else if (scale == Scale::SCALED_ASPECT_2x) scale = Scale::FULLSCREEN;
-      else scale = Scale::UNSCALED;
+    case SDLK_TAB:
+      if (event.type == SDL_KEYDOWN)
+      {
+        if (scale == Scale::UNSCALED) scale = Scale::SCALED_ASPECT_2x;
+        else if (scale == Scale::SCALED_ASPECT_2x) scale = Scale::FULLSCREEN;
+        else scale = Scale::UNSCALED;
     }
-    break;
+      break;
 #endif
 
-  case SDLK_ESCAPE:
-    if (event.type == SDL_KEYDOWN)
-      manager->exit();
-    break;
+    case SDLK_ESCAPE:
+      if (event.type == SDL_KEYDOWN)
+        manager->exit();
+      break;
+  }
   }
 }
 

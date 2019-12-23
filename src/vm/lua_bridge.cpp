@@ -943,9 +943,10 @@ void Code::loadAPI()
     L = luaL_newstate();
   }
 
-  luaopen_base(L);
+  luaL_openlibs(L);
+  /*luaopen_base(L);
   luaopen_table(L);
-  luaopen_coroutine(L);
+  luaopen_coroutine(L);*/
 
   std::ifstream apiFile("api.lua");
   std::string api((std::istreambuf_iterator<char>(apiFile)), std::istreambuf_iterator<char>());

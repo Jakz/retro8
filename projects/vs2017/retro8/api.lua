@@ -61,8 +61,9 @@ function yield()
   coroutine.yield()
 end
 
-function coresume(f, ...)
-  coroutine.resume(f, table.unpack(arg))
+-- TODO: missing vararg
+function coresume(f)
+  coroutine.resume(f)
 end
 
 function costatus()

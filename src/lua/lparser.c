@@ -1442,12 +1442,23 @@ static void inline_if(LexState* ls, expdesc* v)
   FuncState* fs = ls->fs;
   int jf;
 
-  if (ls->t.token == TK_GOTO || ls->t.token == TK_BREAK)
-    luaX_syntaxerror(ls, luaO_pushfstring(ls->L, "unsupported goto or break in inline if"));
-
-  luaK_goiftrue(ls->fs, v);  /* skip over block if condition is false */
-  enterblock(fs, &bl, 0);
-  jf = v->f;
+  if (ls->t.token == TK_GOTO || ls->t.token == TK_BREAK) {
+    luaK_goiffalse(ls->fs, v);  /* will jump to label if condition is true */
+    enterblock(fs, &bl, 0);  /* must enter block before 'goto' */
+    gotostat(ls, v->t);  /* handle goto/break */
+    while (testnext(ls, ';')) {}  /* skip colons */
+    if (block_follow(ls, 0)) {  /* 'goto' is the entire block? */
+      leaveblock(fs);
+      return 0;  /* and that is it */
+    }
+    else  /* must skip over 'then' part if condition is false */
+      jf = luaK_jump(fs);
+  }
+  else {  /* regular case (not goto/break) */
+    luaK_goiftrue(ls->fs, v);  /* skip over block if condition is false */
+    enterblock(fs, &bl, 0);
+    jf = v->f;
+  }
 
   ls->ignorenewline = 0;
   statlist(ls);  /* parse true block */

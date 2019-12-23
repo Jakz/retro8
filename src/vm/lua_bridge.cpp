@@ -677,8 +677,17 @@ namespace string
     if (e < 0)
       e = v.length() - e + 1;
 
-    assert(s <= e);
-    lua_pushstring(L, v.substr(s - 1, e - s + 1).c_str());
+    // TODO: intended behavior? picotetris calls it with swapped indices
+    if (e < s)
+      lua_pushstring(L, "");
+    else
+    {
+      if (s == 0)
+        s = 1;
+
+      lua_pushstring(L, v.substr(s - 1, e - s + 1).c_str());
+    }
+
 
     return 1;
   }
@@ -686,10 +695,19 @@ namespace string
   int tostr(lua_State* L)
   {
     //TODO implement
+
+    static char buffer[20];
     
     switch (lua_type(L, 1))
     {
     case LUA_TBOOLEAN: lua_pushstring(L, lua_toboolean(L, 1) ? "true" : "false"); break;
+    case LUA_TNUMBER:
+    {
+      snprintf(buffer, 20, "% 4.4f", lua_tonumber(L, 1));
+      lua_pushstring(L, buffer);
+      break;
+    }
+    case LUA_TSTRING: lua_pushstring(L, lua_tostring(L, 1)); break;
     default: lua_pushstring(L, "foo");
     }
 

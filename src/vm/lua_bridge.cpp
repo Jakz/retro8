@@ -6,6 +6,8 @@
 #include <functional>
 #include <iostream>
 #include <fstream>
+#include <cstring>
+#include <cmath>
 
 #pragma warning(push)
 #pragma warning(disable: 4244)
@@ -433,7 +435,7 @@ namespace math
     assert(lua_isnumber(L, 1));
 
     real_t angle = lua_tonumber(L, 1);
-    real_t value = ::cos(angle * 2 * PI);
+    real_t value = std::cos(angle * 2 * PI);
     lua_pushnumber(L, value);
 
     return 1;
@@ -444,7 +446,7 @@ namespace math
     assert(lua_isnumber(L, 1));
 
     real_t angle = lua_tonumber(L, 1);
-    real_t value = ::sin(-angle * 2 * PI);
+    real_t value = std::sin(-angle * 2 * PI);
     lua_pushnumber(L, value);
 
     return 1;
@@ -456,7 +458,7 @@ namespace math
     //TODO: check if behavior is same as PICO-8
     real_t dx = lua_tonumber(L, 1);
     real_t dy = lua_tonumber(L, 2);
-    real_t value = ::atan2(dx, -dy);
+    real_t value = std::atan2(dx, -dy);
     lua_pushnumber(L, value);
 
     return 1;
@@ -486,7 +488,7 @@ namespace math
     assert(lua_isnumber(L, 1));
 
     real_t value = lua_tonumber(L, 1);
-    lua_pushnumber(L, ::floor(value));
+    lua_pushnumber(L, std::floor(value));
 
     return 1;
   }
@@ -496,7 +498,7 @@ namespace math
     assert(lua_isnumber(L, 1));
 
     real_t value = lua_tonumber(L, 1);
-    lua_pushnumber(L, ::ceil(value));
+    lua_pushnumber(L, std::ceil(value));
 
     return 1;
   }
@@ -697,7 +699,7 @@ namespace string
     //TODO implement
 
     static char buffer[20];
-    
+
     switch (lua_type(L, 1))
     {
     case LUA_TBOOLEAN: lua_pushstring(L, lua_toboolean(L, 1) ? "true" : "false"); break;

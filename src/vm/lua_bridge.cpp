@@ -172,6 +172,18 @@ int sget(lua_State* L)
   return 1;
 }
 
+int sset(lua_State* L)
+{
+  int x = lua_tonumber(L, 1);
+  int y = lua_tonumber(L, 2);
+  color_t c = lua_gettop(L) >= 3 ? color_t((int)lua_tonumber(L, 3)) : machine.memory().penColor()->low();
+
+  machine.memory().spriteSheet(x, y)->set(x, c);
+
+  return 0;
+}
+
+
 int pal(lua_State* L)
 {
   /* no arguments, reset palette */
@@ -507,15 +519,11 @@ namespace math
 
   int min(lua_State* L)
   {
-    FAIL_IF_NOT_NUMBER(1);
-    real_t v1 = lua_tonumber(L, 1);
+    real_t v1 = lua_isnumber(L, 1) ? lua_tonumber(L, 1) : 0;
     real_t v2 = 0;
 
-    if (lua_gettop(L) == 2)
-    {
-      FAIL_IF_NOT_NUMBER(2);
+    if (lua_gettop(L) == 2 && lua_isnumber(L, 2))
       v2 = lua_tonumber(L, 2);
-    }
 
     lua_pushnumber(L, std::min(v1, v2));
 
@@ -524,11 +532,10 @@ namespace math
 
   int max(lua_State* L)
   {
-    FAIL_IF_NOT_NUMBER(1);
-    real_t v1 = lua_tonumber(L, 1);
+    real_t v1 = lua_isnumber(L, 1) ? lua_tonumber(L, 1) : 0;
     real_t v2 = 0;
 
-    if (lua_gettop(L) == 2)
+    if (lua_gettop(L) == 2 && lua_isnumber(L, 2))
     {
       FAIL_IF_NOT_NUMBER(2);
       v2 = lua_tonumber(L, 2);
@@ -759,6 +766,24 @@ namespace platform
     return 0;
   }
 
+  int memcpy(lua_State* L)
+  {
+    address_t dest = lua_tonumber(L, 1);
+    address_t src = lua_tonumber(L, 2);
+    int32_t length = lua_tonumber(L, 3);
+
+    //TODO: optimize overlap case?
+    if ((src + length < dest) || (dest + length < src))
+      std::memcpy(machine.memory().base() + dest, machine.memory().base() + src, length);
+    else
+    {
+      for (size_t i = 0; i < length; ++i)
+        machine.memory().base()[dest + i] = machine.memory().base()[src + i];
+    }
+
+    return 0;
+  }
+
 
   int btn(lua_State* L)
   {
@@ -892,6 +917,7 @@ void lua::registerFunctions(lua_State* L)
   lua_register(L, "mget", mget);
   lua_register(L, "mset", mset);
   lua_register(L, "sget", sget);
+  lua_register(L, "sset", sset);
 
   lua_register(L, "print", print);
   lua_register(L, "cursor", cursor);
@@ -944,6 +970,7 @@ void lua::registerFunctions(lua_State* L)
   lua_register(L, "poke", platform::poke);
   lua_register(L, "peek", platform::peek);
   lua_register(L, "memset", platform::memset);
+  lua_register(L, "memcpy", platform::memcpy);
 
   lua_register(L, "flip", platform::flip);
 }

@@ -81,7 +81,7 @@ void GameView::render()
     retro8::io::Loader loader;
 
     if (_path.empty())
-      _path = "cartridges/pico-checkmate.p8";
+      _path = "cartridges/lands-of-yocta.png";
 
     loader.load(_path, machine);
 

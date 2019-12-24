@@ -81,9 +81,10 @@ void GameView::render()
     retro8::io::Loader loader;
 
     if (_path.empty())
-      _path = "cartridges/lands-of-yocta.png";
+      _path = "cartridges/pico-racer.png";
 
     loader.load(_path, machine);
+    machine.memory().backupCartridge();
 
     int32_t fps = machine.code().require60fps() ? 60 : 30;
     manager->setFrameRate(fps);

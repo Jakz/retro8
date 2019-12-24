@@ -31,11 +31,14 @@ namespace retro8
 
     static constexpr address_t TILE_MAP_LOW = 0x1000;
     static constexpr address_t TILE_MAP_HIGH = 0x2000;
+    
+    static constexpr int32_t CART_DATA_LENGTH = 0x4300;
   };
 
   class Memory
   {
   private:
+    uint8_t _backup[address::CART_DATA_LENGTH];
     uint8_t memory[1024 * 32];
 
     static constexpr size_t BYTES_PER_PALETTE = sizeof(retro8::gfx::palette_t);
@@ -54,6 +57,12 @@ namespace retro8
       cursor()->reset();
     }
 
+    void backupCartridge()
+    {
+      std::memcpy(_backup, memory, address::CART_DATA_LENGTH);
+    }
+
+    const uint8_t* backup() const { return _backup; }
     uint8_t* base() { return memory; }
 
     gfx::color_byte_t* penColor() { return as<gfx::color_byte_t>(address::PEN_COLOR); }

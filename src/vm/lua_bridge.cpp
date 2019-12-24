@@ -784,6 +784,18 @@ namespace platform
     return 0;
   }
 
+  int reload(lua_State* L)
+  {
+    assert(lua_gettop(L) <= 3);
+    
+    address_t dest = lua_to_or_default(L, number, 1, 0);
+    address_t src = lua_to_or_default(L, number, 1, 0);
+    int32_t length = lua_to_or_default(L, number, 1, address::CART_DATA_LENGTH);
+    
+    std::memcpy(machine.memory().base() + dest, machine.memory().backup() + src, length);
+
+    return 0;
+  }
 
   int btn(lua_State* L)
   {
@@ -971,6 +983,7 @@ void lua::registerFunctions(lua_State* L)
   lua_register(L, "peek", platform::peek);
   lua_register(L, "memset", platform::memset);
   lua_register(L, "memcpy", platform::memcpy);
+  lua_register(L, "reload", platform::reload);
 
   lua_register(L, "flip", platform::flip);
 }

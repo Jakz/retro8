@@ -1,5 +1,7 @@
 #include "machine.h"
 
+#include <algorithm>
+
 using namespace retro8;
 
 void Machine::flip()
@@ -10,14 +12,14 @@ void Machine::flip()
 
   for (size_t i = 0; i < gfx::BYTES_PER_SCREEN; ++i)
   {
-    const gfx::color_byte_t* pixels = data + i;    
+    const gfx::color_byte_t* pixels = data + i;
     const auto rc1 = retro8::gfx::ColorTable::get(screenPalette->get((pixels)->low()));
     const auto rc2 = retro8::gfx::ColorTable::get(screenPalette->get((pixels)->high()));
-      
+
     *(dest) = rc1;
     *((dest)+1) = rc2;
     (dest) += 2;
-    
+
     //RASTERIZE_PIXEL_PAIR((*this), dest, pixels);
   }
 }
@@ -145,7 +147,7 @@ void Machine::circ(coord_t xc, coord_t yc, amount_t r, color_t color)
   coord_t x = 0, y = r;
   float d = 3 - 2 * r;
   circHelper(xc, yc, x, y, color);
-  
+
   while (y >= x)
   {
     x++;
@@ -195,7 +197,7 @@ void Machine::circfill(coord_t xc, coord_t yc, amount_t r, color_t color)
 }
 
 void Machine::spr(index_t idx, coord_t x, coord_t y)
-{  
+{
   const gfx::sprite_t* sprite = _memory.spriteAt(idx);
   const gfx::palette_t* palette = _memory.paletteAt(gfx::DRAW_PALETTE_INDEX);
 
@@ -211,20 +213,20 @@ void Machine::spr(index_t idx, coord_t x, coord_t y)
 void Machine::spr(index_t idx, coord_t bx, coord_t by, float sw, float sh, bool flipX, bool flipY)
 {
   const gfx::palette_t* palette = _memory.paletteAt(gfx::DRAW_PALETTE_INDEX);
-  
+
   coord_t w = sw * gfx::SPRITE_WIDTH;
   coord_t h = sh * gfx::SPRITE_HEIGHT;
 
   /* we bypass spriteAt since we can use directly the address */
   const gfx::color_byte_t* base = reinterpret_cast<const gfx::color_byte_t*>(_memory.spriteAt(idx));
- 
+
   for (coord_t y = 0; y < h; ++y)
   {
     for (coord_t x = 0; x < w; ++x)
     {
       coord_t fx = flipX ? (w - x - 1) : x;
       coord_t fy = flipY ? (h - y - 1) : y;
-      
+
       //TODO: optimize by fetching only once if we need to read next pixel?
       const gfx::color_byte_t pair = *(base + y * gfx::SPRITE_SHEET_PITCH + x / gfx::PIXEL_TO_BYTE_RATIO);
       const color_t color = pair.get(x);
@@ -287,7 +289,7 @@ void Machine::print(const std::string& string, coord_t x, coord_t y, color_t col
   for (size_t i = 0; i < string.length(); ++i)
   {
     auto c = string[i];
-    
+
     const bool isSpecial = std::find(Prefixes.begin(), Prefixes.end(), c) != Prefixes.end();
 
     auto specialGlyph = std::find_if(SpecialGlyphs.begin(), SpecialGlyphs.end(), [&string, &i](const SpecialGlyph& glyph) {
@@ -343,6 +345,3 @@ void Machine::map(coord_t cx, coord_t cy, coord_t x, coord_t y, amount_t cw, amo
     }
   }
 }
-
-
-

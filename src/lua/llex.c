@@ -509,7 +509,7 @@ static int llex (LexState *ls, SemInfo *seminfo) {
       }
       case '+': {
         next(ls);
-        if (check_next1(ls, '=')) 
+        if (check_next1(ls, '='))
           return TK_ASSADD;
         else return '+';
       }
@@ -550,7 +550,7 @@ static int llex (LexState *ls, SemInfo *seminfo) {
       case 0xE2:
       case 0xF0:
       {
-        
+
         static char down_arrow[]  = { 0xe2, 0xac, 0x87, 0xef, 0xb8, 0x8f };
         static char up_arrow[]    = { 0xe2, 0xac, 0x86, 0xef, 0xb8, 0x8f };
         static char left_arrow[]  = { 0xe2, 0xac, 0x85, 0xef, 0xb8, 0x8f };
@@ -569,7 +569,8 @@ static int llex (LexState *ls, SemInfo *seminfo) {
           save_and_next(ls);
 
           anyValid = 0;
-          for (int i = 0; i < sizeof(keys) / sizeof(keys[0]); ++i)
+          int i;
+          for (i = 0; i < sizeof(keys) / sizeof(keys[0]); ++i)
           {
             if (memcmp(ls->buff->buffer, keys[i], ls->buff->n) == 0)
             {
@@ -631,4 +632,3 @@ int luaX_lookahead (LexState *ls) {
   ls->lookahead.token = llex(ls, &ls->lookahead.seminfo);
   return ls->lookahead.token;
 }
-

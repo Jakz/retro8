@@ -64,24 +64,13 @@ void GameView::render()
 
     _frameCounter = 0;
 
-    //SDL_FreeFormat(format);
-
-    // save previous button state for btnp function
     machine.init(_output);
-
-    namespace r8 = retro8;
-
-    SDL_Surface* font = IMG_Load("pico8_font.png");
-    machine.font().load(font);
-    _font = SDL_CreateTextureFromSurface(manager->renderer(), font);
-    SDL_FreeSurface(font);
-
     machine.code().loadAPI();
 
-    retro8::io::Loader loader;
+    r8::io::Loader loader;
 
     if (_path.empty())
-      _path = "cartridges/pico-racer.png";
+      _path = "cartridges/pico-checkmate.p8";
 
     loader.load(_path, machine);
     machine.memory().backupCartridge();
@@ -139,10 +128,10 @@ else
 
   SDL_RenderCopy(renderer, _outputTexture, nullptr, &dest);
 
-  text(_path.c_str(), 10, 10);
+  manager->text(_path.c_str(), 10, 10);
   char buffer[16];
   sprintf(buffer, "%.0f/%c0", 1000.0f / manager->lastFrameTicks(), machine.code().require60fps() ? '6' : '3');
-  text(buffer, 10, 22);
+  manager->text(buffer, 10, 22);
 
   ++_frameCounter;
 
@@ -225,19 +214,6 @@ else
 
   }
 #endif
-}
-
-void GameView::text(const std::string& text, int32_t x, int32_t y)
-{
-  constexpr float scale = 2.0;
-  constexpr int32_t GLYPHS_PER_ROW = 16;
-
-  for (size_t i = 0; i < text.length(); ++i)
-  {
-    SDL_Rect src = { 8 * (text[i] % GLYPHS_PER_ROW), 8 * (text[i] / GLYPHS_PER_ROW), 4, 6 };
-    SDL_Rect dest = { x + 4 * i * scale, y, 4 * scale, 6 * scale };
-    SDL_RenderCopy(manager->renderer(), _font, &src, &dest);
-  }
 }
 
 void GameView::manageKeyRepeat()
@@ -347,6 +323,6 @@ GameView::~GameView()
 {
   SDL_FreeSurface(_output);
   SDL_DestroyTexture(_outputTexture);
-
+  //TODO: the _init future is not destroyed
   machine.sound().close();
 }

@@ -168,6 +168,7 @@
     <ClCompile Include="..\..\..\src\main.cpp" />
     <ClCompile Include="..\..\..\src\test\test.cpp" />
     <ClCompile Include="..\..\..\src\views\game_view.cpp" />
+    <ClCompile Include="..\..\..\src\views\menu_view.cpp" />
     <ClCompile Include="..\..\..\src\views\view_manager.cpp" />
     <ClCompile Include="..\..\..\src\vm\gfx.cpp" />
     <ClCompile Include="..\..\..\src\vm\lua_bridge.cpp" />

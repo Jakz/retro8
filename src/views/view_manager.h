@@ -14,10 +14,9 @@ namespace ui
     virtual void handleMouseEvent(const SDL_Event& event) = 0;
   };
 
-  struct ButtonStyle
+  enum TextAlign
   {
-    bool pressed;
-    bool hovered;
+    LEFT, CENTER, RIGHT
   };
 
   class GameView;
@@ -27,6 +26,8 @@ namespace ui
   public:
     using view_t = View;
     static const size_t VIEW_COUNT = 1;
+
+    SDL_Texture* _font;
 
   private:
     std::array<view_t*, 2> views;
@@ -43,8 +44,14 @@ namespace ui
 
     void deinit();
 
+    SDL_Texture* font() { return _font; }
+
     //TODO: hacky cast to avoid header inclusion
     GameView* gameView() { return (GameView*)views[0]; }
+
+    int32_t textWidth(const std::string& text, float scale = 2.0f) const { return text.length() * scale * 4; }
+    void text(const std::string& text, int32_t x, int32_t y, SDL_Color color, TextAlign align, float scale = 2.0f);
+    void text(const std::string& text, int32_t x, int32_t y);
   };
 }
 

@@ -278,5 +278,8 @@
     <ClCompile Include="..\..\..\src\vm\memory.cpp">
       <Filter>src\vm</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\views\menu_view.cpp">
+      <Filter>src\views</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

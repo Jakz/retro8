@@ -31,7 +31,6 @@ namespace ui
 
     SDL_Surface* _output;
     SDL_Texture* _outputTexture;
-    SDL_Texture* _font;
 
     std::string _path;
 
@@ -66,6 +65,20 @@ namespace ui
 
     void loadCartridge(const std::string& path) { _path = path; }
 
-    void text(const std::string& text, int32_t x, int32_t y);
+  };
+
+  class MenuView : public View
+  {
+  private:
+    ViewManager* _gvm;
+
+  public:
+    MenuView(ViewManager* manager);
+    ~MenuView();
+
+    void handleKeyboardEvent(const SDL_Event& event) override;
+    void handleMouseEvent(const SDL_Event& event) override;
+    
+    void render() override;
   };
 }

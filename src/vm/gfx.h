@@ -155,7 +155,7 @@ namespace retro8
       uint8_t x1;
       uint8_t y1;
 
-      void reset() { x0 = y0 = 0; x1 = SCREEN_WIDTH; y1 = SCREEN_HEIGHT; }
+      void reset() { x0 = y0 = 0; x1 = SCREEN_WIDTH - 1; y1 = SCREEN_HEIGHT - 1; }
       void set(uint8_t xs, uint8_t ys, uint8_t xe, uint8_t ye) { x0 = xs; y0 = ys; x1 = xe; y1 = ye; }
     };
 

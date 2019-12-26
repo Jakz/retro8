@@ -10,7 +10,6 @@ namespace r8 = retro8;
 
 retro8::Machine machine;
 
-
 GameView::GameView(ViewManager* manager) : manager(manager),
 _paused(false), _showFPS(false), _showCartridgeName(false)
 {
@@ -118,20 +117,22 @@ SDL_Rect dest;
   dest = { (480 - 384) / 2, (480 - 384) / 2, 384, 384 };
 #else
 
-if (scale == Scale::UNSCALED)
+if (_scaler == Scaler::UNSCALED)
   dest = { (320 - 128) / 2, (240 - 128) / 2, 128, 128 };
-else if (scale == Scale::SCALED_ASPECT_2x)
+else if (_scaler == Scaler::SCALED_ASPECT_2x)
   dest = { (320 - 256) / 2, (240 - 256) / 2, 256, 256 };
 else
   dest = { 0, 0, 320, 240 };
 #endif
 
   SDL_RenderCopy(renderer, _outputTexture, nullptr, &dest);
-
-  manager->text(_path.c_str(), 10, 10);
-  char buffer[16];
-  sprintf(buffer, "%.0f/%c0", 1000.0f / manager->lastFrameTicks(), machine.code().require60fps() ? '6' : '3');
-  manager->text(buffer, 10, 22);
+ 
+  if (_showFPS)
+  {
+    char buffer[16];
+    sprintf(buffer, "%.0f/%c0", 1000.0f / manager->lastFrameTicks(), machine.code().require60fps() ? '6' : '3');
+    manager->text(buffer, 10, 10);
+  }
 
   ++_frameCounter;
 
@@ -282,29 +283,27 @@ void GameView::handleKeyboardEvent(const SDL_Event& event)
       manageKey(5, event.type == SDL_KEYDOWN);
       break;
 
+#if DESKTOP_MODE
     case SDLK_p:
       if (event.type == SDL_KEYDOWN)
-        _paused = !_paused;
-
-#if SOUND_ENABLED
-      if (_paused)
-        machine.sound().pause();
-      else
-        machine.sound().resume();
-#endif
+        if (_paused)
+          pause();
+        else
+          resume();
       break;
-
-
-#ifndef _WIN32
+#else
     case SDLK_TAB:
       if (event.type == SDL_KEYDOWN)
       {
-        if (scale == Scale::UNSCALED) scale = Scale::SCALED_ASPECT_2x;
-        else if (scale == Scale::SCALED_ASPECT_2x) scale = Scale::FULLSCREEN;
-        else scale = Scale::UNSCALED;
+        if (_scaler < Scaler::LAST) _scaler = Scaler(_scaler + 1);
+        else _scaler = Scaler::FIRST;
     }
       break;
 #endif
+
+    case SDLK_RETURN:
+      manager->openMenu();
+      break;
 
     case SDLK_ESCAPE:
       if (event.type == SDL_KEYDOWN)
@@ -317,6 +316,24 @@ void GameView::handleKeyboardEvent(const SDL_Event& event)
 void GameView::handleMouseEvent(const SDL_Event& event)
 {
 
+}
+
+void GameView::pause()
+{
+  _paused = true;
+
+#if SOUND_ENABLED
+  machine.sound().pause();
+#endif
+}
+
+void GameView::resume()
+{
+  _paused = false;
+
+#if SOUND_ENABLED
+  machine.sound().resume();
+#endif
 }
 
 GameView::~GameView()

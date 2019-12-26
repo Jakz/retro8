@@ -12,11 +12,10 @@ using namespace ui;
 
 extern retro8::Machine machine;
 
-ui::ViewManager::ViewManager() : SDL<ui::ViewManager, ui::ViewManager>(*this, *this), _font(nullptr)
+ui::ViewManager::ViewManager() : SDL<ui::ViewManager, ui::ViewManager>(*this, *this), _font(nullptr),
+_gameView(new GameView(this)), _menuView(new MenuView(this))
 {
-  views[0] = new GameView(this);
-  views[1] = new MenuView(this);
-  view = views[1];
+  _view = _gameView;
 }
 
 void ui::ViewManager::deinit()
@@ -41,18 +40,18 @@ bool ui::ViewManager::loadData()
 
 void ui::ViewManager::handleKeyboardEvent(const SDL_Event& event, bool press)
 {
-  view->handleKeyboardEvent(event);
+  _view->handleKeyboardEvent(event);
 }
 
 void ui::ViewManager::handleMouseEvent(const SDL_Event& event)
 {
-  view->handleMouseEvent(event);
+  _view->handleMouseEvent(event);
 }
 
 
 void ui::ViewManager::render()
 {
-  view->render();
+  _view->render();
 }
 
 void ui::ViewManager::text(const std::string& text, int32_t x, int32_t y)
@@ -89,4 +88,17 @@ void ViewManager::text(const std::string& text, int32_t x, int32_t y, SDL_Color 
   }
 
   SDL_SetTextureColorMod(_font, 255, 255, 255);
+}
+
+void ViewManager::openMenu()
+{
+  _gameView->pause();
+  _menuView->reset();
+  _view = _menuView;
+}
+
+void ViewManager::backToGame()
+{
+  _gameView->resume();
+  _view = _gameView;
 }

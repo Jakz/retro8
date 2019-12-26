@@ -439,23 +439,27 @@ void APU::renderSounds(int16_t* dest, size_t totalSamples)
 
     SoundState& channel = channels[i].sound ? channels[i] : mstate.channels[i];
     const Music* music = &channel == &this->mstate.channels[i] ? this->mstate.music : nullptr; //TODO: crappy comparison
-
-    if (channel.sound)
+  
+    /* render only if enabled */
+    if ((music && _musicEnabled) || (!music && _soundEnabled))
     {
-      const size_t samplePerTick = (44100 / 128) * (channel.sound->speed + 1);
-      while (samples > 0 && channel.sound)
+      if (channel.sound)
       {
-        /* generate the maximum amount of samples available for same note */
-        // TODO: optimize if next note is equal to current
-        size_t available = std::min(samples, samplePerTick - (channel.position % samplePerTick));
-        renderSound(channel, buffer, available);
+        const size_t samplePerTick = (44100 / 128) * (channel.sound->speed + 1);
+        while (samples > 0 && channel.sound)
+        {
+          /* generate the maximum amount of samples available for same note */
+          // TODO: optimize if next note is equal to current
+          size_t available = std::min(samples, samplePerTick - (channel.position % samplePerTick));
+          renderSound(channel, buffer, available);
 
-        samples -= available;
-        buffer += available;
-        channel.position += available;
-        channel.sample = channel.position / samplePerTick;
+          samples -= available;
+          buffer += available;
+          channel.position += available;
+          channel.sample = channel.position / samplePerTick;
 
-        updateChannel(channel, music);
+          updateChannel(channel, music);
+        }
       }
     }
   }

@@ -201,13 +201,14 @@ namespace retro8
 
       SDL_AudioSpec spec;
       SDL_AudioDeviceID device;
-    
-      
+
       std::array<SoundState, CHANNEL_COUNT> channels;
       MusicState mstate;
 
       std::mutex queueMutex;
       std::vector<Command> queue;
+
+      bool _soundEnabled, _musicEnabled;
 
       void handleCommands();
 
@@ -215,8 +216,10 @@ namespace retro8
       void renderSound(const SoundState& sound, int16_t* buffer, size_t samples);
       void updateChannel(SoundState& channel, const Music* music);
 
+      
+
     public:
-      APU(Memory& memory) : memory(memory) { }
+      APU(Memory& memory) : memory(memory), _soundEnabled(true), _musicEnabled(true) { }
 
       void init();
       void close();
@@ -228,6 +231,12 @@ namespace retro8
       void music(music_index_t index, int32_t fadeMs, int32_t mask);
 
       void renderSounds(int16_t* dest, size_t samples);
+
+      bool isMusicEnabled() const { return _musicEnabled; }
+      bool isSoundEnabled() const { return _soundEnabled; }
+
+      void toggleSound(bool active) { _soundEnabled = active; }
+      void toggleMusic(bool active) { _musicEnabled = active; }
     };
   }
 }

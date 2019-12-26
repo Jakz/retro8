@@ -124,9 +124,33 @@ void Machine::rect(coord_t x0, coord_t y0, coord_t x1, coord_t y1, color_t color
 
 void Machine::rectfill(coord_t x0, coord_t y0, coord_t x1, coord_t y1, color_t color)
 {
+#if OPTS_ENABLED
+
+  /* compute directly actual bounding box and set the rect without invoking pset */
+
+  auto* clip = _memory.clipRect();
+  auto cx = memory().camera()->x(), cy = memory().camera()->y();
+
+  x0 -= cx;
+  y0 -= cy;
+  x1 -= cx;
+  y1 -= cy;
+
+  x0 = std::max(x0, coord_t(clip->x0));
+  x1 = std::min(x1, coord_t(clip->x1));
+  y0 = std::max(y0, coord_t(clip->y0));
+  y1 = std::min(y1, coord_t(clip->y1));
+
+  color = _memory.paletteAt(gfx::DRAW_PALETTE_INDEX)->get(color_t(color % gfx::COLOR_COUNT));
+
+  for (coord_t y = y0; y <= y1; ++y)
+    for (coord_t x = x0; x <= x1; ++x)
+      _memory.screenData(x, y)->set(x, color);
+#else
   for (coord_t y = y0; y <= y1; ++y)
     for (coord_t x = x0; x <= x1; ++x)
       pset(x, y, color);
+#endif
 }
 
 void Machine::circHelper(coord_t xc, coord_t yc, coord_t x, coord_t y, color_t color)

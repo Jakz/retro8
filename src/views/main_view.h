@@ -14,18 +14,21 @@
 
 namespace ui
 {
-  enum class Scale
+  enum Scaler
   {
-    UNSCALED,
+    UNSCALED = 0,
     SCALED_ASPECT_2x,
-    FULLSCREEN
+    FULLSCREEN,
+
+    FIRST = UNSCALED,
+    LAST = FULLSCREEN
   };
 
   class GameView : public View
   {
   private:
     uint32_t _frameCounter;
-    Scale scale = Scale::UNSCALED;
+    Scaler _scaler = Scaler::UNSCALED;
 
     ViewManager* manager;
 
@@ -65,6 +68,14 @@ namespace ui
 
     void loadCartridge(const std::string& path) { _path = path; }
 
+    void pause();
+    void resume();
+
+    void setScaler(Scaler scaler) { _scaler = scaler; }
+    Scaler scaler() const { return _scaler; }
+
+    void toggleFPS(bool active) { _showFPS = active; }
+    bool isFPSShown() { return _showFPS; }
   };
 
   class MenuView : public View
@@ -80,5 +91,8 @@ namespace ui
     void handleMouseEvent(const SDL_Event& event) override;
     
     void render() override;
+
+    void reset();
+    void updateLabels();
   };
 }

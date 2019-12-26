@@ -20,6 +20,7 @@ namespace ui
   };
 
   class GameView;
+  class MenuView;
 
   class ViewManager : public SDL<ViewManager, ViewManager>
   {
@@ -30,8 +31,9 @@ namespace ui
     SDL_Texture* _font;
 
   private:
-    std::array<view_t*, 2> views;
-    view_t* view;
+    GameView* _gameView;
+    MenuView* _menuView;
+    view_t* _view;
 
   public:
     ViewManager();
@@ -47,11 +49,14 @@ namespace ui
     SDL_Texture* font() { return _font; }
 
     //TODO: hacky cast to avoid header inclusion
-    GameView* gameView() { return (GameView*)views[0]; }
+    GameView* gameView() { return _gameView; }
 
     int32_t textWidth(const std::string& text, float scale = 2.0f) const { return text.length() * scale * 4; }
     void text(const std::string& text, int32_t x, int32_t y, SDL_Color color, TextAlign align, float scale = 2.0f);
     void text(const std::string& text, int32_t x, int32_t y);
+
+    void openMenu();
+    void backToGame();
   };
 }
 

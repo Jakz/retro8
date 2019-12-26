@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Emulator
+Name=retro-8
+Comment=PICO-8 Emulator
+Terminal=false
+StartupNotify=true
+Exec=retro8
+Icon=icon
+Categories=emulator;

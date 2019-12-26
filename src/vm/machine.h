@@ -32,7 +32,7 @@ namespace retro8
     lua::Code _code;
     SDL_Surface* _output;
 
-    
+
 
   private:
     void circHelper(coord_t xc, coord_t yc, coord_t x, coord_t y, color_t col);
@@ -40,7 +40,7 @@ namespace retro8
 
 
   public:
-    Machine() : _sound(_memory) 
+    Machine() : _sound(_memory)
     {
     }
 

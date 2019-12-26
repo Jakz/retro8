@@ -21,15 +21,17 @@ _gameView(new GameView(this)), _menuView(new MenuView(this))
 void ui::ViewManager::deinit()
 {
   SDL_DestroyTexture(_font);
-  
+
   SDL::deinit();
 }
 
 bool ui::ViewManager::loadData()
 {
   SDL_Surface* font = IMG_Load("pico8_font.png");
+  assert(font);
+
   machine.font().load(font);
-  
+
   _font = SDL_CreateTextureFromSurface(_renderer, font);
 
   SDL_SetTextureBlendMode(_font, SDL_BLENDMODE_BLEND);
@@ -68,7 +70,7 @@ void ui::ViewManager::text(const std::string& text, int32_t x, int32_t y)
 }
 
 void ViewManager::text(const std::string& text, int32_t x, int32_t y, SDL_Color color, TextAlign align, float scale)
-{  
+{
   constexpr int32_t GLYPHS_PER_ROW = 16;
 
   const int32_t width = text.size() * 4 * scale;

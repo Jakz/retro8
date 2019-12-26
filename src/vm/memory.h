@@ -9,6 +9,7 @@
 #include <SDL.h>
 #include <array>
 #include <random>
+#include <cstring>
 
 namespace retro8
 {
@@ -31,7 +32,7 @@ namespace retro8
 
     static constexpr address_t TILE_MAP_LOW = 0x1000;
     static constexpr address_t TILE_MAP_HIGH = 0x2000;
-    
+
     static constexpr int32_t CART_DATA_LENGTH = 0x4300;
   };
 
@@ -69,7 +70,7 @@ namespace retro8
     gfx::cursor_t* cursor() { return as<gfx::cursor_t>(address::CURSOR); }
     gfx::camera_t* camera() { return as<gfx::camera_t>(address::CAMERA); }
     gfx::clip_rect_t* clipRect() { return as<gfx::clip_rect_t>(address::CLIP_RECT); }
-    
+
     gfx::color_byte_t* spriteSheet(coord_t x, coord_t y) { return spriteSheet() + x / gfx::PIXEL_TO_BYTE_RATIO + y * gfx::SPRITE_SHEET_PITCH; }
     gfx::color_byte_t* spriteSheet() { return as<gfx::color_byte_t>(address::SPRITE_SHEET); }
     gfx::color_byte_t* screenData() { return as<gfx::color_byte_t>(address::SCREEN_DATA); }
@@ -100,8 +101,8 @@ namespace retro8
       return addr;
     }
 
-    gfx::sprite_t* spriteAt(sprite_index_t index) { 
-      return reinterpret_cast<gfx::sprite_t*>(&memory[address::SPRITE_SHEET 
+    gfx::sprite_t* spriteAt(sprite_index_t index) {
+      return reinterpret_cast<gfx::sprite_t*>(&memory[address::SPRITE_SHEET
         + (index % gfx::SPRITES_PER_SPRITE_SHEET_ROW) * gfx::SPRITE_BYTES_PER_SPRITE_ROW]
         + (index / gfx::SPRITES_PER_SPRITE_SHEET_ROW) * gfx::SPRITE_SHEET_PITCH * gfx::SPRITE_HEIGHT
         ); }

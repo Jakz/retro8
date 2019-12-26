@@ -19,7 +19,7 @@ void ColorTable::init(SDL_PixelFormat* format)
 
 void Font::load(SDL_Surface* surface)
 {
-  assert(surface->w == SPRITE_WIDTH * FONT_GLYPHS_COLUMNS && surface->h == SPRITE_HEIGHT * FONT_GLYPHS_ROWS);
+  //assert(surface->w == SPRITE_WIDTH * FONT_GLYPHS_COLUMNS && surface->h == SPRITE_HEIGHT * FONT_GLYPHS_ROWS);
 
   for (size_t gy = 0; gy < FONT_GLYPHS_ROWS; ++gy)
     for (size_t gx = 0; gx < FONT_GLYPHS_COLUMNS; ++gx)

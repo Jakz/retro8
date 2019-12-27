@@ -299,13 +299,16 @@ void Machine::print(const std::string& string, coord_t x, coord_t y, color_t col
     size_t index;
   };
 
-  static const std::array<SpecialGlyph, 6> SpecialGlyphs = { {
+  static const std::array<SpecialGlyph, 12> SpecialGlyphs = { {
     { { 0xe2, 0xac, 0x87, 0xef, 0xb8, 0x8f }, 3 }, // down arrow
     { { 0xe2, 0xac, 0x86, 0xef, 0xb8, 0x8f }, 20}, // up arrow
     { { 0xe2, 0xac, 0x85, 0xef, 0xb8, 0x8f }, 11}, // left arrow
     { { 0xe2, 0x9e, 0xa1, 0xef, 0xb8, 0x8f }, 17}, // right arrow
     { { 0xf0, 0x9f, 0x85, 0xbe, 0xef, 0xb8, 0x8f }, 14 }, // o button
     { { 0xe2, 0x9d, 0x8e }, 23 }, // x button
+
+    // 0x8b left, 0x91 right, 0x94 up, 0x83 down, 0x83 o, 0x97 x
+    { { 0x8b }, 11 }, { { 0x91, }, 17 }, { { 0x94 }, 20 }, { { 0x83 }, 3 }, { { 0x8e }, 14 }, { { 0x97 }, 23 } 
   } };
 
   static const std::array<uint8_t, 2> Prefixes = { 0xe2, 0xf0 };
@@ -314,15 +317,12 @@ void Machine::print(const std::string& string, coord_t x, coord_t y, color_t col
   {
     auto c = string[i];
 
-    const bool isSpecial = std::find(Prefixes.begin(), Prefixes.end(), c) != Prefixes.end();
-
     auto specialGlyph = std::find_if(SpecialGlyphs.begin(), SpecialGlyphs.end(), [&string, &i](const SpecialGlyph& glyph) {
-      return string.size() > i + glyph.encoding.size() && memcmp(&string[i], &glyph.encoding[0], glyph.encoding.size()) == 0; //TODO: memcpy is not best design ever
+      return string.size() >= i + glyph.encoding.size() && memcmp(&string[i], &glyph.encoding[0], glyph.encoding.size()) == 0; //TODO: memcmp is not best design ever
     });
 
     const gfx::sequential_sprite_t* sprite = nullptr;
     coord_t width = gfx::GLYPH_WIDTH;
-
 
     if (specialGlyph != SpecialGlyphs.end())
     {

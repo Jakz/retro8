@@ -42,13 +42,15 @@ end
 
 -- check semantics
 function del(t, v)
-  local found = false
-  for i = 1, #t do
-    if t[i] == v then
-      found = true
-    end
-    if found then
-      t[i] = t[i+1]
+  if t ~= nil then
+    local found = false
+    for i = 1, #t do
+      if t[i] == v then
+        found = true
+      end
+      if found then
+        t[i] = t[i+1]
+      end
     end
   end
 end

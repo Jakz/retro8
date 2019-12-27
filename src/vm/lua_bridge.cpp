@@ -570,10 +570,13 @@ namespace math
 
   int abs(lua_State* L)
   {
-    assert(lua_isnumber(L, 1));
-
-    real_t v = lua_tonumber(L, 1);
-    lua_pushnumber(L, std::abs(v));
+    if (lua_isnumber(L, 1))
+    {
+      real_t v = lua_tonumber(L, 1);
+      lua_pushnumber(L, std::abs(v));
+    }
+    else
+      lua_pushnumber(L, 0);
 
     return 1;
   }
@@ -599,6 +602,8 @@ namespace math
   }
 }
 
+#define EXPECT_TYPE(tn, idx) do { if (!lua_is ## tn(L, idx)) std::cout << "expected " # tn << " but got " << lua_typename(L, idx) << std::endl; assert(false);} while (false)
+
 namespace bitwise
 {
   using data_t = uint64_t;
@@ -606,13 +611,16 @@ namespace bitwise
   template<typename F>
   int bitwise(lua_State* L)
   {
-    assert(lua_isnumber(L, 1));
-    assert(lua_isnumber(L, 2));
+    if (lua_isnumber(L, 1) && lua_isnumber(L, 2))
+    {
+      data_t a = lua_tonumber(L, 1);
+      data_t b = lua_tonumber(L, 2);
 
-    data_t a = lua_tonumber(L, 1);
-    data_t b = lua_tonumber(L, 2);
+      lua_pushnumber(L, F()(a, b));
+    }
+    else
+      lua_pushnumber(L, 0);
 
-    lua_pushnumber(L, F()(a,b));
 
     return 1;
   }

@@ -586,6 +586,16 @@ static int llex (LexState *ls, SemInfo *seminfo) {
         } while (anyValid);
 
       }
+      /*case 0x8B:
+      {
+        seminfo->i = 0;
+        return TK_INT;
+      }
+      case 0x91:
+      {
+        seminfo->i = 1;
+        return TK_INT;
+      }*/
 
       case EOZ: {
         return TK_EOS;

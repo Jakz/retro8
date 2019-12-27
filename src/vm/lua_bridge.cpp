@@ -240,7 +240,7 @@ namespace draw
       uint8_t w = lua_tonumber(L, 3);
       uint8_t h = lua_tonumber(L, 4);
 
-      machine.memory().clipRect()->set(x0, y0, x0 + w, y0 + h);
+      machine.memory().clipRect()->set(x0, y0, std::min(x0 + w, int32_t(gfx::SCREEN_WIDTH-1)), std::min(y0 + h, int32_t(gfx::SCREEN_HEIGHT-1)));
     }
 
     return 0;
@@ -746,12 +746,35 @@ namespace platform
     return 0;
   }
 
+  int poke2(lua_State* L)
+  {
+    address_t addr = lua_tonumber(L, 1);
+    uint32_t value = lua_tonumber(L, 2);
+
+    machine.memory().base()[addr] = value & 0xFF;
+    machine.memory().base()[addr+1] = (value & 0xFF00) >> 8;
+
+    return 0;
+  }
+
+
   int peek(lua_State* L)
   {
     address_t addr = lua_tonumber(L, 1);
     uint8_t value = machine.memory().base()[addr];
 
     lua_pushnumber(L, value);
+
+    return 1;
+  }
+
+  int peek2(lua_State* L)
+  {
+    address_t addr = lua_tonumber(L, 1);
+    uint8_t low = machine.memory().base()[addr];
+    uint8_t high = machine.memory().base()[addr+1];
+
+    lua_pushnumber(L, (low | high << 8));
 
     return 1;
   }
@@ -983,6 +1006,8 @@ void lua::registerFunctions(lua_State* L)
   lua_register(L, "dget", platform::dget);
   lua_register(L, "poke", platform::poke);
   lua_register(L, "peek", platform::peek);
+  lua_register(L, "poke2", platform::poke);
+  lua_register(L, "peek2", platform::peek);
   lua_register(L, "memset", platform::memset);
   lua_register(L, "memcpy", platform::memcpy);
   lua_register(L, "reload", platform::reload);

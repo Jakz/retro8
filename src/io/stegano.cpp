@@ -8,6 +8,11 @@ using namespace io;
 
 constexpr size_t RAW_DATA_LENGTH = 0x4300;
 
+#if DEBUGGER
+#include <fstream>
+static std::string fileName;
+#endif
+
 uint8_t Stegano::assembleByte(const uint32_t v)
 {
   constexpr uint32_t MASK_ALPHA = 0xff000000;
@@ -63,6 +68,8 @@ void Stegano::load(const PngData& data, Machine& m)
   /* skip 2 null*/
   o += 2;
 
+  compressedLength = std::min(32769ULL - RAW_DATA_LENGTH, compressedLength);
+
   const std::string lookup = "\n 0123456789abcdefghijklmnopqrstuvwxyz!#%(){}[]<>+=/*:;.,~_";
   std::string code;
 
@@ -100,8 +107,13 @@ void Stegano::load(const PngData& data, Machine& m)
     }
   }
 
-  m.code().initFromSource(code);
+#if DEBUGGER
+  std::ofstream output(fileName);
+  output << code;
+  output.close();
+#endif
 
+  m.code().initFromSource(code);
 }
 
 //TODO: remove SDL_image and use lighter library
@@ -109,6 +121,10 @@ void Stegano::load(const PngData& data, Machine& m)
 
 void Stegano::load(const std::string& path, Machine& m)
 {
+#if DEBUGGER
+  fileName = path.substr(0, path.length() - 4) + ".p8";
+#endif
+  
   SDL_Surface* surface = IMG_Load(path.c_str());
 
   if (!surface)

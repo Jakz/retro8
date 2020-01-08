@@ -68,7 +68,7 @@ void Stegano::load(const PngData& data, Machine& m)
   /* skip 2 null*/
   o += 2;
 
-  compressedLength = std::min(32769ULL - RAW_DATA_LENGTH, compressedLength);
+  compressedLength = std::min(size_t(32769ULL - RAW_DATA_LENGTH), compressedLength);
 
   const std::string lookup = "\n 0123456789abcdefghijklmnopqrstuvwxyz!#%(){}[]<>+=/*:;.,~_";
   std::string code;
@@ -95,7 +95,7 @@ void Stegano::load(const PngData& data, Machine& m)
     else
     {
       uint8_t vn = assembleByte(d[o + i + 1]);
-      
+
       auto offset = ((v - 0x3c) << 4) + (vn & 0xf);
       auto length = (vn >> 4) + 2;
 
@@ -124,7 +124,7 @@ void Stegano::load(const std::string& path, Machine& m)
 #if DEBUGGER
   fileName = path.substr(0, path.length() - 4) + ".p8";
 #endif
-  
+
   SDL_Surface* surface = IMG_Load(path.c_str());
 
   if (!surface)

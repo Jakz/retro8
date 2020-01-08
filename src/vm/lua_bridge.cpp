@@ -71,6 +71,12 @@ int line(lua_State* L)
   return 0;
 }
 
+int fillp(lua_State* L)
+{
+  //TODO: implement
+  return 0;
+}
+
 int rect(lua_State* L)
 {
   int x0 = lua_tonumber(L, 1);
@@ -968,6 +974,7 @@ void lua::registerFunctions(lua_State* L)
   lua_register(L, "palt", palt);
   lua_register(L, "color", color);
   lua_register(L, "line", line);
+  lua_register(L, "fillp", fillp);
   lua_register(L, "rect", rect);
   lua_register(L, "rectfill", rectfill);
   lua_register(L, "circ", circ);

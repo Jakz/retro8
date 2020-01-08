@@ -487,6 +487,8 @@ namespace math
     return 0;
   }
 
+#define FAIL_IF_NOT_NUMBER(i) do { if (!lua_isnumber(L, i)) { printf("Expected number but got %s\n", lua_typename(L, i)); assert(false); } } while (false)
+
   int rnd(lua_State* L)
   {
     real_t max = lua_gettop(L) >= 1 ? lua_tonumber(L, 1) : 1.0f;
@@ -497,27 +499,18 @@ namespace math
 
   int flr(lua_State* L)
   {
-    assert(lua_isnumber(L, 1));
-
-    real_t value = lua_tonumber(L, 1);
+    real_t value = lua_isnumber(L, 1) ? lua_tonumber(L, 1) : 0;
     lua_pushnumber(L, std::floor(value));
-
     return 1;
   }
 
   int ceil(lua_State* L)
   {
-    assert(lua_isnumber(L, 1));
-
-    real_t value = lua_tonumber(L, 1);
+    real_t value = lua_isnumber(L, 1) ? lua_tonumber(L, 1) : 0;
     lua_pushnumber(L, std::ceil(value));
-
     return 1;
   }
 
-
-
-#define FAIL_IF_NOT_NUMBER(i) do { if (!lua_isnumber(L, i)) { printf("Expected number but got %s\n", lua_typename(L, i)); assert(false); } } while (false)
 
   int min(lua_State* L)
   {

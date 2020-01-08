@@ -765,6 +765,18 @@ namespace platform
     return 0;
   }
 
+  int poke4(lua_State* L)
+  {
+    address_t addr = lua_tonumber(L, 1);
+    uint32_t value = lua_tonumber(L, 2);
+
+    machine.memory().base()[addr] = value & 0xFF;
+    machine.memory().base()[addr + 1] = (value & 0xFF00) >> 8;
+    machine.memory().base()[addr + 2] = (value & 0xFF0000) >> 16;
+    machine.memory().base()[addr + 3] = (value & 0xFF000000) >> 24;
+
+    return 0;
+  }
 
   int peek(lua_State* L)
   {
@@ -783,6 +795,19 @@ namespace platform
     uint8_t high = machine.memory().base()[addr+1];
 
     lua_pushnumber(L, (low | high << 8));
+
+    return 1;
+  }
+
+  int peek4(lua_State* L)
+  {
+    address_t addr = lua_tonumber(L, 1);
+    uint8_t b1 = machine.memory().base()[addr];
+    uint8_t b2 = machine.memory().base()[addr + 1];
+    uint8_t b3 = machine.memory().base()[addr + 2];
+    uint8_t b4 = machine.memory().base()[addr + 3];
+
+    lua_pushnumber(L, b1 | (b2 << 8) | (b3 << 16) | (b4 << 24));
 
     return 1;
   }
@@ -1014,8 +1039,10 @@ void lua::registerFunctions(lua_State* L)
   lua_register(L, "dget", platform::dget);
   lua_register(L, "poke", platform::poke);
   lua_register(L, "peek", platform::peek);
-  lua_register(L, "poke2", platform::poke);
-  lua_register(L, "peek2", platform::peek);
+  lua_register(L, "poke2", platform::poke2);
+  lua_register(L, "peek2", platform::peek2);
+  lua_register(L, "poke4", platform::poke4);
+  lua_register(L, "peek4", platform::peek4);
   lua_register(L, "memset", platform::memset);
   lua_register(L, "memcpy", platform::memcpy);
   lua_register(L, "reload", platform::reload);

@@ -19,6 +19,7 @@ function add(t, v)
   if t ~= nil then
     t[#t+1] = v
   end
+  return t
 end
 
 function foreach(c, f)
@@ -68,6 +69,6 @@ function coresume(f)
   coroutine.resume(f)
 end
 
-function costatus()
+function costatus(f)
   return coroutine.status(f)
 end

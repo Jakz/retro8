@@ -25,7 +25,7 @@ namespace retro8
   };
 
   static constexpr size_t BUTTON_COUNT = 6;
-  static constexpr size_t PLAYER_COUNT = 1;
+  static constexpr size_t PLAYER_COUNT = 2;
 
   using coord_t = int32_t;
   using amount_t = int32_t;

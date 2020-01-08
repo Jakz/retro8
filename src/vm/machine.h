@@ -18,8 +18,8 @@ namespace retro8
   public:
     std::mt19937 rnd;
     point_t lastLineEnd;
-    bit_mask<button_t> buttons;
-    bit_mask<button_t> previousButtons;
+    std::array<bit_mask<button_t>, PLAYER_COUNT> buttons;
+    std::array<bit_mask<button_t>, PLAYER_COUNT> previousButtons;
   };
 
   class Machine

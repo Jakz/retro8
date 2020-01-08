@@ -856,17 +856,21 @@ namespace platform
 
   int btn(lua_State* L)
   {
+    index_t index = lua_gettop(L) >= 2 ? lua_tonumber(L, 2) : 0;
+    if (index >= PLAYER_COUNT) index = 0;
+ 
     /* we're asking for a specific button*/
     if (lua_gettop(L) >= 1)
     {
       using bt_t = retro8::button_t;
       static constexpr std::array<bt_t, 6> buttons = { bt_t::LEFT, bt_t::RIGHT, bt_t::UP, bt_t::DOWN, bt_t::ACTION1, bt_t::ACTION2 };
-      lua_pushboolean(L, machine.state().buttons.isSet(buttons[(int)lua_tonumber(L, 1)]));
+      size_t bindex = lua_tonumber(L, 1);
+      lua_pushboolean(L, machine.state().buttons[index].isSet(buttons[bindex]));
     }
     /* push whole bitmask*/
     else
     {
-      lua_pushnumber(L, machine.state().buttons.value);
+      lua_pushnumber(L, machine.state().buttons[index].value);
     }
 
     //TODO: finish for player 2?
@@ -875,6 +879,8 @@ namespace platform
 
   int btnp(lua_State* L)
   {
+    const index_t index = lua_gettop(L) >= 2 ? lua_tonumber(L, 2) : 0;
+
     //TODO: check behavior
 
     /* we're asking for a specific button*/
@@ -882,12 +888,13 @@ namespace platform
     {
       using bt_t = retro8::button_t;
       static constexpr std::array<bt_t, 6> buttons = { bt_t::LEFT, bt_t::RIGHT, bt_t::UP, bt_t::DOWN, bt_t::ACTION1, bt_t::ACTION2 };
-      lua_pushboolean(L, machine.state().previousButtons.isSet(buttons[(int)lua_tonumber(L, 1)]));
+      size_t bindex = lua_tonumber(L, 1);
+      lua_pushboolean(L, machine.state().previousButtons[index].isSet(buttons[bindex]));
     }
     /* push whole bitmask*/
     else
     {
-      lua_pushnumber(L, machine.state().previousButtons.value);
+      lua_pushnumber(L, machine.state().previousButtons[index].value);
     }
 
     //TODO: finish for player?

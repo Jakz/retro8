@@ -55,10 +55,13 @@ void GameView::render()
     assert(_outputTexture);
     assert(_output);
 
-    for (uint32_t i = 0; i < keyStatus.size(); ++i)
+    for (auto& pks : keyStatus)
     {
-      keyStatus[i].button = retro8::button_t(1 << i);
-      keyStatus[i].state = KeyStatus::State::OFF;
+      for (uint32_t i = 0; i < pks.size(); ++i)
+      {
+        pks[i].button = retro8::button_t(1 << i);
+        pks[i].state = KeyStatus::State::OFF;
+      }
     }
 
     _frameCounter = 0;
@@ -69,7 +72,7 @@ void GameView::render()
     r8::io::Loader loader;
 
     if (_path.empty())
-      _path = "cartridges/pico-checkmate.p8";
+      _path = "cartridges/Nanoman.p8.png";
 
     loader.load(_path, machine);
     machine.memory().backupCartridge();
@@ -224,34 +227,40 @@ void GameView::manageKeyRepeat()
 
   /* manage key repeats */
   const uint32_t ticks = _frameCounter;
-  for (KeyStatus& ks : keyStatus)
+
+  for (size_t i = 0; i < keyStatus.size(); ++i)
   {
-    if (ks.state == KeyStatus::State::FIRST)
+    auto& pks = keyStatus[i];
+    
+    for (KeyStatus& ks : pks)
     {
-      machine.state().previousButtons.set(ks.button);
-      ks.state = KeyStatus::State::WAITING;
+      if (ks.state == KeyStatus::State::FIRST)
+      {
+        machine.state().previousButtons[i].set(ks.button);
+        ks.state = KeyStatus::State::WAITING;
+      }
+      else if (ks.state == KeyStatus::State::WAITING && (ticks - ks.ticks) >= TICKS_FOR_FIRST_REPEAT)
+      {
+        machine.state().previousButtons[i].set(ks.button);
+        ks.state = KeyStatus::State::REPEATING;
+        ks.ticks = ticks;
+      }
+      else if (ks.state == KeyStatus::State::REPEATING && (ticks - ks.ticks) >= TICKS_REPEATING)
+      {
+        machine.state().previousButtons[i].set(ks.button);
+        ks.ticks = ticks;
+      }
+      else
+        machine.state().previousButtons[i].reset(ks.button);
     }
-    else if (ks.state == KeyStatus::State::WAITING && (ticks - ks.ticks) >= TICKS_FOR_FIRST_REPEAT)
-    {
-      machine.state().previousButtons.set(ks.button);
-      ks.state = KeyStatus::State::REPEATING;
-      ks.ticks = ticks;
-    }
-    else if (ks.state == KeyStatus::State::REPEATING && (ticks - ks.ticks) >= TICKS_REPEATING)
-    {
-      machine.state().previousButtons.set(ks.button);
-      ks.ticks = ticks;
-    }
-    else
-      machine.state().previousButtons.reset(ks.button);
   }
 }
 
-void GameView::manageKey(size_t index, bool pressed)
+void GameView::manageKey(size_t pindex, size_t index, bool pressed)
 {
-  machine.state().buttons.set(keyStatus[index].button, pressed);
-  keyStatus[index].ticks = _frameCounter;
-  keyStatus[index].state = pressed ? KeyStatus::State::FIRST : KeyStatus::State::OFF;
+  machine.state().buttons[pindex].set(keyStatus[pindex][index].button, pressed);
+  keyStatus[pindex][index].ticks = _frameCounter;
+  keyStatus[pindex][index].state = pressed ? KeyStatus::State::FIRST : KeyStatus::State::OFF;
 }
 
 void GameView::handleKeyboardEvent(const SDL_Event& event)
@@ -261,26 +270,36 @@ void GameView::handleKeyboardEvent(const SDL_Event& event)
     switch (event.key.keysym.sym)
     {
     case SDLK_LEFT:
-      manageKey(0, event.type == SDL_KEYDOWN);
+      manageKey(0, 0, event.type == SDL_KEYDOWN);
       break;
     case SDLK_RIGHT:
-      manageKey(1, event.type == SDL_KEYDOWN);
+      manageKey(0, 1, event.type == SDL_KEYDOWN);
       break;
     case SDLK_UP:
-      manageKey(2, event.type == SDL_KEYDOWN);
+      manageKey(0, 2, event.type == SDL_KEYDOWN);
       break;
     case SDLK_DOWN:
-      manageKey(3, event.type == SDL_KEYDOWN);
+      manageKey(0, 3, event.type == SDL_KEYDOWN);
       break;
 
     case SDLK_z:
     case SDLK_LCTRL:
-      manageKey(4, event.type == SDL_KEYDOWN);
+      manageKey(0, 4, event.type == SDL_KEYDOWN);
       break;
 
     case SDLK_x:
     case SDLK_LALT:
-      manageKey(5, event.type == SDL_KEYDOWN);
+      manageKey(0, 5, event.type == SDL_KEYDOWN);
+      break;
+
+    case SDLK_a:
+    case SDLK_SPACE:
+      manageKey(1, 4, event.type == SDL_KEYDOWN);
+      break;
+
+    case SDLK_s:
+    case SDLK_LSHIFT:
+      manageKey(1, 5, event.type == SDL_KEYDOWN);
       break;
 
 #if DESKTOP_MODE

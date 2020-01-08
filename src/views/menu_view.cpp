@@ -65,8 +65,8 @@ MenuView::MenuView(ViewManager* gvm) : _gvm(gvm)
   };
   
   optionsMenu[SOUND].lambda = [this]() {
-    bool v = !machine.sound().isMusicEnabled();
-    machine.sound().toggleMusic(v);
+    bool v = !machine.sound().isSoundEnabled();
+    machine.sound().toggleSound(v);
     updateLabels();
   };
 
@@ -124,7 +124,7 @@ void MenuView::handleMouseEvent(const SDL_Event& event)
 void MenuView::updateLabels()
 {
   optionsMenu[MUSIC].caption = std::string("music ") + (machine.sound().isMusicEnabled() ? "on" : "off");
-  optionsMenu[SOUND].caption = std::string("sound ") + (machine.sound().isMusicEnabled() ? "on" : "off");
+  optionsMenu[SOUND].caption = std::string("sound ") + (machine.sound().isSoundEnabled() ? "on" : "off");
   optionsMenu[SHOW_FPS].caption = std::string("show fps ") + (_gvm->gameView()->isFPSShown() ? "on" : "off");
 
   auto scaler = _gvm->gameView()->scaler();

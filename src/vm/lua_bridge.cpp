@@ -450,22 +450,28 @@ namespace math
 
   int cos(lua_State* L)
   {
-    assert(lua_isnumber(L, 1));
-
-    real_t angle = lua_tonumber(L, 1);
-    real_t value = std::cos(angle * 2 * PI);
-    lua_pushnumber(L, value);
+    if (lua_isnumber(L, 1))
+    {
+      real_t angle = lua_tonumber(L, 1);
+      real_t value = std::cos(angle * 2 * PI);
+      lua_pushnumber(L, value);
+    }
+    else
+      lua_pushnumber(L, 0);
 
     return 1;
   }
 
   int sin(lua_State* L)
   {
-    assert(lua_isnumber(L, 1));
-
-    real_t angle = lua_tonumber(L, 1);
-    real_t value = std::sin(-angle * 2 * PI);
-    lua_pushnumber(L, value);
+    if (lua_isnumber(L, 1))
+    {
+      real_t angle = lua_tonumber(L, 1);
+      real_t value = std::sin(-angle * 2 * PI);
+      lua_pushnumber(L, value);
+    }
+    else
+      lua_pushnumber(L, 0);
 
     return 1;
   }
@@ -605,7 +611,8 @@ namespace math
 
 namespace bitwise
 {
-  using data_t = uint64_t;
+  using data_t = uint32_t;
+  static constexpr size_t DATA_WIDTH = 32;
 
   template<typename F>
   int bitwise(lua_State* L)
@@ -634,12 +641,31 @@ namespace bitwise
     data_t operator()(data_t v, data_t a) { return v >> a; }
   };
 
+  struct rotate_left
+  {
+    data_t operator()(data_t v, data_t a) { return (v << a) | (v >> (DATA_WIDTH - a)); }
+  };
+
+  struct rotate_right
+  {
+    data_t operator()(data_t v, data_t a) { return (v >> a) | (v << (DATA_WIDTH - a)); }
+  };
+
   inline int band(lua_State* L) { return bitwise<std::bit_and<data_t>>(L); }
   inline int bor(lua_State* L) { return bitwise<std::bit_or<data_t>>(L); }
   inline int bxor(lua_State* L) { return bitwise<std::bit_xor<data_t>>(L); }
 
+  //TODO FIXME: fixme check implementation of logical and arithmetic shifts here
+
   inline int shl(lua_State* L) { return bitwise<shift_left>(L); }
   inline int shr(lua_State* L) { return bitwise<shift_right>(L); }
+  
+  inline int lshl(lua_State* L) { return bitwise<shift_left>(L); }
+  inline int lshr(lua_State* L) { return bitwise<shift_right>(L); }
+  
+  inline int rotl(lua_State* L) { return bitwise<rotate_left>(L); }
+  inline int rotr(lua_State* L) { return bitwise<rotate_right>(L); }
+
 
   int bnot(lua_State* L)
   {
@@ -969,6 +995,16 @@ namespace platform
     lua_pushnumber(L, SDL_GetTicks() / 1000.0f);
     return 1;
   }
+
+  int printh(lua_State* L)
+  {
+    //TODO: finish implementing additional parameters
+    
+    std::string text = lua_tostring(L, 1);
+    std::cout << text << std::endl;
+
+    return 0;
+  }
 }
 
 #pragma warning(pop)
@@ -1026,7 +1062,10 @@ void lua::registerFunctions(lua_State* L)
   lua_register(L, "bnot", bitwise::bnot);
   lua_register(L, "shl", bitwise::shl);
   lua_register(L, "shr", bitwise::shr);
-
+  lua_register(L, "lshl", bitwise::lshl);
+  lua_register(L, "lshr", bitwise::lshr);
+  lua_register(L, "rotl", bitwise::rotl);
+  lua_register(L, "rotr", bitwise::rotr);
 
   lua_register(L, "music", ::sound::music);
   lua_register(L, "sfx", ::sound::sfx);
@@ -1038,6 +1077,7 @@ void lua::registerFunctions(lua_State* L)
   lua_register(L, "btn", platform::btn);
   lua_register(L, "btnp", platform::btnp);
   lua_register(L, "time", platform::time);
+  lua_register(L, "t", platform::time);
   lua_register(L, "extcmd", platform::extcmd);
   lua_register(L, "menuitem", platform::menuitem);
   lua_register(L, "stat", platform::stat);
@@ -1053,6 +1093,7 @@ void lua::registerFunctions(lua_State* L)
   lua_register(L, "memset", platform::memset);
   lua_register(L, "memcpy", platform::memcpy);
   lua_register(L, "reload", platform::reload);
+  lua_register(L, "printh", platform::printh);
 
   lua_register(L, "flip", platform::flip);
 }

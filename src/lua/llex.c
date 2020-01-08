@@ -623,6 +623,15 @@ static int llex (LexState *ls, SemInfo *seminfo) {
         return TK_INT;
       }
 
+      case '?':
+      {
+        //TODO FIXME: print with ? consume the whole line for now, so it's not executed
+        while (!check_next1(ls, '\n'))
+          next(ls);
+        continue;
+      }
+
+
       case EOZ: {
         return TK_EOS;
       }

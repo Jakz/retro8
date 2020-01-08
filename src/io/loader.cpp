@@ -11,7 +11,12 @@
 using namespace retro8;
 using namespace retro8::io;
 
-
+void Loader::fixLine(std::string& line)
+{
+  /* inline ? print operator */
+  if (!line.empty() && line[0] == '?')
+    line = "print(" + line.substr(1) + ")";
+}
 
 int Loader::valueForHexDigit(char c)
 {
@@ -57,8 +62,11 @@ std::string Loader::load(const std::string& path)
     lines.push_back(line);
 
   for (auto& line : lines)
+  {
     if (!line.empty() && line.back() == '\r')
       line.resize(line.length() - 1);
+    fixLine(line);
+  }
 
   std::stringstream code;
   bool started = false;

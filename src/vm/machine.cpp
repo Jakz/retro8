@@ -293,6 +293,7 @@ void Machine::sspr(coord_t sx, coord_t sy, coord_t sw, coord_t sh, coord_t dx, c
 // TODO: add support for strange characters like symbols
 void Machine::print(const std::string& string, coord_t x, coord_t y, color_t color)
 {
+  
   struct SpecialGlyph
   {
     std::vector<uint8_t> encoding;
@@ -313,9 +314,17 @@ void Machine::print(const std::string& string, coord_t x, coord_t y, color_t col
 
   static const std::array<uint8_t, 2> Prefixes = { 0xe2, 0xf0 };
 
+  const coord_t sx = x;
   for (size_t i = 0; i < string.length(); ++i)
   {
     auto c = string[i];
+
+    if (c == '\n')
+    {
+      y += TEXT_LINE_HEIGHT;
+      x = sx;
+      continue;
+    }
 
     auto specialGlyph = std::find_if(SpecialGlyphs.begin(), SpecialGlyphs.end(), [&string, &i](const SpecialGlyph& glyph) {
       return string.size() >= i + glyph.encoding.size() && memcmp(&string[i], &glyph.encoding[0], glyph.encoding.size()) == 0; //TODO: memcmp is not best design ever

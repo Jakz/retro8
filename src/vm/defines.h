@@ -37,6 +37,8 @@ namespace retro8
   using palette_index_t = size_t;
   using address_t = int32_t;
   struct point_t { coord_t x, y; };
+
+  static constexpr coord_t TEXT_LINE_HEIGHT = 6;
 }
 
 #define RASTERIZE_PIXEL_PAIR(machine, dest, pixels) do { \

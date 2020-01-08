@@ -317,7 +317,7 @@ int print(lua_State* L)
     retro8::coord_t y = cursor->y();
     retro8::color_t c = machine.memory().penColor()->low();
     machine.print(text, x, y, c);
-    cursor->set(cursor->x(), cursor->y() + 6); //TODO: check height / magic number
+    cursor->set(cursor->x(), cursor->y() + TEXT_LINE_HEIGHT); //TODO: check height
   }
   else if (lua_gettop(L) >= 3)
   {

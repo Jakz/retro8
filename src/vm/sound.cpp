@@ -237,8 +237,8 @@ void APU::handleCommands()
         /* stop sound on channel*/
         if (s.index == -1)
         {
-          assert(s.channel >= 0 && s.channel <= channels.size());
-          channels[s.channel].sound = nullptr;
+          if (s.channel >= 0 && s.channel <= channels.size())
+            channels[s.channel].sound = nullptr;
           continue;
         }
         /* stop sound from looping */
@@ -431,6 +431,8 @@ void APU::renderSounds(int16_t* dest, size_t totalSamples)
   constexpr int16_t maxVolume = 4096;
 
   memset(dest, 0, sizeof(int16_t)*totalSamples);
+
+  return;
 
   for (size_t i = 0; i < CHANNEL_COUNT; ++i)
   {

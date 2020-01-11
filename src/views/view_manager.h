@@ -57,6 +57,8 @@ namespace ui
 
     void openMenu();
     void backToGame();
+
+    void setPngCartridge(SDL_Surface* cartridge);
   };
 }
 

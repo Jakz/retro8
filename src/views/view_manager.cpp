@@ -104,3 +104,8 @@ void ViewManager::backToGame()
   _gameView->resume();
   _view = _gameView;
 }
+
+void ViewManager::setPngCartridge(SDL_Surface* cartridge)
+{
+  _menuView->setPngCartridge(cartridge);
+}

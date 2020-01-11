@@ -82,6 +82,7 @@ namespace ui
   {
   private:
     ViewManager* _gvm;
+    SDL_Texture* _cartridge;
 
   public:
     MenuView(ViewManager* manager);
@@ -94,5 +95,7 @@ namespace ui
 
     void reset();
     void updateLabels();
+
+    void setPngCartridge(SDL_Surface* cartridge);
   };
 }

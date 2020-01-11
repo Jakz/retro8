@@ -33,7 +33,7 @@ std::vector<MenuEntry>::const_iterator selected;
 
 enum { RESUME = 0, HELP, OPTIONS, RESET, EXIT, SHOW_FPS = 0, SCALER, SOUND, MUSIC, BACK };
 
-MenuView::MenuView(ViewManager* gvm) : _gvm(gvm)
+MenuView::MenuView(ViewManager* gvm) : _gvm(gvm), _cartridge(nullptr)
 {
   static_assert(SCALER == 1, "must be 1");
 
@@ -160,11 +160,21 @@ void MenuView::render()
   SDL_Rect border = { 0, 0, W, H };
   SDL_RenderDrawRect(renderer, &border);
 
-  _gvm->text("retro8", W / 2 + 2, 20 + 2, { 0, 22, 120 }, TextAlign::CENTER, 4.0f);
-  _gvm->text("retro8", W / 2, 20, { 0, 47, 255 }, TextAlign::CENTER, 4.0f);
-  _gvm->text("v0.1b", W / 2 + _gvm->textWidth("retro8", 4.0)/2 + 3, 34, { 0, 47, 255 }, TextAlign::LEFT, 2.0f);
+  bool hasCartridge = _cartridge;
 
-  retro8::point_t menuBase = { W / 2, 90 };
+  // 160x205
+
+  if (hasCartridge)
+    _gvm->blit(_cartridge, W/2 - 5, (240 - 205)/2);
+
+  const int32_t bx = hasCartridge ? W / 4 : W / 2;
+  const int32_t by = 24;
+
+  _gvm->text("retro8", bx + 2, by + 2, { 0, 22, 120 }, TextAlign::CENTER, 4.0f);
+  _gvm->text("retro8", bx, by, { 0, 47, 255 }, TextAlign::CENTER, 4.0f);
+  _gvm->text("v0.1b", bx + _gvm->textWidth("retro8", 4.0)/2 - _gvm->textWidth("v0.1b", 1.0), by + 24, { 0, 47, 255 }, TextAlign::LEFT, 1.0f);
+
+  retro8::point_t menuBase = { bx, by + 70 };
 
   for (auto it = menu->begin(); it != menu->end(); ++it)
   {
@@ -176,4 +186,15 @@ void MenuView::render()
     _gvm->text(it->caption, menuBase.x, menuBase.y, color, TextAlign::CENTER, 2.0f);
     menuBase.y += 16;
   }
+}
+
+void MenuView::setPngCartridge(SDL_Surface* cartridge)
+{
+  if (_cartridge)
+    SDL_DestroyTexture(_cartridge);
+
+  if (cartridge)
+    _cartridge = SDL_CreateTextureFromSurface(_gvm->renderer(), cartridge);
+  else
+    _cartridge = nullptr;   
 }

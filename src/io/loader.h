@@ -20,7 +20,11 @@ namespace retro8
 
     public:
       void load(const std::string& path, Machine& dest);
+      SDL_Surface* loadPNG(const std::string& path, Machine& dest);
+
       std::string load(const std::string& path);
+
+      bool isPngCartridge(const std::string& path) const;
 
       static void fixLine(std::string& line);
     };

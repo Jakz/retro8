@@ -72,9 +72,20 @@ void GameView::render()
     r8::io::Loader loader;
 
     if (_path.empty())
-      _path = "cartridges/Nanoman.p8.png";
+      _path = "cartridges/Breakout Hero.p8.png";
 
-    loader.load(_path, machine);
+    if (loader.isPngCartridge(_path))
+    {
+      SDL_Surface* cartridge = loader.loadPNG(_path, machine);
+      manager->setPngCartridge(cartridge);
+      SDL_FreeSurface(cartridge);
+    }
+    else
+    {
+      loader.load(_path, machine);
+      manager->setPngCartridge(nullptr);
+    }
+    
     machine.memory().backupCartridge();
 
     int32_t fps = machine.code().require60fps() ? 60 : 30;

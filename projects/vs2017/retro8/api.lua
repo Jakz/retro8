@@ -66,7 +66,7 @@ end
 
 -- TODO: missing vararg
 function coresume(f)
-  coroutine.resume(f)
+  return coroutine.resume(f)
 end
 
 function costatus(f)

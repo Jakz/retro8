@@ -242,6 +242,46 @@ static lua_Number lua_strx2number (const char *s, char **endptr) {
 #endif
 /* }====================================================== */
 
+lua_Number lua_strb2number(const char* s, char** endptr)
+{
+  if (s[0] != '0' || (s[1] != 'b' && s[1] != 'B'))
+    return 0.0f;
+
+  s += 2;
+
+  //TODO: additional checks on wrong format
+
+  lua_Number result = 0.0f;
+
+  while (*s == '0') ++s;
+  while (*s == '1' || *s == '0')
+  {
+    result *= 2.0f;
+    result += (*s == '1') ? 1 : 0;
+    ++s;
+  }
+
+  if (*s == '.')
+  {
+    int fractional = 0;
+    int digits = 0;
+    ++s;
+
+    while (*s == '1' || *s == '0')
+    {
+      fractional <<= 1;
+      fractional += (*s == '1') ? 1 : 0;
+      ++s;
+      ++digits;
+
+      float total = 1 << digits;
+      result += fractional / total;
+    }
+  }
+
+  *endptr = cast(char*, s);
+  return result;
+}
 
 /* maximum length of a numeral */
 #if !defined (L_MAXLENNUM)
@@ -250,7 +290,11 @@ static lua_Number lua_strx2number (const char *s, char **endptr) {
 
 static const char *l_str2dloc (const char *s, lua_Number *result, int mode) {
   char *endptr;
-  *result = (mode == 'x') ? lua_strx2number(s, &endptr)  /* try to convert */
+
+  if (mode == 'b')
+    *result = lua_strb2number(s, &endptr);
+  else
+    *result = (mode == 'x') ? lua_strx2number(s, &endptr)  /* try to convert */
                           : lua_str2number(s, &endptr);
   if (endptr == s) return NULL;  /* nothing recognized? */
   while (lisspace(cast_uchar(*endptr))) endptr++;  /* skip trailing spaces */
@@ -273,7 +317,7 @@ static const char *l_str2dloc (const char *s, lua_Number *result, int mode) {
 */
 static const char *l_str2d (const char *s, lua_Number *result) {
   const char *endptr;
-  const char *pmode = strpbrk(s, ".xXnN");
+  const char *pmode = strpbrk(s, ".xXnNbB");
   int mode = pmode ? ltolower(cast_uchar(*pmode)) : 0;
   if (mode == 'n')  /* reject 'inf' and 'nan' */
     return NULL;

@@ -556,12 +556,10 @@ namespace math
   int mid(lua_State* L)
   {
     assert(lua_isnumber(L, 1));
-    assert(lua_isnumber(L, 2));
-    assert(lua_isnumber(L, 3));
-
     real_t a = lua_tonumber(L, 1);
+    assert(lua_isnumber(L, 2));
     real_t b = lua_tonumber(L, 2);
-    real_t c = lua_tonumber(L, 3);
+    real_t c = lua_gettop(L) >= 3 ? lua_tonumber(L, 3) : 0;
 
     if ((a < b && b < c) || (c < b && b < a))
       lua_pushnumber(L, b);

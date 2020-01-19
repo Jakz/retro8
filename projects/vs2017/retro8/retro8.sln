@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.28307.421
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "retro8", "retro8.vcxproj", "{9834F81E-B512-4925-ADA7-746E485735D1}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "retroarch", "retroarch.vcxproj", "{0E0E60BF-5A2C-4690-9E9A-6990DA1715B4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -15,6 +17,10 @@ Global
 		{9834F81E-B512-4925-ADA7-746E485735D1}.Debug|x64.Build.0 = Debug|x64
 		{9834F81E-B512-4925-ADA7-746E485735D1}.Release|x64.ActiveCfg = Release|x64
 		{9834F81E-B512-4925-ADA7-746E485735D1}.Release|x64.Build.0 = Release|x64
+		{0E0E60BF-5A2C-4690-9E9A-6990DA1715B4}.Debug|x64.ActiveCfg = Debug|x64
+		{0E0E60BF-5A2C-4690-9E9A-6990DA1715B4}.Debug|x64.Build.0 = Debug|x64
+		{0E0E60BF-5A2C-4690-9E9A-6990DA1715B4}.Release|x64.ActiveCfg = Release|x64
+		{0E0E60BF-5A2C-4690-9E9A-6990DA1715B4}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

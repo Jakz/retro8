@@ -8,7 +8,8 @@ void Machine::flip()
 {
   auto* data = _memory.screenData();
   auto* screenPalette = _memory.paletteAt(gfx::SCREEN_PALETTE_INDEX);
-  auto* dest = static_cast<uint32_t*>(_output->pixels);
+  auto output = _output;
+
 
   for (size_t i = 0; i < gfx::BYTES_PER_SCREEN; ++i)
   {
@@ -16,11 +17,9 @@ void Machine::flip()
     const auto rc1 = retro8::gfx::ColorTable::get(screenPalette->get((pixels)->low()));
     const auto rc2 = retro8::gfx::ColorTable::get(screenPalette->get((pixels)->high()));
 
-    *(dest) = rc1;
-    *((dest)+1) = rc2;
-    (dest) += 2;
-
-    //RASTERIZE_PIXEL_PAIR((*this), dest, pixels);
+    *(output) = rc1;
+    *((output)+1) = rc2;
+    (output) += 2;
   }
 }
 

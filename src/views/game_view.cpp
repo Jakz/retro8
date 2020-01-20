@@ -66,13 +66,13 @@ void GameView::render()
 
     _frameCounter = 0;
 
-    machine.init(_output);
+    machine.init(static_cast<r8::gfx::ColorTable::pixel_t*>(_output->pixels));
     machine.code().loadAPI();
 
     r8::io::Loader loader;
 
     if (_path.empty())
-      _path = "cartridges/Breakout Hero.p8.png";
+      _path = "cartridges/Desert Drift.p8.png";
 
     if (loader.isPngCartridge(_path))
     {

@@ -48,8 +48,11 @@ namespace retro8
 
     struct ColorTable
     {
+    public:
+      using pixel_t = uint32_t;
+
     private:
-      static std::array<uint32_t, COLOR_COUNT> table;
+      static std::array<pixel_t, COLOR_COUNT> table;
 
     public:
       static void init(SDL_PixelFormat* format);

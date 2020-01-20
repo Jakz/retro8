@@ -30,7 +30,7 @@ namespace retro8
     sfx::APU _sound;
     gfx::Font _font;
     lua::Code _code;
-    SDL_Surface* _output;
+    gfx::ColorTable::pixel_t* _output;
 
 
 
@@ -47,7 +47,7 @@ namespace retro8
     Machine(const Machine&) = delete;
     Machine& operator=(const Machine&) = delete;
 
-    void init(SDL_Surface* output) { _output = output; }
+    void init(gfx::ColorTable::pixel_t* output) { _output = output; }
 
     void flip();
 

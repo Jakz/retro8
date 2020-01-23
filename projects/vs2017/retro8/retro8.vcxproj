@@ -79,6 +79,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\io\loader.cpp" />
+    <ClCompile Include="..\..\..\src\io\picopng.cpp" />
     <ClCompile Include="..\..\..\src\io\stegano.cpp" />
     <ClCompile Include="..\..\..\src\lua\lapi.c" />
     <ClCompile Include="..\..\..\src\lua\lauxlib.c" />

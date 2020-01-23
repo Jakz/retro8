@@ -49,6 +49,11 @@ private:
   bit_mask<T>(utype value) : value(value) { }
 };
 
+struct Platform
+{
+  static uint32_t getTicks();
+};
+
 #define SOUND_ENABLED true
 
 #ifdef _WIN32
@@ -57,7 +62,8 @@ private:
 #define LOGD(...)
 #endif
 
-#define OPTS_ENABLED true
+#define R8_OPTS_ENABLED true
+#define R8_USE_LODE_PNG true
 
 #ifdef _WIN32
 #define MOUSE_ENABLED true

@@ -86,15 +86,9 @@ std::string Loader::load(const std::string& path)
   return "";
 }
 
-bool Loader::isPngCartridge(const std::string& path) const
+bool Loader::isPngCartridge(const std::string& path)
 {
   return path.length() >= 4 && path.substr(path.length() - 4) == ".png";
-}
-
-SDL_Surface* Loader::loadPNG(const std::string& path, Machine& dest)
-{
-  Stegano stegano;
-  return stegano.load(path, dest, true);
 }
 
 void Loader::load(const std::string& path, Machine& m)

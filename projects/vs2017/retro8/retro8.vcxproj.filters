@@ -281,5 +281,8 @@
     <ClCompile Include="..\..\..\src\views\menu_view.cpp">
       <Filter>src\views</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\io\picopng.cpp">
+      <Filter>src\io</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

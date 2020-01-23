@@ -19,13 +19,11 @@ namespace retro8
       uint8_t valueForUint8(const char* c);
 
     public:
-      void loadRaw(const void* data, size_t length);
       void load(const std::string& path, Machine& dest);
-      SDL_Surface* loadPNG(const std::string& path, Machine& dest);
 
       std::string load(const std::string& path);
 
-      bool isPngCartridge(const std::string& path) const;
+      static bool isPngCartridge(const std::string& path);
 
       static void fixLine(std::string& line);
 

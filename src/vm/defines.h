@@ -1,7 +1,5 @@
 #pragma once
 
-#include <SDL.h>
-
 #include <array>
 
 namespace retro8
@@ -43,8 +41,8 @@ namespace retro8
 
 #define RASTERIZE_PIXEL_PAIR(machine, dest, pixels) do { \
   auto* screenPalette = (machine).memory().paletteAt(retro8::gfx::SCREEN_PALETTE_INDEX); \
-  const auto rc1 = retro8::gfx::ColorTable::get(screenPalette->get((pixels)->low())); \
-  const auto rc2 = retro8::gfx::ColorTable::get(screenPalette->get((pixels)->high())); \
+  const auto rc1 = colorTable.get(screenPalette->get((pixels)->low())); \
+  const auto rc2 = colorTable.get(screenPalette->get((pixels)->high())); \
 \
   *(dest) = rc1; \
   *((dest)+1) = rc2; \

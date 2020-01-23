@@ -11,8 +11,13 @@ namespace retro8
     struct PngData
     {
       const uint32_t* data;
+      void* userData;
       size_t length;
     };
+
+#if R8_USE_LODE_PNG
+    int decodePNG(std::vector<unsigned char>& out_image, unsigned long& image_width, unsigned long& image_height, const unsigned char* in_png, size_t in_size, bool convert_to_rgba32 = true);
+#endif
     
     class Stegano
     {
@@ -24,7 +29,6 @@ namespace retro8
       uint8_t assembleByte(const uint32_t v);
     public:
       void load(const PngData& data, Machine& dest);
-      SDL_Surface* load(const std::string& path, Machine& dest, bool keepData);
     };
   }
 }

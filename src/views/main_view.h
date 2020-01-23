@@ -32,6 +32,7 @@ namespace ui
 
     ViewManager* manager;
 
+    SDL_PixelFormat* _format;
     SDL_Surface* _output;
     SDL_Texture* _outputTexture;
 
@@ -44,6 +45,7 @@ namespace ui
     bool _showFPS;
     bool _showCartridgeName;
 
+    void rasterize();
     void render();
     void update();
 

@@ -7,7 +7,6 @@
 #include "lua_bridge.h"
 #include "memory.h"
 
-#include <SDL.h>
 #include <array>
 #include <random>
 
@@ -30,9 +29,6 @@ namespace retro8
     sfx::APU _sound;
     gfx::Font _font;
     lua::Code _code;
-    gfx::ColorTable::pixel_t* _output;
-
-
 
   private:
     void circHelper(coord_t xc, coord_t yc, coord_t x, coord_t y, color_t col);
@@ -46,10 +42,6 @@ namespace retro8
 
     Machine(const Machine&) = delete;
     Machine& operator=(const Machine&) = delete;
-
-    void init(gfx::ColorTable::pixel_t* output) { _output = output; }
-
-    void flip();
 
     void color(color_t color);
 

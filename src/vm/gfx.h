@@ -2,7 +2,6 @@
 
 #include "defines.h"
 
-#include <SDL.h>
 #include <array>
 #include <cassert>
 
@@ -52,11 +51,25 @@ namespace retro8
       using pixel_t = uint32_t;
 
     private:
-      static std::array<pixel_t, COLOR_COUNT> table;
+      std::array<pixel_t, COLOR_COUNT> table;
 
     public:
-      static void init(SDL_PixelFormat* format);
-      static uint32_t get(color_t c) { return table[c]; }
+      template<typename B>
+      void init(const B& mapper)
+      {
+        struct rgb_color_t { uint8_t r, g, b; };
+
+        constexpr std::array<rgb_color_t, COLOR_COUNT> colors = { {
+          {  0,   0,   0}, { 29,  43,  83}, {126,  37,  83}, {  0, 135,  81},
+          {171,  82,  54}, { 95,  87,  79}, {194, 195, 199}, {255, 241, 232},
+          {255,   0,  77}, {255, 163,   0}, {255, 236,  39}, {  0, 228,  54},
+          { 41, 173, 255}, {131, 118, 156}, {255, 119, 168}, {255, 204, 170}
+        } };
+
+        for (size_t i = 0; i < COLOR_COUNT; ++i)
+          table[i] = mapper(colors[i].r, colors[i].g, colors[i].b);
+      }
+      pixel_t get(color_t c) const { return table[c]; }
     };
 
     
@@ -199,7 +212,7 @@ namespace retro8
       inline const sequential_sprite_t* glyph(char c) const { return c < 128 ? &glyphs[c] : nullptr; }
       inline const sequential_sprite_t* specialGlyph(size_t i) const { return &glyphs[128+i]; }
 
-      void load(SDL_Surface* surface);
+      void load(const uint8_t* data);
     };
 
   };

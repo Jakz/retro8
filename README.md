@@ -3,6 +3,7 @@
 This is an attempt to have an open source reimplementation of PICO-8 fantasy console to be used on Desktop platforms but especially wherever you want to compile it.
 
 It was born as an attempt to make PICO-8 games playable on OpenDingux devices (GCW0, RG350, ..).
+Currently working to port it as a RetroArch core.
 
 ## Implementation
 

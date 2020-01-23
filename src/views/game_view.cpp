@@ -1,8 +1,10 @@
 #include "main_view.h"
 
 #include "io/loader.h"
+#include "io/stegano.h"
 
 #include <future>
+#include <SDL_image.h>
 
 using namespace ui;
 namespace r8 = retro8;
@@ -22,10 +24,57 @@ void GameView::update()
   machine.code().draw();
 }
 
-void rasterize()
-{
 
+
+retro8::io::PngData loadPng(const std::string& path)
+{
+  SDL_Surface* surface = IMG_Load(path.c_str());
+
+  if (!surface)
+  {
+    printf("Error while loading PNG cart: %s\n", IMG_GetError());
+    assert(false);
+  }
+
+  retro8::io::PngData pngData = { static_cast<const uint32_t*>(surface->pixels), surface, surface->h * surface->w };
+  assert(surface->pitch == retro8::io::Stegano::IMAGE_WIDTH * sizeof(uint32_t));
+  assert(surface->format->BytesPerPixel == 4);
+
+  return pngData;
 }
+
+r8::gfx::ColorTable colorTable;
+
+struct ColorMapper
+{
+  SDL_PixelFormat* format;
+  ColorMapper(SDL_PixelFormat* format) : format(format) { }
+
+  inline r8::gfx::ColorTable::pixel_t operator()(uint8_t r, uint8_t g, uint8_t b) const
+  {
+    return SDL_MapRGB(format, r, g, b);
+  }
+};
+
+void GameView::rasterize()
+{
+  auto* data = machine.memory().screenData();
+  auto* screenPalette = machine.memory().paletteAt(r8::gfx::SCREEN_PALETTE_INDEX);
+  auto output = static_cast<uint32_t*>(_output->pixels);
+
+  for (size_t i = 0; i < r8::gfx::BYTES_PER_SCREEN; ++i)
+  {
+    const r8::gfx::color_byte_t* pixels = data + i;
+    const auto rc1 = colorTable.get(screenPalette->get((pixels)->low()));
+    const auto rc2 = colorTable.get(screenPalette->get((pixels)->high()));
+
+    *(output) = rc1;
+    *((output)+1) = rc2;
+    (output) += 2;
+  }
+}
+
+
 
 bool init = false;
 void GameView::render()
@@ -36,16 +85,16 @@ void GameView::render()
     SDL_GetRendererInfo(manager->renderer(), &info);
     //SDL_PixelFormat* format = SDL_AllocFormat(SDL_GetWindowPixelFormat(manager->window()));
 
-    SDL_PixelFormat* format = SDL_AllocFormat(info.texture_formats[0]);
+    _format = SDL_AllocFormat(info.texture_formats[0]);
 
-    /* initialize color table to current pixel format */
-    r8::gfx::ColorTable::init(format);
+    LOGD("Initializing color table");
+    colorTable.init(ColorMapper(_format));
 
-    printf("Using renderer pixel format: %s\n", SDL_GetPixelFormatName(format->format));
+    printf("Using renderer pixel format: %s\n", SDL_GetPixelFormatName(_format->format));
 
     /* initialize main surface and its texture */
-    _output = SDL_CreateRGBSurface(0, 128, 128, 32, format->Rmask, format->Gmask, format->Bmask, format->Amask);
-    _outputTexture = SDL_CreateTexture(manager->renderer(), format->format, SDL_TEXTUREACCESS_STREAMING, 128, 128);
+    _output = SDL_CreateRGBSurface(0, 128, 128, 32, _format->Rmask, _format->Gmask, _format->Bmask, _format->Amask);
+    _outputTexture = SDL_CreateTexture(manager->renderer(), _format->format, SDL_TEXTUREACCESS_STREAMING, 128, 128);
 
     if (!_output)
     {
@@ -66,22 +115,25 @@ void GameView::render()
 
     _frameCounter = 0;
 
-    machine.init(static_cast<r8::gfx::ColorTable::pixel_t*>(_output->pixels));
     machine.code().loadAPI();
 
-    r8::io::Loader loader;
 
     if (_path.empty())
       _path = "cartridges/Desert Drift.p8.png";
 
-    if (loader.isPngCartridge(_path))
+    if (r8::io::Loader::isPngCartridge(_path))
     {
-      SDL_Surface* cartridge = loader.loadPNG(_path, machine);
-      manager->setPngCartridge(cartridge);
-      SDL_FreeSurface(cartridge);
+      auto cartridge = loadPng(_path);
+
+      retro8::io::Stegano stegano;
+      stegano.load(cartridge, machine);
+
+      manager->setPngCartridge(static_cast<SDL_Surface*>(cartridge.userData));
+      SDL_FreeSurface(static_cast<SDL_Surface*>(cartridge.userData));
     }
     else
     {
+      r8::io::Loader loader;
       loader.load(_path, machine);
       manager->setPngCartridge(nullptr);
     }
@@ -119,7 +171,7 @@ void GameView::render()
     if (!_initFuture.valid() || _initFuture.wait_for(std::chrono::nanoseconds(0)) == std::future_status::ready)
     {
       update();
-      machine.flip();
+      rasterize();
     }
 
     SDL_UpdateTexture(_outputTexture, nullptr, _output->pixels, _output->pitch);
@@ -184,7 +236,7 @@ else
         const r8::gfx::palette_t* palette = machine.memory().paletteAt(j);
 
         for (size_t i = 0; i < r8::gfx::COLOR_COUNT; ++i)
-          dest[j*16 + i] = r8::gfx::ColorTable::get(palette->get(r8::color_t(i)));
+          dest[j*16 + i] = colorTable.get(palette->get(r8::color_t(i)));
       }
 
       SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, palettes);
@@ -368,8 +420,12 @@ void GameView::resume()
 
 GameView::~GameView()
 {
+  SDL_FreeFormat(_format);
   SDL_FreeSurface(_output);
   SDL_DestroyTexture(_outputTexture);
   //TODO: the _init future is not destroyed
   machine.sound().close();
 }
+
+
+uint32_t Platform::getTicks() { return SDL_GetTicks(); }

@@ -115,34 +115,3 @@ void Stegano::load(const PngData& data, Machine& m)
 
   m.code().initFromSource(code);
 }
-
-//TODO: remove SDL_image and use lighter library
-#include <SDL_image.h>
-
-SDL_Surface* Stegano::load(const std::string& path, Machine& m, bool keepData)
-{
-#if DEBUGGER
-  fileName = path.substr(0, path.length() - 4) + ".p8";
-#endif
-
-  SDL_Surface* surface = IMG_Load(path.c_str());
-
-  if (!surface)
-  {
-    printf("Error while loading PNG cart: %s\n", IMG_GetError());
-    assert(false);
-  }
-
-  PngData pngData = { static_cast<const uint32_t*>(surface->pixels), surface->h * surface->w };
-  assert(surface->pitch == IMAGE_WIDTH * sizeof(uint32_t));
-  assert(surface->format->BytesPerPixel == 4);
-  load(pngData, m);
-
-  if (keepData)
-    return surface;
-  else
-  {
-    SDL_FreeSurface(surface);
-    return nullptr;
-  }
-}

@@ -4,25 +4,6 @@
 
 using namespace retro8;
 
-void Machine::flip()
-{
-  auto* data = _memory.screenData();
-  auto* screenPalette = _memory.paletteAt(gfx::SCREEN_PALETTE_INDEX);
-  auto output = _output;
-
-
-  for (size_t i = 0; i < gfx::BYTES_PER_SCREEN; ++i)
-  {
-    const gfx::color_byte_t* pixels = data + i;
-    const auto rc1 = retro8::gfx::ColorTable::get(screenPalette->get((pixels)->low()));
-    const auto rc2 = retro8::gfx::ColorTable::get(screenPalette->get((pixels)->high()));
-
-    *(output) = rc1;
-    *((output)+1) = rc2;
-    (output) += 2;
-  }
-}
-
 void Machine::color(color_t color)
 {
   gfx::color_byte_t* penColor = _memory.penColor();
@@ -123,7 +104,7 @@ void Machine::rect(coord_t x0, coord_t y0, coord_t x1, coord_t y1, color_t color
 
 void Machine::rectfill(coord_t x0, coord_t y0, coord_t x1, coord_t y1, color_t color)
 {
-#if OPTS_ENABLED
+#if R8_OPTS_ENABLED
 
   /* compute directly actual bounding box and set the rect without invoking pset */
 

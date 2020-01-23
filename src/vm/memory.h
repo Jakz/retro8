@@ -6,7 +6,6 @@
 #include "sound.h"
 #include "lua_bridge.h"
 
-#include <SDL.h>
 #include <array>
 #include <random>
 #include <cstring>

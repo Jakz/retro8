@@ -29,8 +29,9 @@ bool ui::ViewManager::loadData()
 {
   SDL_Surface* font = IMG_Load("pico8_font.png");
   assert(font);
+  assert(font->format->BytesPerPixel == 1);
 
-  machine.font().load(font);
+  machine.font().load(static_cast<const uint8_t*>(font->pixels));
 
   _font = SDL_CreateTextureFromSurface(_renderer, font);
 

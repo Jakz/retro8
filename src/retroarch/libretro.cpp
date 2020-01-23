@@ -49,7 +49,8 @@ extern "C"
 
   void retro_init()
   {
-    screen = new pixel_t[retro8::gfx::SCREEN_WIDTH * retro8::gfx::SCREEN_HEIGHT];
+    screen = new pixel_t[r8::gfx::SCREEN_WIDTH * r8::gfx::SCREEN_HEIGHT];
+    LOGD("Initializing screen buffer of %zu bytes", sizeof(pixel_t)*r8::gfx::SCREEN_WIDTH*r8::gfx::SCREEN_HEIGHT);
     colorTable.init(ColorMapper());
   }
 
@@ -77,7 +78,7 @@ extern "C"
     info->geometry.base_height = retro8::gfx::SCREEN_HEIGHT;
     info->geometry.max_width = retro8::gfx::SCREEN_WIDTH;
     info->geometry.max_height = retro8::gfx::SCREEN_HEIGHT;
-    info->geometry.aspect_ratio = retro8::gfx::TILE_MAP_WIDTH / float(retro8::gfx::TILE_MAP_HEIGHT);
+    info->geometry.aspect_ratio = retro8::gfx::SCREEN_WIDTH / float(retro8::gfx::SCREEN_HEIGHT);
   }
 
   void retro_set_environment(retro_environment_t env)
@@ -159,16 +160,20 @@ extern "C"
     auto* data = machine.memory().screenData();
     auto* screenPalette = machine.memory().paletteAt(retro8::gfx::SCREEN_PALETTE_INDEX);
 
+    auto pointer = screen;
+
     for (size_t i = 0; i < r8::gfx::BYTES_PER_SCREEN; ++i)
     {
       const r8::gfx::color_byte_t* pixels = data + i;
       const auto rc1 = colorTable.get(screenPalette->get((pixels)->low()));
       const auto rc2 = colorTable.get(screenPalette->get((pixels)->high()));
 
-      *(screen) = rc1;
-      *((screen)+1) = rc2;
-      (screen) += 2;
+      *(pointer) = rc1;
+      *((pointer)+1) = rc2;
+      (pointer) += 2;
     }
+
+    env.video(screen, r8::gfx::SCREEN_WIDTH, r8::gfx::SCREEN_HEIGHT, r8::gfx::SCREEN_WIDTH * sizeof(pixel_t));
 
   }
 

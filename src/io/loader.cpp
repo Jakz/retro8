@@ -51,52 +51,15 @@ retro8::sprite_flags_t Loader::spriteFlagsFromString(const char* c)
   return (h << 4) | l;
 }
 
-std::string Loader::load(const std::string& path)
-{
-  std::vector<std::string> lines;
-
-  std::ifstream input(path);
-  assert(input.good());
-  
-  for (std::string line; std::getline(input, line); /**/)
-    lines.push_back(line);
-
-  for (auto& line : lines)
-  {
-    if (!line.empty() && line.back() == '\r')
-      line.resize(line.length() - 1);
-    fixLine(line);
-  }
-
-  std::stringstream code;
-  bool started = false;
-
-  for (auto& line : lines)
-  {
-    if (line == "__lua__")
-      started = true;
-    else if (line[0] == '_' && line[1] == '_')
-      return code.str();
-    else if (started)
-      code << line << std::endl;
-  }
-
-  assert(false);
-
-  return "";
-}
-
 bool Loader::isPngCartridge(const std::string& path)
 {
   return path.length() >= 4 && path.substr(path.length() - 4) == ".png";
 }
 
-void Loader::load(const std::string& path, Machine& m)
-{ 
+template<typename T>
+std::vector<std::string> Loader::loadLines(T& input)
+{
   std::vector<std::string> lines;
-
-  std::ifstream input(path);
-  assert(input.good());
 
   for (std::string line; std::getline(input, line); /**/)
     lines.push_back(line);
@@ -105,6 +68,24 @@ void Loader::load(const std::string& path, Machine& m)
     if (!line.empty() && line.back() == '\r')
       line.resize(line.length() - 1);
 
+  return lines;
+}
+
+void Loader::loadFile(const std::string& path, Machine& dest)
+{
+  auto stream = std::ifstream(path);
+  assert(stream.good());
+  load(loadLines(stream), dest);
+}
+
+void Loader::loadRaw(const std::string& data, Machine& dest)
+{
+  auto stream = std::stringstream(data);
+  load(loadLines(stream), dest);
+}
+
+void Loader::load(const std::vector<std::string>& lines, Machine& m)
+{ 
   enum class State { HEADER, CODE, GFX, GFF, LABEL, MAP, SFX, MUSIC };
 
   State state = State::HEADER;

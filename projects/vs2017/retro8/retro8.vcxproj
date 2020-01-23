@@ -79,7 +79,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\io\loader.cpp" />
-    <ClCompile Include="..\..\..\src\io\picopng.cpp" />
     <ClCompile Include="..\..\..\src\io\stegano.cpp" />
     <ClCompile Include="..\..\..\src\lua\lapi.c" />
     <ClCompile Include="..\..\..\src\lua\lauxlib.c" />
@@ -163,6 +162,7 @@
     <ClInclude Include="..\..\..\src\views\view_manager.h" />
     <ClInclude Include="..\..\..\src\vm\defines.h" />
     <ClInclude Include="..\..\..\src\vm\gfx.h" />
+    <ClInclude Include="..\..\..\src\vm\lua_api.h" />
     <ClInclude Include="..\..\..\src\vm\lua_bridge.h" />
     <ClInclude Include="..\..\..\src\vm\machine.h" />
     <ClInclude Include="..\..\..\src\vm\memory.h" />

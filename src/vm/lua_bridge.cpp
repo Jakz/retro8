@@ -2,6 +2,7 @@
 
 #include "machine.h"
 #include "lua/lua.hpp"
+#include "lua_api.h"
 
 #include <functional>
 #include <iostream>
@@ -1110,14 +1111,13 @@ void Code::loadAPI()
   }
 
   luaL_openlibs(L);
-  /*luaopen_base(L);
-  luaopen_table(L);
-  luaopen_coroutine(L);*/
 
-  std::ifstream apiFile("api.lua");
-  std::string api((std::istreambuf_iterator<char>(apiFile)), std::istreambuf_iterator<char>());
+  /*std::ifstream apiFile("api.lua");
+  std::string api((std::istreambuf_iterator<char>(apiFile)), std::istreambuf_iterator<char>());*/
 
-  if (luaL_dostring(L, api.c_str()))
+  LOGD("Loading extended PICO-8 Api");
+
+  if (luaL_dostring(L, lua_api_string))
     printError("api.lua loading");
 }
 

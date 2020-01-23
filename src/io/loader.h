@@ -18,10 +18,13 @@ namespace retro8
       retro8::sprite_flags_t spriteFlagsFromString(const char* c);
       uint8_t valueForUint8(const char* c);
 
-    public:
-      void load(const std::string& path, Machine& dest);
+      template<typename T> std::vector<std::string> loadLines(T& stream);
+      void load(const std::vector<std::string>& lines, Machine& dest);
 
-      std::string load(const std::string& path);
+    public:
+
+      void loadRaw(const std::string& data, Machine& dest);
+      void loadFile(const std::string& path, Machine& dest);
 
       static bool isPngCartridge(const std::string& path);
 

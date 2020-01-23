@@ -196,7 +196,7 @@ void GameView::render()
     else
     {
       r8::io::Loader loader;
-      loader.load(_path, machine);
+      loader.loadFile(_path, machine);
       manager->setPngCartridge(nullptr);
     }
     

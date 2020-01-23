@@ -141,6 +141,9 @@
     <ClInclude Include="..\..\..\src\vm\memory.h">
       <Filter>src\vm</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\vm\lua_api.h">
+      <Filter>src\vm</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\main.cpp">
@@ -280,9 +283,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\views\menu_view.cpp">
       <Filter>src\views</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\io\picopng.cpp">
-      <Filter>src\io</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

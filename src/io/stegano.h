@@ -15,10 +15,6 @@ namespace retro8
       size_t length;
     };
 
-#if R8_USE_LODE_PNG
-    int decodePNG(std::vector<unsigned char>& out_image, unsigned long& image_width, unsigned long& image_height, const unsigned char* in_png, size_t in_size, bool convert_to_rgba32 = true);
-#endif
-    
     class Stegano
     {
     public:

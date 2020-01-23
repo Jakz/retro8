@@ -6,6 +6,68 @@
 #include <future>
 #include <SDL_image.h>
 
+
+#include <SDL_audio.h>
+
+class SDLAudio
+{
+private:
+  SDL_AudioSpec spec;
+  SDL_AudioDeviceID device;
+
+  static void audio_callback(void* data, uint8_t* cbuffer, int length);
+
+public:
+  void init(retro8::sfx::APU* apu);
+
+  void pause();
+  void resume();
+  void close();
+};
+
+void SDLAudio::audio_callback(void* data, uint8_t* cbuffer, int length)
+{
+  retro8::sfx::APU* apu = static_cast<retro8::sfx::APU*>(data);
+  int16_t* buffer = reinterpret_cast<int16_t*>(cbuffer);
+  apu->renderSounds(buffer, length / sizeof(int16_t));
+  return;
+}
+
+void SDLAudio::init(retro8::sfx::APU* apu)
+{
+  SDL_AudioSpec wantSpec;
+  wantSpec.freq = 44100;
+  wantSpec.format = AUDIO_S16SYS;
+  wantSpec.channels = 1;
+  wantSpec.samples = 2048;
+  wantSpec.userdata = apu;
+  wantSpec.callback = audio_callback;
+
+  device = SDL_OpenAudioDevice(NULL, 0, &wantSpec, &spec, 0);
+
+  if (!device)
+  {
+    printf("Error while opening audio: %s", SDL_GetError());
+  }
+}
+
+void SDLAudio::resume()
+{
+  SDL_PauseAudioDevice(device, false);
+}
+
+void SDLAudio::pause()
+{
+  SDL_PauseAudioDevice(device, true);
+}
+
+void SDLAudio::close()
+{
+  SDL_CloseAudioDevice(device);
+}
+
+SDLAudio sdlAudio;
+
 using namespace ui;
 namespace r8 = retro8;
 
@@ -154,7 +216,8 @@ void GameView::render()
     }
 
     machine.sound().init();
-    machine.sound().resume();
+    sdlAudio.init(&machine.sound());
+    sdlAudio.resume();
 
     init = true;
   }
@@ -405,7 +468,7 @@ void GameView::pause()
   _paused = true;
 
 #if SOUND_ENABLED
-  machine.sound().pause();
+  sdlAudio.pause();
 #endif
 }
 
@@ -414,7 +477,7 @@ void GameView::resume()
   _paused = false;
 
 #if SOUND_ENABLED
-  machine.sound().resume();
+  sdlAudio.resume();
 #endif
 }
 
@@ -424,7 +487,7 @@ GameView::~GameView()
   SDL_FreeSurface(_output);
   SDL_DestroyTexture(_outputTexture);
   //TODO: the _init future is not destroyed
-  machine.sound().close();
+  sdlAudio.close();
 }
 
 

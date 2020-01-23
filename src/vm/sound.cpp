@@ -164,50 +164,13 @@ constexpr float ORGAN_DEFAULT_COEFFICIENT = 0.5f;
 size_t position = 0;
 int16_t* rendered = nullptr;
 
-void audio_callback(void* data, uint8_t* cbuffer, int length)
-{
-  APU* apu = static_cast<APU*>(data);
-  int16_t* buffer = reinterpret_cast<int16_t*>(cbuffer);
-  apu->renderSounds(buffer, length / sizeof(int16_t));
-  return;
-}
+
 
 void APU::init()
 {
   static_assert(sizeof(SoundSample) == 2, "Must be 2 bytes");
   static_assert(sizeof(Sound) == 68, "Must be 68 bytes");
-
-  SDL_AudioSpec wantSpec;
-  wantSpec.freq = 44100;
-  wantSpec.format = AUDIO_S16SYS;
-  wantSpec.channels = 1;
-  wantSpec.samples = 2048;
-  wantSpec.userdata = this;
-  wantSpec.callback = audio_callback;
-
   for (auto& channel : channels) channel.sound = nullptr;
-
-  device = SDL_OpenAudioDevice(NULL, 0, &wantSpec, &spec, 0);
-
-  if (!device)
-  {
-    printf("Error while opening audio: %s", SDL_GetError());
-  }
-}
-
-void APU::resume()
-{
-  SDL_PauseAudioDevice(device, false);
-}
-
-void APU::pause()
-{
-  SDL_PauseAudioDevice(device, true);
-}
-
-void APU::close()
-{
-  SDL_CloseAudioDevice(device);
 }
 
 void APU::play(sound_index_t index, channel_index_t channel, uint32_t start, uint32_t end)

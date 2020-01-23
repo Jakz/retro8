@@ -6,7 +6,6 @@
 #include <array>
 #include <vector>
 #include <mutex>
-#include <SDL_audio.h>
 
 #if SOUND_ENABLED
 
@@ -198,10 +197,6 @@ namespace retro8
         Command(music_index_t index, int32_t fadeMs, int32_t mask) : isMusic(true), music({ index, fadeMs, mask }) { }
       };
 
-
-      SDL_AudioSpec spec;
-      SDL_AudioDeviceID device;
-
       std::array<SoundState, CHANNEL_COUNT> channels;
       MusicState mstate;
 
@@ -222,10 +217,6 @@ namespace retro8
       APU(Memory& memory) : memory(memory), _soundEnabled(true), _musicEnabled(true) { }
 
       void init();
-      void close();
-
-      void resume();
-      void pause();
 
       void play(sound_index_t index, channel_index_t channel, uint32_t start, uint32_t end);
       void music(music_index_t index, int32_t fadeMs, int32_t mask);

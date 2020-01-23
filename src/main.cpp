@@ -16,7 +16,6 @@
 * R shoulder - SDLK_BACKSPACE
 * Power slider in up position - SDLK_POWER (not encouraged to map in game, as it's used by the pwswd daemon)
 * Power slider in down position - SDLK_PAUSE
-
 */
 
 #if TEST_MODE

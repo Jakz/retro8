@@ -147,6 +147,9 @@
     <ClInclude Include="..\..\..\src\vm\pico_font.h">
       <Filter>src\vm</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\vm\input.h">
+      <Filter>src\vm</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\main.cpp">

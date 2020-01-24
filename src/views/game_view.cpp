@@ -166,18 +166,10 @@ void GameView::render()
     assert(_outputTexture);
     assert(_output);
 
-    for (auto& pks : keyStatus)
-    {
-      for (uint32_t i = 0; i < pks.size(); ++i)
-      {
-        pks[i].button = retro8::button_t(1 << i);
-        pks[i].state = KeyStatus::State::OFF;
-      }
-    }
-
     _frameCounter = 0;
 
     machine.code().loadAPI();
+    _input.setMachine(&machine);
 
 
     if (_path.empty())
@@ -222,7 +214,8 @@ void GameView::render()
     init = true;
   }
 
-  manageKeyRepeat();
+  _input.manageKeyRepeat();
+  _input.tick();
 
   auto* renderer = manager->renderer();
 
@@ -346,49 +339,6 @@ else
 #endif
 }
 
-void GameView::manageKeyRepeat()
-{
-  static constexpr uint32_t TICKS_FOR_FIRST_REPEAT = 15;
-  static constexpr uint32_t TICKS_REPEATING = 4;
-
-  /* manage key repeats */
-  const uint32_t ticks = _frameCounter;
-
-  for (size_t i = 0; i < keyStatus.size(); ++i)
-  {
-    auto& pks = keyStatus[i];
-    
-    for (KeyStatus& ks : pks)
-    {
-      if (ks.state == KeyStatus::State::FIRST)
-      {
-        machine.state().previousButtons[i].set(ks.button);
-        ks.state = KeyStatus::State::WAITING;
-      }
-      else if (ks.state == KeyStatus::State::WAITING && (ticks - ks.ticks) >= TICKS_FOR_FIRST_REPEAT)
-      {
-        machine.state().previousButtons[i].set(ks.button);
-        ks.state = KeyStatus::State::REPEATING;
-        ks.ticks = ticks;
-      }
-      else if (ks.state == KeyStatus::State::REPEATING && (ticks - ks.ticks) >= TICKS_REPEATING)
-      {
-        machine.state().previousButtons[i].set(ks.button);
-        ks.ticks = ticks;
-      }
-      else
-        machine.state().previousButtons[i].reset(ks.button);
-    }
-  }
-}
-
-void GameView::manageKey(size_t pindex, size_t index, bool pressed)
-{
-  machine.state().buttons[pindex].set(keyStatus[pindex][index].button, pressed);
-  keyStatus[pindex][index].ticks = _frameCounter;
-  keyStatus[pindex][index].state = pressed ? KeyStatus::State::FIRST : KeyStatus::State::OFF;
-}
-
 void GameView::handleKeyboardEvent(const SDL_Event& event)
 {
   if (!event.key.repeat)
@@ -396,36 +346,36 @@ void GameView::handleKeyboardEvent(const SDL_Event& event)
     switch (event.key.keysym.sym)
     {
     case SDLK_LEFT:
-      manageKey(0, 0, event.type == SDL_KEYDOWN);
+      _input.manageKey(0, 0, event.type == SDL_KEYDOWN);
       break;
     case SDLK_RIGHT:
-      manageKey(0, 1, event.type == SDL_KEYDOWN);
+      _input.manageKey(0, 1, event.type == SDL_KEYDOWN);
       break;
     case SDLK_UP:
-      manageKey(0, 2, event.type == SDL_KEYDOWN);
+      _input.manageKey(0, 2, event.type == SDL_KEYDOWN);
       break;
     case SDLK_DOWN:
-      manageKey(0, 3, event.type == SDL_KEYDOWN);
+      _input.manageKey(0, 3, event.type == SDL_KEYDOWN);
       break;
 
     case SDLK_z:
     case SDLK_LCTRL:
-      manageKey(0, 4, event.type == SDL_KEYDOWN);
+      _input.manageKey(0, 4, event.type == SDL_KEYDOWN);
       break;
 
     case SDLK_x:
     case SDLK_LALT:
-      manageKey(0, 5, event.type == SDL_KEYDOWN);
+      _input.manageKey(0, 5, event.type == SDL_KEYDOWN);
       break;
 
     case SDLK_a:
     case SDLK_SPACE:
-      manageKey(1, 4, event.type == SDL_KEYDOWN);
+      _input.manageKey(1, 4, event.type == SDL_KEYDOWN);
       break;
 
     case SDLK_s:
     case SDLK_LSHIFT:
-      manageKey(1, 5, event.type == SDL_KEYDOWN);
+      _input.manageKey(1, 5, event.type == SDL_KEYDOWN);
       break;
 
 #if DESKTOP_MODE

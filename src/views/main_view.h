@@ -10,6 +10,7 @@
 #include "lua/lua.hpp"
 
 #include "vm/machine.h"
+#include "vm/input.h"
 #include "vm/lua_bridge.h"
 
 namespace ui
@@ -32,6 +33,8 @@ namespace ui
 
     ViewManager* manager;
 
+    retro8::input::InputManager _input;
+
     SDL_PixelFormat* _format;
     SDL_Surface* _output;
     SDL_Texture* _outputTexture;
@@ -48,18 +51,6 @@ namespace ui
     void rasterize();
     void render();
     void update();
-
-    struct KeyStatus
-    {
-      enum class State { OFF, FIRST, WAITING, REPEATING } state;
-      retro8::button_t button;
-      uint32_t ticks;
-    };
-    std::array<std::array<KeyStatus, retro8::BUTTON_COUNT>, retro8::PLAYER_COUNT> keyStatus;
-
- 
-    void manageKeyRepeat();
-    void manageKey(size_t pindex, size_t index, bool pressed);
 
   public:
     GameView(ViewManager* manager);

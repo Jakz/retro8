@@ -6,6 +6,7 @@
 #include "io/loader.h"
 #include "io/stegano.h"
 #include "vm/machine.h"
+#include "vm/input.h"
 
 #include <cstring>
 
@@ -15,6 +16,7 @@ using pixel_t = uint32_t;
 r8::Machine machine;
 r8::io::Loader loader;
 
+r8::input::InputManager input;
 r8::gfx::ColorTable colorTable;
 pixel_t* screen;
 
@@ -27,6 +29,7 @@ struct RetroArchEnv
   retro_input_state_t inputState;
 
   uint32_t frameCounter;
+  uint16_t buttonState;
 };
 
 RetroArchEnv env;
@@ -54,6 +57,8 @@ extern "C"
     LOGD("Initializing screen buffer of %zu bytes", sizeof(pixel_t)*r8::gfx::SCREEN_WIDTH*r8::gfx::SCREEN_HEIGHT);
     colorTable.init(ColorMapper());
     machine.font().load();
+    machine.code().loadAPI();
+    input.setMachine(&machine);
   }
 
   void retro_deinit()
@@ -111,9 +116,8 @@ extern "C"
   {
     if (info && info->data)
     {
-      machine.code().loadAPI();
+      input.reset();
 
-      
       const char* bdata = static_cast<const char*>(info->data);
 
       if (std::memcmp(bdata, ".PNG", 4) == 0)
@@ -161,9 +165,11 @@ extern "C"
     /* if code is at 60fps or every 2 frames (30fps) */
     if (machine.code().require60fps() || env.frameCounter % 2 == 0)
     {
+      /* call _update and _draw of PICO-8 code */
       machine.code().update();
       machine.code().draw();
 
+      /* rasterize screen memory to ARGB framebuffer */
       auto* data = machine.memory().screenData();
       auto* screenPalette = machine.memory().paletteAt(retro8::gfx::SCREEN_PALETTE_INDEX);
 
@@ -180,10 +186,49 @@ extern "C"
         (pointer) += 2;
       }
 
+      input.manageKeyRepeat();
     }
 
     env.video(screen, r8::gfx::SCREEN_WIDTH, r8::gfx::SCREEN_HEIGHT, r8::gfx::SCREEN_WIDTH * sizeof(pixel_t));
     ++env.frameCounter;
+
+    /* manage input */
+    {
+      const unsigned player = 0;
+
+      struct BtPair {
+        int16_t rabt;
+        size_t r8bt;
+        bool isSet;
+      };
+
+      static std::array<BtPair, retro8::BUTTON_COUNT> mapping = { {
+        { RETRO_DEVICE_ID_JOYPAD_LEFT, 0, false },
+        { RETRO_DEVICE_ID_JOYPAD_RIGHT, 1, false },
+        { RETRO_DEVICE_ID_JOYPAD_UP, 2, false },
+        { RETRO_DEVICE_ID_JOYPAD_DOWN, 3, false },
+        { RETRO_DEVICE_ID_JOYPAD_A, 4, false },
+        { RETRO_DEVICE_ID_JOYPAD_B, 5, false },
+      } };
+
+
+      //TODO: add mapping for action1/2 of player 2 because it's used by some games
+
+      env.inputPoll();
+      for (auto& entry : mapping)
+      {
+        const bool isSet = env.inputState(player, RETRO_DEVICE_JOYPAD, 0, entry.rabt);
+        const bool wasSet = entry.isSet;
+
+        if (wasSet != isSet)
+          input.manageKey(player, entry.r8bt, isSet);
+
+        entry.isSet = isSet;
+      }
+
+      input.tick();
+    }
+
   }
 
   void retro_reset()

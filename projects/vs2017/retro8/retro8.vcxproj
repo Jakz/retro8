@@ -162,6 +162,7 @@
     <ClInclude Include="..\..\..\src\views\view_manager.h" />
     <ClInclude Include="..\..\..\src\vm\defines.h" />
     <ClInclude Include="..\..\..\src\vm\gfx.h" />
+    <ClInclude Include="..\..\..\src\vm\input.h" />
     <ClInclude Include="..\..\..\src\vm\lua_api.h" />
     <ClInclude Include="..\..\..\src\vm\lua_bridge.h" />
     <ClInclude Include="..\..\..\src\vm\machine.h" />

@@ -212,6 +212,9 @@ namespace retro8
       inline const sequential_sprite_t* glyph(char c) const { return c < 128 ? &glyphs[c] : nullptr; }
       inline const sequential_sprite_t* specialGlyph(size_t i) const { return &glyphs[128+i]; }
 
+      void load();
+
+      /* this assumes a 1 byte per pixel bmp */
       void load(const uint8_t* data);
     };
 

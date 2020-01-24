@@ -166,6 +166,7 @@
     <ClInclude Include="..\..\..\src\vm\lua_bridge.h" />
     <ClInclude Include="..\..\..\src\vm\machine.h" />
     <ClInclude Include="..\..\..\src\vm\memory.h" />
+    <ClInclude Include="..\..\..\src\vm\pico_font.h" />
     <ClInclude Include="..\..\..\src\vm\sound.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

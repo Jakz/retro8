@@ -12,7 +12,6 @@
 namespace r8 = retro8;
 using pixel_t = uint32_t;
 
-
 r8::Machine machine;
 r8::io::Loader loader;
 
@@ -26,6 +25,8 @@ struct RetroArchEnv
   retro_audio_sample_batch_t audioBatch;
   retro_input_poll_t inputPoll;
   retro_input_state_t inputState;
+
+  uint32_t frameCounter;
 };
 
 RetroArchEnv env;
@@ -52,6 +53,7 @@ extern "C"
     screen = new pixel_t[r8::gfx::SCREEN_WIDTH * r8::gfx::SCREEN_HEIGHT];
     LOGD("Initializing screen buffer of %zu bytes", sizeof(pixel_t)*r8::gfx::SCREEN_WIDTH*r8::gfx::SCREEN_HEIGHT);
     colorTable.init(ColorMapper());
+    machine.font().load();
   }
 
   void retro_deinit()
@@ -103,7 +105,7 @@ extern "C"
   unsigned retro_get_region(void) { return 0; }
   void *retro_get_memory_data(unsigned id) { return nullptr; }
   size_t retro_get_memory_size(unsigned id) { return 0; }
-
+  
   bool retro_load_game_special(unsigned game_type, const struct retro_game_info *info, size_t num_info) { return false; }
   bool retro_load_game(const retro_game_info* info)
   {
@@ -142,7 +144,9 @@ extern "C"
       }
 
       machine.sound().init();
- 
+      
+      env.frameCounter = 0;
+
       return true;
     }
   }
@@ -154,27 +158,32 @@ extern "C"
 
   void retro_run()
   {
-    machine.code().update();
-    machine.code().draw();
-    
-    auto* data = machine.memory().screenData();
-    auto* screenPalette = machine.memory().paletteAt(retro8::gfx::SCREEN_PALETTE_INDEX);
-
-    auto pointer = screen;
-
-    for (size_t i = 0; i < r8::gfx::BYTES_PER_SCREEN; ++i)
+    /* if code is at 60fps or every 2 frames (30fps) */
+    if (machine.code().require60fps() || env.frameCounter % 2 == 0)
     {
-      const r8::gfx::color_byte_t* pixels = data + i;
-      const auto rc1 = colorTable.get(screenPalette->get((pixels)->low()));
-      const auto rc2 = colorTable.get(screenPalette->get((pixels)->high()));
+      machine.code().update();
+      machine.code().draw();
 
-      *(pointer) = rc1;
-      *((pointer)+1) = rc2;
-      (pointer) += 2;
+      auto* data = machine.memory().screenData();
+      auto* screenPalette = machine.memory().paletteAt(retro8::gfx::SCREEN_PALETTE_INDEX);
+
+      auto pointer = screen;
+
+      for (size_t i = 0; i < r8::gfx::BYTES_PER_SCREEN; ++i)
+      {
+        const r8::gfx::color_byte_t* pixels = data + i;
+        const auto rc1 = colorTable.get(screenPalette->get((pixels)->low()));
+        const auto rc2 = colorTable.get(screenPalette->get((pixels)->high()));
+
+        *(pointer) = rc1;
+        *((pointer)+1) = rc2;
+        (pointer) += 2;
+      }
+
     }
 
     env.video(screen, r8::gfx::SCREEN_WIDTH, r8::gfx::SCREEN_HEIGHT, r8::gfx::SCREEN_WIDTH * sizeof(pixel_t));
-
+    ++env.frameCounter;
   }
 
   void retro_reset()

@@ -31,7 +31,7 @@ bool ui::ViewManager::loadData()
   assert(font);
   assert(font->format->BytesPerPixel == 1);
 
-  machine.font().load(static_cast<const uint8_t*>(font->pixels));
+  machine.font().load();
 
   _font = SDL_CreateTextureFromSurface(_renderer, font);
 

@@ -144,6 +144,9 @@
     <ClInclude Include="..\..\..\src\vm\lua_api.h">
       <Filter>src\vm</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\vm\pico_font.h">
+      <Filter>src\vm</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\main.cpp">

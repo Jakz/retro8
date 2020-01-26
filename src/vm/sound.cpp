@@ -395,8 +395,6 @@ void APU::renderSounds(int16_t* dest, size_t totalSamples)
 
   memset(dest, 0, sizeof(int16_t)*totalSamples);
 
-  return;
-
   for (size_t i = 0; i < CHANNEL_COUNT; ++i)
   {
     int16_t* buffer = dest;

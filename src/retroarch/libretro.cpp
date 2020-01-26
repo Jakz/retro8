@@ -13,12 +13,15 @@
 namespace r8 = retro8;
 using pixel_t = uint32_t;
 
+constexpr int SAMPLE_RATE = 44100;
+
 r8::Machine machine;
 r8::io::Loader loader;
 
 r8::input::InputManager input;
 r8::gfx::ColorTable colorTable;
 pixel_t* screen;
+int16_t* audioBuffer;
 
 struct RetroArchEnv
 {
@@ -55,6 +58,10 @@ extern "C"
   {
     screen = new pixel_t[r8::gfx::SCREEN_WIDTH * r8::gfx::SCREEN_HEIGHT];
     LOGD("Initializing screen buffer of %zu bytes", sizeof(pixel_t)*r8::gfx::SCREEN_WIDTH*r8::gfx::SCREEN_HEIGHT);
+
+    audioBuffer = new int16_t[SAMPLE_RATE * 2];
+    LOGD("Initializing audio buffer of %zu bytes", sizeof(int16_t) * SAMPLE_RATE * 2);
+
     colorTable.init(ColorMapper());
     machine.font().load();
     machine.code().loadAPI();
@@ -64,6 +71,7 @@ extern "C"
   void retro_deinit()
   {
     delete[] screen;
+    delete[] audioBuffer;
     //TODO: release all structures bound to Lua etc
   }
   
@@ -80,7 +88,7 @@ extern "C"
   void retro_get_system_av_info(retro_system_av_info* info)
   {
     info->timing.fps = 60.0f;
-    info->timing.sample_rate = 44100;
+    info->timing.sample_rate = SAMPLE_RATE;
     info->geometry.base_width = retro8::gfx::SCREEN_WIDTH;
     info->geometry.base_height = retro8::gfx::SCREEN_HEIGHT;
     info->geometry.max_width = retro8::gfx::SCREEN_WIDTH;
@@ -191,6 +199,9 @@ extern "C"
 
     env.video(screen, r8::gfx::SCREEN_WIDTH, r8::gfx::SCREEN_HEIGHT, r8::gfx::SCREEN_WIDTH * sizeof(pixel_t));
     ++env.frameCounter;
+
+    machine.sound().renderSounds(audioBuffer, SAMPLE_RATE);
+    env.audioBatch(audioBuffer, SAMPLE_RATE);
 
     /* manage input */
     {

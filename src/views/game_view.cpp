@@ -378,6 +378,17 @@ void GameView::handleKeyboardEvent(const SDL_Event& event)
       _input.manageKey(1, 5, event.type == SDL_KEYDOWN);
       break;
 
+    case SDLK_m:
+    {
+      if (event.type == SDL_KEYDOWN)
+      {
+        bool s = machine.sound().isMusicEnabled();
+        machine.sound().toggleMusic(!s);
+        machine.sound().toggleSound(!s);
+      }
+      break;
+    }
+
 #if DESKTOP_MODE
     case SDLK_p:
       if (event.type == SDL_KEYDOWN)

@@ -21,9 +21,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\src\sdl_helper.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\common.h">
       <Filter>src</Filter>
     </ClInclude>
@@ -149,6 +146,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\vm\input.h">
       <Filter>src\vm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\views\sdl_helper.h">
+      <Filter>src\views</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

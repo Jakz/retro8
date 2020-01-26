@@ -1,0 +1,26 @@
+SRC_FOLDERS	:= \
+	$(CORE_DIR)/src/io \
+	$(CORE_DIR)/src/retroarch \
+	$(CORE_DIR)/src/vm
+
+SRC_FOLDERS_C	:= \
+	$(CORE_DIR)/src/lua
+
+INCLUDES	:=  \
+	$(CORE_DIR)/src \
+    	$(CORE_DIR)/src/io \
+    	$(CORE_DIR)/src/lua \
+    	$(CORE_DIR)/src/retroarch \
+    	$(CORE_DIR)/src/vm
+
+INCFLAGS   := $(foreach dir,$(INCLUDES), -I$(dir))
+
+SRC_CORE_CXX   := $(foreach dir, $(SRC_FOLDERS), $(wildcard $(dir)/*.cpp))
+
+SRC_CORE_C  := $(foreach dir,$(SRC_FOLDERS_C), $(wildcard $(dir)/*.c))
+
+SOURCES_CXX	:=\
+	$(SRC_CORE_CXX)	
+
+SOURCES_C	:=\
+	$(SRC_CORE_C)	

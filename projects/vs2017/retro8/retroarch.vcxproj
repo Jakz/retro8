@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{0E0E60BF-5A2C-4690-9E9A-6990DA1715B4}</ProjectGuid>
+    <RootNamespace>retroarch</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <TargetName>retro8_libretro</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <TargetName>retro8_libretro</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)../../../src</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)../../../src</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\io\loader.cpp" />
+    <ClCompile Include="..\..\..\src\io\picopng.cpp" />
+    <ClCompile Include="..\..\..\src\io\stegano.cpp" />
+    <ClCompile Include="..\..\..\src\lua\lapi.c" />
+    <ClCompile Include="..\..\..\src\lua\lauxlib.c" />
+    <ClCompile Include="..\..\..\src\lua\lbaselib.c" />
+    <ClCompile Include="..\..\..\src\lua\lbitlib.c" />
+    <ClCompile Include="..\..\..\src\lua\lcode.c" />
+    <ClCompile Include="..\..\..\src\lua\lcorolib.c" />
+    <ClCompile Include="..\..\..\src\lua\lctype.c" />
+    <ClCompile Include="..\..\..\src\lua\ldblib.c" />
+    <ClCompile Include="..\..\..\src\lua\ldebug.c" />
+    <ClCompile Include="..\..\..\src\lua\ldo.c" />
+    <ClCompile Include="..\..\..\src\lua\ldump.c" />
+    <ClCompile Include="..\..\..\src\lua\lfunc.c" />
+    <ClCompile Include="..\..\..\src\lua\lgc.c" />
+    <ClCompile Include="..\..\..\src\lua\linit.c" />
+    <ClCompile Include="..\..\..\src\lua\liolib.c" />
+    <ClCompile Include="..\..\..\src\lua\llex.c" />
+    <ClCompile Include="..\..\..\src\lua\lmathlib.c" />
+    <ClCompile Include="..\..\..\src\lua\lmem.c" />
+    <ClCompile Include="..\..\..\src\lua\loadlib.c" />
+    <ClCompile Include="..\..\..\src\lua\lobject.c" />
+    <ClCompile Include="..\..\..\src\lua\lopcodes.c" />
+    <ClCompile Include="..\..\..\src\lua\loslib.c" />
+    <ClCompile Include="..\..\..\src\lua\lparser.c" />
+    <ClCompile Include="..\..\..\src\lua\lstate.c" />
+    <ClCompile Include="..\..\..\src\lua\lstring.c" />
+    <ClCompile Include="..\..\..\src\lua\lstrlib.c" />
+    <ClCompile Include="..\..\..\src\lua\ltable.c" />
+    <ClCompile Include="..\..\..\src\lua\ltablib.c" />
+    <ClCompile Include="..\..\..\src\lua\ltests.c" />
+    <ClCompile Include="..\..\..\src\lua\ltm.c" />
+    <ClCompile Include="..\..\..\src\lua\lundump.c" />
+    <ClCompile Include="..\..\..\src\lua\lutf8lib.c" />
+    <ClCompile Include="..\..\..\src\lua\lvm.c" />
+    <ClCompile Include="..\..\..\src\lua\lzio.c" />
+    <ClCompile Include="..\..\..\src\retroarch\libretro.cpp" />
+    <ClCompile Include="..\..\..\src\vm\gfx.cpp" />
+    <ClCompile Include="..\..\..\src\vm\lua_bridge.cpp" />
+    <ClCompile Include="..\..\..\src\vm\machine.cpp" />
+    <ClCompile Include="..\..\..\src\vm\memory.cpp" />
+    <ClCompile Include="..\..\..\src\vm\sound.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\src\common.h" />
+    <ClInclude Include="..\..\..\src\io\loader.h" />
+    <ClInclude Include="..\..\..\src\io\stegano.h" />
+    <ClInclude Include="..\..\..\src\lua\lapi.h" />
+    <ClInclude Include="..\..\..\src\lua\lauxlib.h" />
+    <ClInclude Include="..\..\..\src\lua\lcode.h" />
+    <ClInclude Include="..\..\..\src\lua\lctype.h" />
+    <ClInclude Include="..\..\..\src\lua\ldebug.h" />
+    <ClInclude Include="..\..\..\src\lua\ldo.h" />
+    <ClInclude Include="..\..\..\src\lua\lfunc.h" />
+    <ClInclude Include="..\..\..\src\lua\lgc.h" />
+    <ClInclude Include="..\..\..\src\lua\llex.h" />
+    <ClInclude Include="..\..\..\src\lua\llimits.h" />
+    <ClInclude Include="..\..\..\src\lua\lmem.h" />
+    <ClInclude Include="..\..\..\src\lua\lobject.h" />
+    <ClInclude Include="..\..\..\src\lua\lopcodes.h" />
+    <ClInclude Include="..\..\..\src\lua\lparser.h" />
+    <ClInclude Include="..\..\..\src\lua\lprefix.h" />
+    <ClInclude Include="..\..\..\src\lua\lstate.h" />
+    <ClInclude Include="..\..\..\src\lua\lstring.h" />
+    <ClInclude Include="..\..\..\src\lua\ltable.h" />
+    <ClInclude Include="..\..\..\src\lua\ltests.h" />
+    <ClInclude Include="..\..\..\src\lua\ltm.h" />
+    <ClInclude Include="..\..\..\src\lua\lua.h" />
+    <ClInclude Include="..\..\..\src\lua\lua.hpp" />
+    <ClInclude Include="..\..\..\src\lua\luaconf.h" />
+    <ClInclude Include="..\..\..\src\lua\lualib.h" />
+    <ClInclude Include="..\..\..\src\lua\lundump.h" />
+    <ClInclude Include="..\..\..\src\lua\lvm.h" />
+    <ClInclude Include="..\..\..\src\lua\lzio.h" />
+    <ClInclude Include="..\..\..\src\retroarch\libretro.h" />
+    <ClInclude Include="..\..\..\src\vm\defines.h" />
+    <ClInclude Include="..\..\..\src\vm\gfx.h" />
+    <ClInclude Include="..\..\..\src\vm\input.h" />
+    <ClInclude Include="..\..\..\src\vm\lua_api.h" />
+    <ClInclude Include="..\..\..\src\vm\lua_bridge.h" />
+    <ClInclude Include="..\..\..\src\vm\machine.h" />
+    <ClInclude Include="..\..\..\src\vm\memory.h" />
+    <ClInclude Include="..\..\..\src\vm\pico_font.h" />
+    <ClInclude Include="..\..\..\src\vm\sound.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

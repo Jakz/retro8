@@ -2,7 +2,7 @@
 
 #include "machine.h"
 #include "lua/lua.hpp"
-#include "lua_api.h"
+#include "gen/lua_api.h"
 
 #include <functional>
 #include <iostream>

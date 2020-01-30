@@ -1,6 +1,6 @@
 #include "gfx.h"
 
-#include "pico_font.h"
+#include "gen/pico_font.h"
 
 
 using namespace retro8;

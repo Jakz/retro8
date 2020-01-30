@@ -19,6 +19,9 @@
     <Filter Include="src\lua">
       <UniqueIdentifier>{b501b260-9d32-44c3-8fa8-7ea19ecaa1c6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\gen">
+      <UniqueIdentifier>{fae37348-b6e8-4580-a006-48440daab96a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\common.h">
@@ -149,6 +152,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\views\sdl_helper.h">
       <Filter>src\views</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\gen\pico_font.h">
+      <Filter>src\gen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\gen\lua_api.h">
+      <Filter>src\gen</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

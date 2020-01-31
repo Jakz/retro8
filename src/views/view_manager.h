@@ -3,6 +3,7 @@
 #include "sdl_helper.h"
 
 #include <array>
+#include <string>
 
 namespace ui
 {

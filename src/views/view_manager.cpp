@@ -64,8 +64,9 @@ void ui::ViewManager::text(const std::string& text, int32_t x, int32_t y)
 
   for (size_t i = 0; i < text.length(); ++i)
   {
-    SDL_Rect src = { 8 * (text[i] % GLYPHS_PER_ROW), 8 * (text[i] / GLYPHS_PER_ROW), 4, 6 };
-    SDL_Rect dest = { x + 4 * i * scale, y, 4 * scale, 6 * scale };
+
+    SDL_Rect src = SDL_MakeRect(8 * (text[i] % GLYPHS_PER_ROW), 8 * (text[i] / GLYPHS_PER_ROW), 4, 6);
+    SDL_Rect dest = SDL_MakeRect(x + 4 * i * scale, y, 4 * scale, 6 * scale);
     SDL_RenderCopy(_renderer, _font, &src, &dest);
   }
 }
@@ -85,8 +86,8 @@ void ViewManager::text(const std::string& text, int32_t x, int32_t y, SDL_Color 
 
   for (size_t i = 0; i < text.length(); ++i)
   {
-    SDL_Rect src = { 8 * (text[i] % GLYPHS_PER_ROW), 8 * (text[i] / GLYPHS_PER_ROW), 4, 6 };
-    SDL_Rect dest = { x + 4 * i * scale, y, 4 * scale, 6 * scale };
+    SDL_Rect src = SDL_MakeRect(8 * (text[i] % GLYPHS_PER_ROW), 8 * (text[i] / GLYPHS_PER_ROW), 4, 6);
+    SDL_Rect dest = SDL_MakeRect(x + 4 * i * scale, y, 4 * scale, 6 * scale);
     SDL_RenderCopy(_renderer, _font, &src, &dest);
   }
 

@@ -98,7 +98,7 @@ retro8::io::PngData loadPng(const std::string& path)
     assert(false);
   }
 
-  retro8::io::PngData pngData = { static_cast<const uint32_t*>(surface->pixels), surface, surface->h * surface->w };
+  retro8::io::PngData pngData = { static_cast<const uint32_t*>(surface->pixels), surface, static_cast<size_t>(surface->h * surface->w)};
   assert(surface->pitch == retro8::io::Stegano::IMAGE_WIDTH * sizeof(uint32_t));
   assert(surface->format->BytesPerPixel == 4);
 

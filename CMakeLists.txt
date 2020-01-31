@@ -26,8 +26,13 @@ add_compile_options(-Wno-unused-parameter -Wno-missing-field-initializers
 add_compile_options(-g -O2 -W -Wall -Wextra)
 add_compile_options(
   $<$<COMPILE_LANGUAGE:CXX>:-Wno-reorder>
-  $<$<COMPILE_LANGUAGE:CXX>:-std=c++11>
 )
+
+if(APPLE)
+  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-std=c++14>)
+else()
+  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-std=c++11>)
+endif()
 
 include_directories(src)
 include_directories(${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIR})

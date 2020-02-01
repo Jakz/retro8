@@ -483,7 +483,7 @@ namespace math
     //TODO: check if behavior is same as PICO-8
     real_t dx = lua_tonumber(L, 1);
     real_t dy = lua_tonumber(L, 2);
-    real_t value = std::atan2(dx, -dy);
+    real_t value = std::atan2(dx, dy) / (2 * PI);
     lua_pushnumber(L, value);
 
     return 1;

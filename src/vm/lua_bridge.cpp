@@ -480,10 +480,12 @@ namespace math
   int atan2(lua_State* L)
   {
     assert(lua_isnumber(L, 1));
-    //TODO: check if behavior is same as PICO-8
     real_t dx = lua_tonumber(L, 1);
     real_t dy = lua_tonumber(L, 2);
-    real_t value = std::atan2(dx, dy) / (2 * PI);
+    real_t value = std::atan2(dx, dy) / (2 * PI) - 0.25;
+    if (value < 0.0)
+      value += 1.0;
+
     lua_pushnumber(L, value);
 
     return 1;

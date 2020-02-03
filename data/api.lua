@@ -18,8 +18,8 @@ end
 function add(t, v)
   if t ~= nil then
     t[#t+1] = v
+    return v
   end
-  return t
 end
 
 function foreach(c, f)
@@ -41,7 +41,6 @@ function count(t)
   end
 end
 
--- check semantics
 function del(t, v)
   if t ~= nil then
     local found = false
@@ -52,6 +51,9 @@ function del(t, v)
       if found then
         t[i] = t[i+1]
       end
+    end
+    if found then
+      return v
     end
   end
 end

@@ -4,13 +4,17 @@ project (retro8)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/projects/cmake")
 
+option(OPENDINGUX "Build on opendingux toolchain" OFF)
+
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "")
   set(CMAKE_BUILD_TYPE "Debug")
 endif()
 
-set(CMAKE_CXX_COMPILER "$ENV{CROSS}g++" CACHE PATH "" FORCE)
-set(CMAKE_C_COMPILER "$ENV{CROSS}gcc" CACHE PATH "" FORCE)
-SET(CMAKE_SYSROOT "/opt/gcw0-toolchain/usr/mipsel-gcw0-linux-uclibc/sysroot")
+if(OPENDINGUX)
+  set(CMAKE_CXX_COMPILER "$ENV{CROSS}g++" CACHE PATH "" FORCE)
+  set(CMAKE_C_COMPILER "$ENV{CROSS}gcc" CACHE PATH "" FORCE)
+  set(CMAKE_SYSROOT "/opt/gcw0-toolchain/usr/mipsel-gcw0-linux-uclibc/sysroot")
+endif()
 
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
@@ -22,8 +26,13 @@ add_compile_options(-Wno-unused-parameter -Wno-missing-field-initializers
 add_compile_options(-g -O2 -W -Wall -Wextra)
 add_compile_options(
   $<$<COMPILE_LANGUAGE:CXX>:-Wno-reorder>
-  $<$<COMPILE_LANGUAGE:CXX>:-std=c++11>
 )
+
+if(APPLE)
+  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-std=c++14>)
+else()
+  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-std=c++11>)
+endif()
 
 include_directories(src)
 include_directories(${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIR})

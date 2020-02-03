@@ -207,3 +207,5 @@ inline void SDL<EventHandler, Renderer>::blit(SDL_Texture* texture, int dx, int 
 
   SDL_RenderCopy(_renderer, texture, &from, &to);
 }
+
+inline static SDL_Rect SDL_MakeRect(int x, int y, int w, int h) { return { x, y, w, h }; }

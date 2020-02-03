@@ -1449,7 +1449,7 @@ static void inline_if(LexState* ls, expdesc* v)
     while (testnext(ls, ';')) {}  /* skip colons */
     if (1 || block_follow(ls, 0)) {  /* 'goto' is the entire block? (ALWAYS TRUE WITH INLINE!) */
       leaveblock(fs);
-      return 0;  /* and that is it */
+      return;  /* and that is it */
     }
     else  /* must skip over 'then' part if condition is false */
       jf = luaK_jump(fs);
@@ -1505,7 +1505,7 @@ static int test_then_block (LexState *ls, int *escapelist) {
     while (testnext(ls, ';')) {}  /* skip colons */
     if (block_follow(ls, 0)) {  /* 'goto' is the entire block? */
       leaveblock(fs);
-      return;  /* and that is it */
+      return 0;  /* and that is it */
     }
     else  /* must skip over 'then' part if condition is false */
       jf = luaK_jump(fs);

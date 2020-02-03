@@ -714,14 +714,14 @@ namespace string
     size_t s = lua_tonumber(L, 2);
     size_t e = lua_to_or_default(L, number, 3, -1);
 
-    size_t rs = s, re = e;
+    size_t len = v.length();
     if (s < 0)
-      s = v.length() - s + 1;
+      s = len - s + 1;
     if (e < 0)
-      e = v.length() - e + 1;
+      e = len - e + 1;
 
     // TODO: intended behavior? picotetris calls it with swapped indices
-    if (e < s)
+    if (e < s || s > len)
       lua_pushstring(L, "");
     else
     {

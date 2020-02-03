@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <type_traits>
+#include <vector>
 
 using u32 = uint32_t;
 using u16 = uint16_t;
@@ -52,6 +53,7 @@ private:
 struct Platform
 {
   static uint32_t getTicks();
+  static int loadPNG(std::vector<unsigned char>& out_image, unsigned long& image_width, unsigned long& image_height, const unsigned char* in_png, size_t in_size, bool convert_to_rgba32 = true);
 };
 
 #define SOUND_ENABLED true

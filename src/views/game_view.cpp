@@ -4,8 +4,6 @@
 #include "io/stegano.h"
 
 #include <future>
-#include <SDL_image.h>
-
 
 #include <SDL_audio.h>
 
@@ -90,13 +88,33 @@ void GameView::update()
 
 retro8::io::PngData loadPng(const std::string& path)
 {
-  SDL_Surface* surface = IMG_Load(path.c_str());
+  std::ifstream fl(path, std::ios_base::in | std::ios_base::binary);
+  fl.seekg(0, std::ios::end);
+  size_t length = fl.tellg();
 
-  if (!surface)
+  char* bdata = new char[length];
+  
+  fl.seekg(0, std::ios::beg);
+  fl.read(bdata, length);
+
+  fl.close();
+  
+  std::vector<uint8_t> out;
+  unsigned long width, height;
+  auto result = Platform::loadPNG(out, width, height, (uint8_t*)bdata, length, true);
+
+  delete [] bdata;
+
+  assert(result == 0);
+
+  if (result != 0)
   {
-    printf("Error while loading PNG cart: %s\n", IMG_GetError());
+    printf("Error while loading PNG cart.");
     assert(false);
   }
+
+  SDL_Surface* surface = SDL_CreateRGBSurface(0, width, height, 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
+  std::memcpy(surface->pixels, out.data(), width*height * sizeof(uint32_t));
 
   retro8::io::PngData pngData = { static_cast<const uint32_t*>(surface->pixels), surface, static_cast<size_t>(surface->h * surface->w)};
   assert(surface->pitch == retro8::io::Stegano::IMAGE_WIDTH * sizeof(uint32_t));

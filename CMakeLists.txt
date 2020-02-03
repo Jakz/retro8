@@ -17,7 +17,6 @@ if(OPENDINGUX)
 endif()
 
 find_package(SDL2 REQUIRED)
-find_package(SDL2_image REQUIRED)
 
 add_compile_options(-Wno-unused-parameter -Wno-missing-field-initializers
   -Wno-sign-compare -Wno-parentheses -Wno-unused-variable
@@ -35,7 +34,7 @@ else()
 endif()
 
 include_directories(src)
-include_directories(${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIR})
+include_directories(${SDL2_INCLUDE_DIR})
 
 set(SRC_ROOT "${CMAKE_SOURCE_DIR}/src")
 
@@ -49,4 +48,4 @@ set(SOURCES ${SOURCES_ROOT} ${SOURCES_VIEWS} ${SOURCES_IO} ${SOURCES_VM} ${SOURC
 
 add_executable(retro8 ${SOURCES})
 
-target_link_libraries(retro8 ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARIES})
+target_link_libraries(retro8 ${SDL2_LIBRARY})

@@ -3,7 +3,6 @@
 #include "common.h"
 
 #include "SDL.h"
-#include "SDL_image.h"
 
 #include <cstdint>
 #include <cstdio>
@@ -73,12 +72,6 @@ bool SDL<EventHandler, Renderer>::init()
     return false;
   }
 
-  if (IMG_Init(IMG_INIT_PNG) != IMG_INIT_PNG)
-  {
-    printf("Error on IMG_Init().\n");
-    return false;
-  }
-
   // SDL_WINDOW_FULLSCREEN
 #if defined(WINDOW_SCALE)
 #if defined(DEBUGGER)
@@ -128,8 +121,6 @@ void SDL<EventHandler, Renderer>::capFPS()
 template<typename EventHandler, typename Renderer>
 void SDL<EventHandler, Renderer>::deinit()
 {
-  IMG_Quit();
-
   SDL_DestroyRenderer(_renderer);
   SDL_DestroyWindow(_window);
 

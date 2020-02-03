@@ -1,6 +1,7 @@
 #include "view_manager.h"
 
 #include "main_view.h"
+#include "gen/pico_font.h"
 
 #ifdef _WIN32
 #define PREFIX  "../../../"
@@ -27,16 +28,28 @@ void ui::ViewManager::deinit()
 
 bool ui::ViewManager::loadData()
 {
-  SDL_Surface* font = IMG_Load("pico8_font.png");
-  assert(font);
-  assert(font->format->BytesPerPixel == 1);
+  {
+    constexpr size_t FONT_WIDTH = 128, FONT_HEIGHT = 80;
+
+    /* create texture for font
+       128x80 1bit per pixel font
+    */
+    SDL_RendererInfo info;
+    SDL_GetRendererInfo(_renderer, &info);
+    SDL_PixelFormat* format = SDL_AllocFormat(info.texture_formats[0]);
+    SDL_Surface* fontSurface = SDL_CreateRGBSurface(0, FONT_WIDTH, FONT_HEIGHT, 32, format->Rmask, format->Gmask, format->Bmask, format->Amask);
+    SDL_FreeFormat(format);
+
+    auto pixels = static_cast<uint32_t*>(fontSurface->pixels);
+    for (size_t i = 0; i < FONT_WIDTH*FONT_HEIGHT; ++i)
+      pixels[i] = (retro8::gfx::font_map[i / 8] & (1 << (7 - (i % 8)))) ? 0xffffffff : 0;
+
+    _font = SDL_CreateTextureFromSurface(_renderer, fontSurface);
+    SDL_SetTextureBlendMode(_font, SDL_BLENDMODE_BLEND);
+    SDL_FreeSurface(fontSurface);
+  }
 
   machine.font().load();
-
-  _font = SDL_CreateTextureFromSurface(_renderer, font);
-
-  SDL_SetTextureBlendMode(_font, SDL_BLENDMODE_BLEND);
-  SDL_FreeSurface(font);
 
   return true;
 }

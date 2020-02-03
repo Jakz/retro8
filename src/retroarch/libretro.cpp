@@ -42,8 +42,6 @@ struct ColorMapper
   r8::gfx::ColorTable::pixel_t operator()(uint8_t r, uint8_t g, uint8_t b) const { return 0xff000000 | (r << 16) | (g << 8) | b; }
 };
 
-int decodePNG(std::vector<unsigned char>& out_image, unsigned long& image_width, unsigned long& image_height, const unsigned char* in_png, size_t in_size, bool convert_to_rgba32 = true);
-
 //TODO
 uint32_t Platform::getTicks() { return 0; }
 
@@ -132,7 +130,7 @@ extern "C"
       {
         std::vector<uint8_t> out;
         unsigned long width, height;
-        auto result = decodePNG(out, width, height, (uint8_t*)bdata, info->size, true);
+        auto result = Platform::loadPNG(out, width, height, (uint8_t*)bdata, info->size, true);
         assert(result == 0);
         r8::io::Stegano stegano;
         stegano.load({ reinterpret_cast<const uint32_t*>(out.data()), nullptr, out.size() / 4 }, machine);

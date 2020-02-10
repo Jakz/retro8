@@ -4,3 +4,4 @@ projects/opendingux/**
 **/.vs/**
 **/Debug/**
 **/Release/**
+.DS_Store

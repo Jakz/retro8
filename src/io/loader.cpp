@@ -7,6 +7,7 @@
 #include <iterator>
 #include <cassert>
 #include <sstream>
+//#include <cctype>
 
 using namespace retro8;
 using namespace retro8::io;
@@ -122,6 +123,10 @@ void Loader::load(const std::vector<std::string>& lines, Machine& m)
       state = State::SFX;
     else if (line == "__music__")
       state = State::MUSIC;
+    else if (line.empty()) /* skip empty lines */
+      continue;
+    /*else if (std::all_of(line.begin(), line.end(), [](char c) { return std::isspace(c); }))
+      continue;*/
     else
     {
       switch (state)

@@ -1,6 +1,6 @@
 SRC_FOLDERS	:= \
 	$(CORE_DIR)/src/io \
-	$(CORE_DIR)/src/retroarch \
+	$(CORE_DIR)/src/libretro \
 	$(CORE_DIR)/src/vm
 
 SRC_FOLDERS_C	:= \
@@ -10,7 +10,7 @@ INCLUDES	:=  \
 	$(CORE_DIR)/src \
     	$(CORE_DIR)/src/io \
     	$(CORE_DIR)/src/lua \
-    	$(CORE_DIR)/src/retroarch \
+	$(CORE_DIR)/src/libretro \
     	$(CORE_DIR)/src/vm
 
 INCFLAGS   := $(foreach dir,$(INCLUDES), -I$(dir))

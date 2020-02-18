@@ -13,7 +13,7 @@
     <Filter Include="src\lua">
       <UniqueIdentifier>{2368e1b6-dcbf-4a03-9ec7-31a181f8f28a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\retroarch">
+    <Filter Include="src\libretro">
       <UniqueIdentifier>{84f3008f-35b1-4fc8-a328-0386a6107d2b}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\gen">
@@ -144,8 +144,8 @@
     <ClCompile Include="..\..\..\src\lua\lzio.c">
       <Filter>src\lua</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\retroarch\libretro.cpp">
-      <Filter>src\retroarch</Filter>
+    <ClCompile Include="..\..\..\src\libretro\libretro.cpp">
+      <Filter>src\libretro</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\io\picopng.cpp">
       <Filter>src\io</Filter>
@@ -260,8 +260,8 @@
     <ClInclude Include="..\..\..\src\lua\lzio.h">
       <Filter>src\lua</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\retroarch\libretro.h">
-      <Filter>src\retroarch</Filter>
+    <ClInclude Include="..\..\..\src\libretro\libretro.h">
+      <Filter>src\libretro</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\vm\lua_api.h">
       <Filter>src\vm</Filter>

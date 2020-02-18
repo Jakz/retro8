@@ -111,7 +111,7 @@
     <ClCompile Include="..\..\..\src\lua\lutf8lib.c" />
     <ClCompile Include="..\..\..\src\lua\lvm.c" />
     <ClCompile Include="..\..\..\src\lua\lzio.c" />
-    <ClCompile Include="..\..\..\src\retroarch\libretro.cpp" />
+    <ClCompile Include="..\..\..\src\libretro\libretro.cpp" />
     <ClCompile Include="..\..\..\src\vm\gfx.cpp" />
     <ClCompile Include="..\..\..\src\vm\lua_bridge.cpp" />
     <ClCompile Include="..\..\..\src\vm\machine.cpp" />
@@ -151,7 +151,7 @@
     <ClInclude Include="..\..\..\src\lua\lundump.h" />
     <ClInclude Include="..\..\..\src\lua\lvm.h" />
     <ClInclude Include="..\..\..\src\lua\lzio.h" />
-    <ClInclude Include="..\..\..\src\retroarch\libretro.h" />
+    <ClInclude Include="..\..\..\src\libretro\libretro.h" />
     <ClInclude Include="..\..\..\src\vm\defines.h" />
     <ClInclude Include="..\..\..\src\vm\gfx.h" />
     <ClInclude Include="..\..\..\src\vm\input.h" />

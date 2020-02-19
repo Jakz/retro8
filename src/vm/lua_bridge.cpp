@@ -271,8 +271,8 @@ int map(lua_State* L)
   coord_t cy = lua_tonumber(L, 2);
   coord_t x = lua_tonumber(L, 3);
   coord_t y = lua_tonumber(L, 4);
-  amount_t cw = lua_tonumber(L, 5);
-  amount_t ch = lua_tonumber(L, 6);
+  amount_t cw = lua_gettop(L) >= 5 ? lua_tonumber(L, 5) : (gfx::SCREEN_WIDTH / gfx::SPRITE_WIDTH);
+  amount_t ch = lua_gettop(L) >= 6 ? lua_tonumber(L, 6) : (gfx::SCREEN_HEIGHT / gfx::SPRITE_HEIGHT);
   sprite_flags_t layer = 0;
 
   if (lua_gettop(L) == 7)

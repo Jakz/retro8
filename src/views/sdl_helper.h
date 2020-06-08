@@ -12,6 +12,13 @@
 using Texture = SDL_Texture;
 #else
 using Texture = SDL_Surface;
+#define SDL12
+
+using SDL_AudioDeviceID = int;
+#define SDL_OpenAudioDevice(x, y, w, s, z) SDL_OpenAudio(w, s)
+#define SDL_PauseAudioDevice(_,y) SDL_PauseAudio(y)
+#define SDL_CloseAudioDevice(_) SDL_CloseAudio()
+
 #endif
 
 enum class Align { LEFT, CENTER, RIGHT };

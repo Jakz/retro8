@@ -191,7 +191,7 @@ void GameView::render()
 
 
     if (_path.empty())
-      _path = "cartridges/Desert Drift.p8.png";
+      _path = "cartridges/PicoFox.p8.png";
 
     if (r8::io::Loader::isPngCartridge(_path))
     {
@@ -237,8 +237,7 @@ void GameView::render()
 
   auto* renderer = manager->renderer();
 
-  SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-  SDL_RenderClear(renderer);
+  manager->clear(0, 0, 0);
 
   if (!_paused)
   {
@@ -322,7 +321,8 @@ else
 
 
     {
-      /*static SDL_Surface* tilemap = nullptr;
+      /*
+      static SDL_Surface* tilemap = nullptr;
 
       if (!tilemap)
       {
@@ -350,7 +350,7 @@ else
       SDL_Rect destr = { (1024 - 286) , 256, 256, 128 };
       SDL_RenderCopy(renderer, texture, nullptr, &destr);
       SDL_DestroyTexture(texture);
-      //SDL_FreeSurface(tilemap);*/
+      SDL_FreeSurface(tilemap);*/
     }
 
   }

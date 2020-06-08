@@ -153,12 +153,8 @@ void MenuView::render()
 
   auto renderer = _gvm->renderer();
 
-  SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-  SDL_RenderClear(renderer);
-
-  SDL_SetRenderDrawColor(renderer, 20, 20, 40, 255);
-  SDL_Rect border = { 0, 0, W, H };
-  SDL_RenderDrawRect(renderer, &border);
+  _gvm->clear(0, 0, 0);
+  _gvm->rect(0, 0, W, H, 20, 20, 40, 255);
 
   bool hasCartridge = _cartridge;
 

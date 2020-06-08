@@ -57,6 +57,9 @@ public:
   void blit(SDL_Texture* texture, int sx, int sy, int w, int h, int dx, int dy, int dw, int dh);
   void blit(SDL_Texture* texture, int dx, int dy);
 
+  void clear(int r, int g, int b);
+  void rect(int x, int y, int w, int h, int r, int g, int b, int a);
+
   //void slowTextBlit(TTF_Font* font, int dx, int dy, Align align, const std::string& string);
 
   SDL_Window* window() { return _window; }
@@ -197,6 +200,21 @@ inline void SDL<EventHandler, Renderer>::blit(SDL_Texture* texture, int dx, int 
   to.h = from.h;
 
   SDL_RenderCopy(_renderer, texture, &from, &to);
+}
+
+template<typename EventHandler, typename Renderer>
+inline void SDL<EventHandler, Renderer>::clear(int r, int g, int b)
+{
+  SDL_SetRenderDrawColor(_renderer, r, g, b, 255);
+  SDL_RenderClear(_renderer);
+}
+
+template<typename EventHandler, typename Renderer>
+inline void SDL<EventHandler, Renderer>::rect(int x, int y, int w, int h, int r, int g, int b, int a)
+{
+  SDL_SetRenderDrawColor(_renderer, r, g, b, a);
+  SDL_Rect border = { x, y, w, h };
+  SDL_RenderDrawRect(_renderer, &border);
 }
 
 inline static SDL_Rect SDL_MakeRect(int x, int y, int w, int h) { return { x, y, w, h }; }

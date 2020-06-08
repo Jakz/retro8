@@ -8,6 +8,12 @@
 #include <cstdio>
 #include <cassert>
 
+#if SDL_COMPILEDVERSION > 2000
+using Texture = SDL_Texture;
+#else
+using Texture = SDL_Surface;
+#endif
+
 enum class Align { LEFT, CENTER, RIGHT };
 
 template<typename EventHandler, typename Renderer>
@@ -52,10 +58,10 @@ public:
 
   void exit() { willQuit = true; }
 
-  void blit(SDL_Texture* texture, const SDL_Rect& src, int dx, int dy);
-  void blit(SDL_Texture* texture, int sx, int sy, int w, int h, int dx, int dy);
-  void blit(SDL_Texture* texture, int sx, int sy, int w, int h, int dx, int dy, int dw, int dh);
-  void blit(SDL_Texture* texture, int dx, int dy);
+  void blit(Texture* texture, const SDL_Rect& src, int dx, int dy);
+  void blit(Texture* texture, int sx, int sy, int w, int h, int dx, int dy);
+  void blit(Texture* texture, int sx, int sy, int w, int h, int dx, int dy, int dw, int dh);
+  void blit(Texture* texture, int dx, int dy);
 
   void clear(int r, int g, int b);
   void rect(int x, int y, int w, int h, int r, int g, int b, int a);
@@ -164,7 +170,7 @@ void SDL<EventHandler, Renderer>::handleEvents()
 }
 
 template<typename EventHandler, typename Renderer>
-inline void SDL<EventHandler, Renderer>::blit(SDL_Texture* texture, int sx, int sy, int w, int h, int dx, int dy, int dw, int dh)
+inline void SDL<EventHandler, Renderer>::blit(Texture* texture, int sx, int sy, int w, int h, int dx, int dy, int dw, int dh)
 {
   SDL_Rect from = { sx, sy, w, h };
   SDL_Rect to = { dx, dy, dw, dh };
@@ -172,21 +178,21 @@ inline void SDL<EventHandler, Renderer>::blit(SDL_Texture* texture, int sx, int 
 }
 
 template<typename EventHandler, typename Renderer>
-inline void SDL<EventHandler, Renderer>::blit(SDL_Texture* texture, const SDL_Rect& from, int dx, int dy)
+inline void SDL<EventHandler, Renderer>::blit(Texture* texture, const SDL_Rect& from, int dx, int dy)
 {
   SDL_Rect to = { dx, dy, from.w, from.h };
   SDL_RenderCopy(_renderer, texture, &from, &to);
 }
 
 template<typename EventHandler, typename Renderer>
-inline void SDL<EventHandler, Renderer>::blit(SDL_Texture* texture, int sx, int sy, int w, int h, int dx, int dy)
+inline void SDL<EventHandler, Renderer>::blit(Texture* texture, int sx, int sy, int w, int h, int dx, int dy)
 {
   blit(texture, { sx, sy, w, h }, dx, dy);
 }
 
 
 template<typename EventHandler, typename Renderer>
-inline void SDL<EventHandler, Renderer>::blit(SDL_Texture* texture, int dx, int dy)
+inline void SDL<EventHandler, Renderer>::blit(Texture* texture, int dx, int dy)
 {
   u32 dummy;
   int dummy2;

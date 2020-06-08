@@ -37,7 +37,7 @@ namespace ui
 
     SDL_PixelFormat* _format;
     SDL_Surface* _output;
-    SDL_Texture* _outputTexture;
+    Texture* _outputTexture;
 
     std::string _path;
 
@@ -75,7 +75,7 @@ namespace ui
   {
   private:
     ViewManager* _gvm;
-    SDL_Texture* _cartridge;
+    Texture* _cartridge;
 
   public:
     MenuView(ViewManager* manager);

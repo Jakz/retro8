@@ -251,7 +251,7 @@ void GameView::render()
   }
 
 SDL_Rect dest;
-  //SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, machine.screen());
+  //Texture* texture = SDL_CreateTextureFromSurface(renderer, machine.screen());
 #ifdef _WIN32
   dest = { (480 - 384) / 2, (480 - 384) / 2, 384, 384 };
 #else
@@ -290,7 +290,7 @@ else
           RASTERIZE_PIXEL_PAIR(machine, dest, data);
         }
 
-      SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, spritesheet);
+      Texture* texture = SDL_CreateTextureFromSurface(renderer, spritesheet);
       SDL_Rect destr = { (1024 - 286) , 30, 256, 256 };
       SDL_RenderCopy(renderer, texture, nullptr, &destr);
       SDL_DestroyTexture(texture);
@@ -312,7 +312,7 @@ else
           dest[j*16 + i] = colorTable.get(palette->get(r8::color_t(i)));
       }
 
-      SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, palettes);
+      Texture* texture = SDL_CreateTextureFromSurface(renderer, palettes);
       SDL_Rect destr = { (1024 - 286) , 300, 256, 32 };
       SDL_RenderCopy(renderer, texture, nullptr, &destr);
       SDL_DestroyTexture(texture);
@@ -346,7 +346,7 @@ else
         }
       }
 
-      SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, tilemap);
+      Texture* texture = SDL_CreateTextureFromSurface(renderer, tilemap);
       SDL_Rect destr = { (1024 - 286) , 256, 256, 128 };
       SDL_RenderCopy(renderer, texture, nullptr, &destr);
       SDL_DestroyTexture(texture);

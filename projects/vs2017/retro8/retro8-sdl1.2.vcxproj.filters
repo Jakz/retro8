@@ -16,6 +16,9 @@
     <Filter Include="src\vm">
       <UniqueIdentifier>{da7a994f-80a9-4361-9d36-c441cd2c4090}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\views">
+      <UniqueIdentifier>{f916d59d-e58f-46bd-b334-34632fc018a0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\main.cpp">
@@ -147,6 +150,15 @@
     <ClCompile Include="..\..\..\src\vm\sound.cpp">
       <Filter>src\vm</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\views\menu_view.cpp">
+      <Filter>src\views</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\views\view_manager.cpp">
+      <Filter>src\views</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\views\game_view.cpp">
+      <Filter>src\views</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\common.h">
@@ -265,6 +277,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\vm\memory.h">
       <Filter>src\vm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\views\sdl_helper.h">
+      <Filter>src\views</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\views\view_manager.h">
+      <Filter>src\views</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\views\main_view.h">
+      <Filter>src\views</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

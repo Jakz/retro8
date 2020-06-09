@@ -151,8 +151,6 @@ void MenuView::render()
   constexpr int32_t W = 320;
   constexpr int32_t H = 240;
 
-  auto renderer = _gvm->renderer();
-
   _gvm->clear(0, 0, 0);
   _gvm->rect(0, 0, W, H, 20, 20, 40, 255);
 

@@ -287,5 +287,8 @@
     <ClInclude Include="..\..\..\src\views\main_view.h">
       <Filter>src\views</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\views\sdl_impl12.h">
+      <Filter>src\views</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

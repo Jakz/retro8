@@ -70,7 +70,10 @@ struct Platform
 #ifdef _WIN32
 #define MOUSE_ENABLED true
 #define WINDOW_SCALE 1
+
+#if SDL_COMPILEDVERSION > 2000
 #define DEBUGGER true
+#endif
 #define DESKTOP_MODE true
 #define TEST_MODE false
 #else

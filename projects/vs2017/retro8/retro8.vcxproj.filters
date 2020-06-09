@@ -159,6 +159,9 @@
     <ClInclude Include="..\..\..\src\gen\lua_api.h">
       <Filter>src\gen</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\views\sdl_impl.h">
+      <Filter>src\views</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\main.cpp">

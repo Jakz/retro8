@@ -890,7 +890,12 @@ namespace platform
       using bt_t = retro8::button_t;
       static constexpr std::array<bt_t, 6> buttons = { bt_t::LEFT, bt_t::RIGHT, bt_t::UP, bt_t::DOWN, bt_t::ACTION1, bt_t::ACTION2 };
       size_t bindex = lua_tonumber(L, 1);
-      lua_pushboolean(L, machine.state().buttons[index].isSet(buttons[bindex]));
+
+      if (bindex < buttons.size())
+        lua_pushboolean(L, machine.state().buttons[index].isSet(buttons[bindex]));
+      else
+        lua_pushboolean(L, false);
+
     }
     /* push whole bitmask*/
     else
@@ -1189,10 +1194,10 @@ void Code::initFromSource(const std::string& code)
   }
 }
 
-void Code::callVoidFunction(const char* name)
+void Code::callFunction(const char* name, int ret)
 {
   lua_getglobal(L, name);
-  int error = lua_pcall(L, 0, 0, 0);
+  int error = lua_pcall(L, 0, ret, 0);
 
   if (error)
     printError(name);
@@ -1201,19 +1206,19 @@ void Code::callVoidFunction(const char* name)
 void Code::update()
 {
   if (_update60)
-    callVoidFunction("_update60");
+    callFunction("_update60");
   else if (_update)
-    callVoidFunction("_update");
+    callFunction("_update");
 }
 
 void Code::draw()
 {
   if (_draw)
-    callVoidFunction("_draw");
+    callFunction("_draw");
 }
 
 void Code::init()
 {
   if (_init)
-    callVoidFunction("_init");
+    callFunction("_init");
 }

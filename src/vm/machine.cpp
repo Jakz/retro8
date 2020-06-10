@@ -353,7 +353,8 @@ void Machine::map(coord_t cx, coord_t cy, coord_t x, coord_t y, amount_t cw, amo
       const sprite_index_t index = *_memory.spriteInTileMap(cx + tx, cy + ty);
 
       /* don't draw if index is 0 or layer is not zero and sprite flags are not correcly masked to it */
-      if (index != 0 && (!layer || (layer & *_memory.spriteFlagsFor(index)) == layer))
+      /* TODO: experimentally the behavior is layer & flags != 0 instead that layer & flags == layer */
+      if (index != 0 && (!layer || (layer & *_memory.spriteFlagsFor(index)) != 0))
         spr(index, x + tx * gfx::SPRITE_WIDTH, y + ty * gfx::SPRITE_HEIGHT);
     }
   }

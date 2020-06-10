@@ -34,7 +34,7 @@ namespace lua
 
     void printError(const char* where);
     void initFromSource(const std::string& code);
-    void callVoidFunction(const char* name);
+    void callFunction(const char* name, int ret = 0);
 
     bool hasUpdate() const { return _update != nullptr || _update60 != nullptr; }
     bool hasDraw() const { return _draw != nullptr; }

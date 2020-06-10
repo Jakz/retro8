@@ -52,6 +52,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>D:\dev\sdl\SDL1.2.15\include;$(SolutionDir)../../../src;D:\dev\odreader\projects\vs2017\zlib\include;C:\Users\Jack\Documents\dev\retro-8\projects\vs2017\libs\lua\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -66,6 +67,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>D:\dev\sdl\SDL1.2.15\include;$(SolutionDir)../../../src;D:\dev\odreader\projects\vs2017\zlib\include;C:\Users\Jack\Documents\dev\retro-8\projects\vs2017\libs\lua\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>D:\dev/retro-8\projects\vs2017\libs\zlib\lib\win_x64\zlib.lib;D:\dev\sdl\SDL1.2.15\lib\x64\SDL.lib;D:\dev\sdl\SDL1.2.15\lib\x64\SDLmain.lib;%(AdditionalDependencies)</AdditionalDependencies>

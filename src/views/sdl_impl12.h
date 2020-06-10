@@ -7,17 +7,13 @@ bool SDL<EventHandler, Renderer>::init()
     return false;
   }
 
-  // SDL_WINDOW_FULLSCREEN
 #if defined(WINDOW_SCALE)
-#if defined(DEBUGGER)
-  _window = SDL_CreateWindow("retro-8", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1024, 480, SDL_WINDOW_OPENGL);
-#else
-  _window = SDL_CreateWindow("retro-8", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_OPENGL);
+  _screen = SDL_SetVideoMode(640, 480, 32, SDL_HWSURFACE);
+  #else
+  _screen = SDL_SetVideoMode(320, 240, 32, SDL_HWSURFACE);
 #endif
-#else
-  _window = SDL_CreateWindow("retro-8", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 320, 240, SDL_WINDOW_OPENGL);
-#endif
-  _renderer = SDL_CreateRenderer(_window, -1, SDL_RENDERER_ACCELERATED);
+
+  SDL_WM_SetCaption("retro-8", nullptr);
 
   return true;
 }
@@ -67,7 +63,7 @@ inline void SDL<EventHandler, Renderer>::blit(Texture* texture, int sx, int sy, 
 template<typename EventHandler, typename Renderer>
 inline void SDL<EventHandler, Renderer>::blit(Texture* texture, const SDL_Rect& src, const SDL_Rect& dest)
 {
-  SDL_BlitSurface(texture, src, _screen, dest);
+  SDL_BlitSurface(texture, const_cast<SDL_Rect*>(&src), _screen, const_cast<SDL_Rect*>(&dest));
 }
 
 template<typename EventHandler, typename Renderer>
@@ -79,16 +75,17 @@ inline void SDL<EventHandler, Renderer>::blit(Texture* texture, int dx, int dy)
 template<typename EventHandler, typename Renderer>
 inline void SDL<EventHandler, Renderer>::clear(int r, int g, int b)
 {
-  SDL_Rect to = { 0, 0, texture->w, texture->h };
+  SDL_Rect to = { 0, 0, _screen->w, _screen->h };
   SDL_FillRect(_screen, &to, SDL_MapRGB(_screen->format, r, g, b));
 }
 
 template<typename EventHandler, typename Renderer>
 inline void SDL<EventHandler, Renderer>::rect(int x, int y, int w, int h, int r, int g, int b, int a)
 {
-  SDL_SetRenderDrawColor(_renderer, r, g, b, a);
+  //TODO: implement
+  /*SDL_SetRenderDrawColor(_renderer, r, g, b, a);
   SDL_Rect border = { x, y, w, h };
-  SDL_RenderDrawRect(_renderer, &border);
+  SDL_RenderDrawRect(_renderer, &border);*/
 }
 
 template<typename EventHandler, typename Renderer>

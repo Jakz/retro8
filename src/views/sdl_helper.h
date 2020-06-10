@@ -10,6 +10,11 @@
 
 #if SDL_COMPILEDVERSION > 2000
 using Texture = SDL_Texture;
+
+#if _WIN32
+  #define DEBUGGER true
+#endif
+
 #else
 using Texture = SDL_Surface;
 #define SDL12

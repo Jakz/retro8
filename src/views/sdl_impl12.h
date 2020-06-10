@@ -1,3 +1,5 @@
+#if defined(SDL12)
+
 template<typename EventHandler, typename Renderer>
 bool SDL<EventHandler, Renderer>::init()
 {
@@ -97,3 +99,4 @@ inline void SDL<EventHandler, Renderer>::release(Texture* texture)
 
 inline static SDL_Rect SDL_MakeRect(int x, int y, int w, int h) { return { (Sint16)x, (Sint16)y, (Uint16)w, (Uint16)h }; }
 
+#endif

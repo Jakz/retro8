@@ -159,6 +159,8 @@ extern "C"
 
       return true;
     }
+    
+    return false;
   }
 
   void retro_unload_game(void)

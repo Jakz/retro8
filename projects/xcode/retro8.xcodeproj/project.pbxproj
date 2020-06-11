@@ -52,6 +52,52 @@
 		045273E223C3E9CC00F67C90 /* machine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 045273B123C3E9CC00F67C90 /* machine.cpp */; };
 		045273E323C3E9CC00F67C90 /* memory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 045273B323C3E9CC00F67C90 /* memory.cpp */; };
 		045273E423C3E9CC00F67C90 /* sound.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 045273B523C3E9CC00F67C90 /* sound.cpp */; };
+		0485411F249216DF003B2EF1 /* libretro.h in Headers */ = {isa = PBXBuildFile; fileRef = 0485411D249216DF003B2EF1 /* libretro.h */; };
+		04854120249216DF003B2EF1 /* libretro.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0485411E249216DF003B2EF1 /* libretro.cpp */; };
+		0485412124921717003B2EF1 /* loader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0452735E23C3E9CC00F67C90 /* loader.cpp */; };
+		0485412224921717003B2EF1 /* stegano.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0452736023C3E9CC00F67C90 /* stegano.cpp */; };
+		0485412424921717003B2EF1 /* gfx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 045273AD23C3E9CC00F67C90 /* gfx.cpp */; };
+		0485412524921717003B2EF1 /* lua_bridge.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 045273AF23C3E9CC00F67C90 /* lua_bridge.cpp */; };
+		0485412624921717003B2EF1 /* machine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 045273B123C3E9CC00F67C90 /* machine.cpp */; };
+		0485412724921717003B2EF1 /* memory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 045273B323C3E9CC00F67C90 /* memory.cpp */; };
+		0485412824921717003B2EF1 /* sound.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 045273B523C3E9CC00F67C90 /* sound.cpp */; };
+		0485412C24921739003B2EF1 /* pico_font.h in Headers */ = {isa = PBXBuildFile; fileRef = 0485412A24921739003B2EF1 /* pico_font.h */; };
+		0485412D24921739003B2EF1 /* lua_api.h in Headers */ = {isa = PBXBuildFile; fileRef = 0485412B24921739003B2EF1 /* lua_api.h */; };
+		0485412E249217C6003B2EF1 /* lapi.c in Sources */ = {isa = PBXBuildFile; fileRef = 0452736323C3E9CC00F67C90 /* lapi.c */; };
+		0485412F249217C6003B2EF1 /* lauxlib.c in Sources */ = {isa = PBXBuildFile; fileRef = 0452736523C3E9CC00F67C90 /* lauxlib.c */; };
+		04854130249217C6003B2EF1 /* lbaselib.c in Sources */ = {isa = PBXBuildFile; fileRef = 0452736723C3E9CC00F67C90 /* lbaselib.c */; };
+		04854131249217C6003B2EF1 /* lbitlib.c in Sources */ = {isa = PBXBuildFile; fileRef = 0452736823C3E9CC00F67C90 /* lbitlib.c */; };
+		04854132249217C6003B2EF1 /* lcode.c in Sources */ = {isa = PBXBuildFile; fileRef = 0452736923C3E9CC00F67C90 /* lcode.c */; };
+		04854133249217C6003B2EF1 /* lcorolib.c in Sources */ = {isa = PBXBuildFile; fileRef = 0452736B23C3E9CC00F67C90 /* lcorolib.c */; };
+		04854134249217C6003B2EF1 /* lctype.c in Sources */ = {isa = PBXBuildFile; fileRef = 0452736C23C3E9CC00F67C90 /* lctype.c */; };
+		04854135249217C6003B2EF1 /* ldblib.c in Sources */ = {isa = PBXBuildFile; fileRef = 0452736E23C3E9CC00F67C90 /* ldblib.c */; };
+		04854136249217C6003B2EF1 /* ldebug.c in Sources */ = {isa = PBXBuildFile; fileRef = 0452736F23C3E9CC00F67C90 /* ldebug.c */; };
+		04854137249217C6003B2EF1 /* ldo.c in Sources */ = {isa = PBXBuildFile; fileRef = 0452737123C3E9CC00F67C90 /* ldo.c */; };
+		04854138249217C6003B2EF1 /* ldump.c in Sources */ = {isa = PBXBuildFile; fileRef = 0452737323C3E9CC00F67C90 /* ldump.c */; };
+		04854139249217C6003B2EF1 /* lfunc.c in Sources */ = {isa = PBXBuildFile; fileRef = 0452737423C3E9CC00F67C90 /* lfunc.c */; };
+		0485413A249217C6003B2EF1 /* lgc.c in Sources */ = {isa = PBXBuildFile; fileRef = 0452737623C3E9CC00F67C90 /* lgc.c */; };
+		0485413B249217C6003B2EF1 /* linit.c in Sources */ = {isa = PBXBuildFile; fileRef = 0452737823C3E9CC00F67C90 /* linit.c */; };
+		0485413C249217C6003B2EF1 /* liolib.c in Sources */ = {isa = PBXBuildFile; fileRef = 0452737923C3E9CC00F67C90 /* liolib.c */; };
+		0485413D249217C6003B2EF1 /* llex.c in Sources */ = {isa = PBXBuildFile; fileRef = 0452737A23C3E9CC00F67C90 /* llex.c */; };
+		0485413E249217C6003B2EF1 /* lmathlib.c in Sources */ = {isa = PBXBuildFile; fileRef = 0452737D23C3E9CC00F67C90 /* lmathlib.c */; };
+		0485413F249217C6003B2EF1 /* lmem.c in Sources */ = {isa = PBXBuildFile; fileRef = 0452737E23C3E9CC00F67C90 /* lmem.c */; };
+		04854140249217C6003B2EF1 /* loadlib.c in Sources */ = {isa = PBXBuildFile; fileRef = 0452738023C3E9CC00F67C90 /* loadlib.c */; };
+		04854141249217C6003B2EF1 /* lobject.c in Sources */ = {isa = PBXBuildFile; fileRef = 0452738123C3E9CC00F67C90 /* lobject.c */; };
+		04854142249217C6003B2EF1 /* lopcodes.c in Sources */ = {isa = PBXBuildFile; fileRef = 0452738323C3E9CC00F67C90 /* lopcodes.c */; };
+		04854143249217C6003B2EF1 /* loslib.c in Sources */ = {isa = PBXBuildFile; fileRef = 0452738523C3E9CC00F67C90 /* loslib.c */; };
+		04854144249217C6003B2EF1 /* lparser.c in Sources */ = {isa = PBXBuildFile; fileRef = 0452738623C3E9CC00F67C90 /* lparser.c */; };
+		04854145249217C6003B2EF1 /* lstate.c in Sources */ = {isa = PBXBuildFile; fileRef = 0452738923C3E9CC00F67C90 /* lstate.c */; };
+		04854146249217C6003B2EF1 /* lstring.c in Sources */ = {isa = PBXBuildFile; fileRef = 0452738B23C3E9CC00F67C90 /* lstring.c */; };
+		04854147249217C6003B2EF1 /* lstrlib.c in Sources */ = {isa = PBXBuildFile; fileRef = 0452738D23C3E9CC00F67C90 /* lstrlib.c */; };
+		04854148249217C6003B2EF1 /* ltable.c in Sources */ = {isa = PBXBuildFile; fileRef = 0452738E23C3E9CC00F67C90 /* ltable.c */; };
+		04854149249217C6003B2EF1 /* ltablib.c in Sources */ = {isa = PBXBuildFile; fileRef = 0452739023C3E9CC00F67C90 /* ltablib.c */; };
+		0485414A249217C6003B2EF1 /* ltests.c in Sources */ = {isa = PBXBuildFile; fileRef = 0452739123C3E9CC00F67C90 /* ltests.c */; };
+		0485414B249217C6003B2EF1 /* ltm.c in Sources */ = {isa = PBXBuildFile; fileRef = 0452739323C3E9CC00F67C90 /* ltm.c */; };
+		0485414C249217C6003B2EF1 /* lundump.c in Sources */ = {isa = PBXBuildFile; fileRef = 0452739923C3E9CC00F67C90 /* lundump.c */; };
+		0485414D249217C6003B2EF1 /* lutf8lib.c in Sources */ = {isa = PBXBuildFile; fileRef = 0452739B23C3E9CC00F67C90 /* lutf8lib.c */; };
+		0485414E249217C6003B2EF1 /* lvm.c in Sources */ = {isa = PBXBuildFile; fileRef = 0452739C23C3E9CC00F67C90 /* lvm.c */; };
+		0485414F249217C6003B2EF1 /* lzio.c in Sources */ = {isa = PBXBuildFile; fileRef = 0452739E23C3E9CC00F67C90 /* lzio.c */; };
+		04854150249217D1003B2EF1 /* picopng.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04ECF30D23F1631500BA0410 /* picopng.cpp */; };
 		04ECF30C23F162FC00BA0410 /* libSDL2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 04ECF30B23F162FC00BA0410 /* libSDL2.a */; };
 		04ECF30E23F1631500BA0410 /* picopng.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04ECF30D23F1631500BA0410 /* picopng.cpp */; };
 /* End PBXBuildFile section */
@@ -153,6 +199,11 @@
 		045273B423C3E9CC00F67C90 /* memory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = memory.h; sourceTree = "<group>"; };
 		045273B523C3E9CC00F67C90 /* sound.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sound.cpp; sourceTree = "<group>"; };
 		045273B623C3E9CC00F67C90 /* sound.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sound.h; sourceTree = "<group>"; };
+		0485411024921697003B2EF1 /* retro8_libretro.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = retro8_libretro.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		0485411D249216DF003B2EF1 /* libretro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libretro.h; sourceTree = "<group>"; };
+		0485411E249216DF003B2EF1 /* libretro.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = libretro.cpp; sourceTree = "<group>"; };
+		0485412A24921739003B2EF1 /* pico_font.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pico_font.h; sourceTree = "<group>"; };
+		0485412B24921739003B2EF1 /* lua_api.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lua_api.h; sourceTree = "<group>"; };
 		04ECF30A23E066CC00BA0410 /* sdl_helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sdl_helper.h; sourceTree = "<group>"; };
 		04ECF30B23F162FC00BA0410 /* libSDL2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSDL2.a; path = ../../../../../../../../usr/local/Cellar/sdl2/2.0.8/lib/libSDL2.a; sourceTree = "<group>"; };
 		04ECF30D23F1631500BA0410 /* picopng.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = picopng.cpp; sourceTree = "<group>"; };
@@ -164,6 +215,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				04ECF30C23F162FC00BA0410 /* libSDL2.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0485410E24921697003B2EF1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -183,6 +241,7 @@
 			isa = PBXGroup;
 			children = (
 				0452735123C3E98B00F67C90 /* retro8 */,
+				0485411024921697003B2EF1 /* retro8_libretro.dylib */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -191,6 +250,8 @@
 			isa = PBXGroup;
 			children = (
 				0452735C23C3E9CC00F67C90 /* common.h */,
+				0485412924921739003B2EF1 /* gen */,
+				0485411C249216DF003B2EF1 /* libretro */,
 				0452735D23C3E9CC00F67C90 /* io */,
 				0452736223C3E9CC00F67C90 /* lua */,
 				045273A023C3E9CC00F67C90 /* main.cpp */,
@@ -312,7 +373,38 @@
 			path = vm;
 			sourceTree = "<group>";
 		};
+		0485411C249216DF003B2EF1 /* libretro */ = {
+			isa = PBXGroup;
+			children = (
+				0485411D249216DF003B2EF1 /* libretro.h */,
+				0485411E249216DF003B2EF1 /* libretro.cpp */,
+			);
+			path = libretro;
+			sourceTree = "<group>";
+		};
+		0485412924921739003B2EF1 /* gen */ = {
+			isa = PBXGroup;
+			children = (
+				0485412A24921739003B2EF1 /* pico_font.h */,
+				0485412B24921739003B2EF1 /* lua_api.h */,
+			);
+			path = gen;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		0485410C24921697003B2EF1 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0485412C24921739003B2EF1 /* pico_font.h in Headers */,
+				0485412D24921739003B2EF1 /* lua_api.h in Headers */,
+				0485411F249216DF003B2EF1 /* libretro.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
 		0452735023C3E98B00F67C90 /* retro8 */ = {
@@ -332,6 +424,23 @@
 			productReference = 0452735123C3E98B00F67C90 /* retro8 */;
 			productType = "com.apple.product-type.tool";
 		};
+		0485410F24921697003B2EF1 /* libretro */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0485411A24921697003B2EF1 /* Build configuration list for PBXNativeTarget "libretro" */;
+			buildPhases = (
+				0485410C24921697003B2EF1 /* Headers */,
+				0485410D24921697003B2EF1 /* Sources */,
+				0485410E24921697003B2EF1 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = libretro;
+			productName = libretro;
+			productReference = 0485411024921697003B2EF1 /* retro8_libretro.dylib */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -343,6 +452,10 @@
 				TargetAttributes = {
 					0452735023C3E98B00F67C90 = {
 						CreatedOnToolsVersion = 7.3.1;
+					};
+					0485410F24921697003B2EF1 = {
+						CreatedOnToolsVersion = 10.1;
+						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -359,6 +472,7 @@
 			projectRoot = "";
 			targets = (
 				0452735023C3E98B00F67C90 /* retro8 */,
+				0485410F24921697003B2EF1 /* libretro */,
 			);
 		};
 /* End PBXProject section */
@@ -414,6 +528,56 @@
 				045273CF23C3E9CC00F67C90 /* lparser.c in Sources */,
 				045273D323C3E9CC00F67C90 /* ltable.c in Sources */,
 				045273DB23C3E9CC00F67C90 /* main.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0485410D24921697003B2EF1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				04854150249217D1003B2EF1 /* picopng.cpp in Sources */,
+				0485412E249217C6003B2EF1 /* lapi.c in Sources */,
+				0485412F249217C6003B2EF1 /* lauxlib.c in Sources */,
+				04854130249217C6003B2EF1 /* lbaselib.c in Sources */,
+				04854131249217C6003B2EF1 /* lbitlib.c in Sources */,
+				04854132249217C6003B2EF1 /* lcode.c in Sources */,
+				04854133249217C6003B2EF1 /* lcorolib.c in Sources */,
+				04854134249217C6003B2EF1 /* lctype.c in Sources */,
+				04854135249217C6003B2EF1 /* ldblib.c in Sources */,
+				04854136249217C6003B2EF1 /* ldebug.c in Sources */,
+				04854137249217C6003B2EF1 /* ldo.c in Sources */,
+				04854138249217C6003B2EF1 /* ldump.c in Sources */,
+				04854139249217C6003B2EF1 /* lfunc.c in Sources */,
+				0485413A249217C6003B2EF1 /* lgc.c in Sources */,
+				0485413B249217C6003B2EF1 /* linit.c in Sources */,
+				0485413C249217C6003B2EF1 /* liolib.c in Sources */,
+				0485413D249217C6003B2EF1 /* llex.c in Sources */,
+				0485413E249217C6003B2EF1 /* lmathlib.c in Sources */,
+				0485413F249217C6003B2EF1 /* lmem.c in Sources */,
+				04854140249217C6003B2EF1 /* loadlib.c in Sources */,
+				04854141249217C6003B2EF1 /* lobject.c in Sources */,
+				04854142249217C6003B2EF1 /* lopcodes.c in Sources */,
+				04854143249217C6003B2EF1 /* loslib.c in Sources */,
+				04854144249217C6003B2EF1 /* lparser.c in Sources */,
+				04854145249217C6003B2EF1 /* lstate.c in Sources */,
+				04854146249217C6003B2EF1 /* lstring.c in Sources */,
+				04854147249217C6003B2EF1 /* lstrlib.c in Sources */,
+				04854148249217C6003B2EF1 /* ltable.c in Sources */,
+				04854149249217C6003B2EF1 /* ltablib.c in Sources */,
+				0485414A249217C6003B2EF1 /* ltests.c in Sources */,
+				0485414B249217C6003B2EF1 /* ltm.c in Sources */,
+				0485414C249217C6003B2EF1 /* lundump.c in Sources */,
+				0485414D249217C6003B2EF1 /* lutf8lib.c in Sources */,
+				0485414E249217C6003B2EF1 /* lvm.c in Sources */,
+				0485414F249217C6003B2EF1 /* lzio.c in Sources */,
+				0485412124921717003B2EF1 /* loader.cpp in Sources */,
+				0485412224921717003B2EF1 /* stegano.cpp in Sources */,
+				0485412424921717003B2EF1 /* gfx.cpp in Sources */,
+				0485412524921717003B2EF1 /* lua_bridge.cpp in Sources */,
+				0485412624921717003B2EF1 /* machine.cpp in Sources */,
+				0485412724921717003B2EF1 /* memory.cpp in Sources */,
+				0485412824921717003B2EF1 /* sound.cpp in Sources */,
+				04854120249216DF003B2EF1 /* libretro.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -533,6 +697,75 @@
 			};
 			name = Release;
 		};
+		0485411824921697003B2EF1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				EXECUTABLE_PREFIX = "";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_ENABLE_CPP_EXCEPTIONS = YES;
+				GCC_ENABLE_CPP_RTTI = YES;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				HEADER_SEARCH_PATHS = "${SRCROOT}/../../src";
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = retro8_libretro;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		0485411924921697003B2EF1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				EXECUTABLE_PREFIX = "";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_ENABLE_CPP_EXCEPTIONS = YES;
+				GCC_ENABLE_CPP_RTTI = YES;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				HEADER_SEARCH_PATHS = "${SRCROOT}/../../src";
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = retro8_libretro;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -550,6 +783,15 @@
 			buildConfigurations = (
 				0452735923C3E98B00F67C90 /* Debug */,
 				0452735A23C3E98B00F67C90 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		0485411A24921697003B2EF1 /* Build configuration list for PBXNativeTarget "libretro" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0485411824921697003B2EF1 /* Debug */,
+				0485411924921697003B2EF1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

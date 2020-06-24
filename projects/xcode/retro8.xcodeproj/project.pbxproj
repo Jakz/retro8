@@ -98,7 +98,6 @@
 		0485414E249217C6003B2EF1 /* lvm.c in Sources */ = {isa = PBXBuildFile; fileRef = 0452739C23C3E9CC00F67C90 /* lvm.c */; };
 		0485414F249217C6003B2EF1 /* lzio.c in Sources */ = {isa = PBXBuildFile; fileRef = 0452739E23C3E9CC00F67C90 /* lzio.c */; };
 		04854150249217D1003B2EF1 /* picopng.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04ECF30D23F1631500BA0410 /* picopng.cpp */; };
-		04ECF30C23F162FC00BA0410 /* libSDL2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 04ECF30B23F162FC00BA0410 /* libSDL2.a */; };
 		04ECF30E23F1631500BA0410 /* picopng.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04ECF30D23F1631500BA0410 /* picopng.cpp */; };
 /* End PBXBuildFile section */
 
@@ -205,7 +204,6 @@
 		0485412A24921739003B2EF1 /* pico_font.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pico_font.h; sourceTree = "<group>"; };
 		0485412B24921739003B2EF1 /* lua_api.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lua_api.h; sourceTree = "<group>"; };
 		04ECF30A23E066CC00BA0410 /* sdl_helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sdl_helper.h; sourceTree = "<group>"; };
-		04ECF30B23F162FC00BA0410 /* libSDL2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSDL2.a; path = ../../../../../../../../usr/local/Cellar/sdl2/2.0.8/lib/libSDL2.a; sourceTree = "<group>"; };
 		04ECF30D23F1631500BA0410 /* picopng.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = picopng.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -214,7 +212,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				04ECF30C23F162FC00BA0410 /* libSDL2.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -231,7 +228,6 @@
 		0452734823C3E98B00F67C90 = {
 			isa = PBXGroup;
 			children = (
-				04ECF30B23F162FC00BA0410 /* libSDL2.a */,
 				0452735B23C3E9CC00F67C90 /* src */,
 				0452735223C3E98B00F67C90 /* Products */,
 			);
@@ -669,13 +665,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				HEADER_SEARCH_PATHS = (
-					"${SRCROOT}/../../src",
-					/usr/local/include/SDL2,
+				HEADER_SEARCH_PATHS = "${SRCROOT}/../../src";
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				OTHER_CFLAGS = (
+					"-I/usr/local/include/SDL2",
+					"-D_THREAD_SAFE\n-I/usr/local/include/SDL2",
+					"-D_THREAD_SAFE",
 				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					/usr/local/Cellar/sdl2/2.0.8/lib,
+				OTHER_LDFLAGS = (
+					"-L/usr/local/lib",
+					"-lSDL2",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -685,13 +684,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				HEADER_SEARCH_PATHS = (
-					"${SRCROOT}/../../src",
-					/usr/local/include/SDL2,
+				HEADER_SEARCH_PATHS = "${SRCROOT}/../../src";
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				OTHER_CFLAGS = (
+					"-I/usr/local/include/SDL2",
+					"-D_THREAD_SAFE\n-I/usr/local/include/SDL2",
+					"-D_THREAD_SAFE",
 				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					/usr/local/Cellar/sdl2/2.0.8/lib,
+				OTHER_LDFLAGS = (
+					"-L/usr/local/lib",
+					"-lSDL2",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

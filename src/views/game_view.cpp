@@ -191,7 +191,7 @@ void GameView::render()
 
 
     if (_path.empty())
-      _path = "cartridges/PicoFox.p8.png";
+      _path = "cartridges/PicoKart.p8";
 
     if (r8::io::Loader::isPngCartridge(_path))
     {

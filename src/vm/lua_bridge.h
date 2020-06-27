@@ -44,5 +44,9 @@ namespace lua
     void init();
     void update();
     void draw();
+
+#if TEST_MODE
+    lua_State* state() const { return L; }
+#endif
   };
 }

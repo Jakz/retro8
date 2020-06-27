@@ -91,6 +91,48 @@ TEST_CASE("tilemap")
   }
 }
 
+TEST_CASE("mid")
+{
+  Machine m;
+
+  SECTION("a < b < c = b")
+  {
+    m.code().initFromSource("function _test() return mid(1, 2, 3) end");
+    m.code().callFunction("_test", 1);
+    REQUIRE(lua_tonumber(m.code().state(), -1) == 2);
+  }
+}
+
+TEST_CASE("bitwise")
+{
+  Machine m;
+
+  std::string code;
+  uint32_t expected;
+
+  SECTION("and")
+  {
+    auto i = GENERATE(range(0, 255));
+    auto j = GENERATE(range(0, 255));
+    
+    code = "return band(" + std::to_string(i) + ", " + std::to_string(j) + ")";
+    expected = i & j;
+  }
+
+  SECTION("or")
+  {
+    auto i = GENERATE(range(0, 255));
+    auto j = GENERATE(range(0, 255));
+
+    code = "return bor(" + std::to_string(i) + ", " + std::to_string(j) + ")";
+    expected = i | j;
+  }
+
+  m.code().initFromSource("function _test() " + code + " end");
+  m.code().callFunction("_test", 1);
+  REQUIRE(lua_tonumber(m.code().state(), -1) == expected);
+}
+
 TEST_CASE("lua language modifications")
 {
   lua_State* L = luaL_newstate();
@@ -153,9 +195,10 @@ TEST_CASE("lua language modifications")
   lua_close(L);
 }
 
-TEST_CASE("cartridge testing")
+/*TEST_CASE("cartridge testing")
 {
   retro8::io::Loader loader;
+  retro8::Machine m;
 
   namespace fs = std::filesystem;
   std::error_code ec;
@@ -186,7 +229,7 @@ TEST_CASE("cartridge testing")
     }
   }
 
-}
+}*/
 
 int testMain(int rargc, char* rargv[])
 {

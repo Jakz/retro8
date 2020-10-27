@@ -10,6 +10,8 @@
 
 #include <cstring>
 
+#define LIBRETRO_LOG LOGD
+
 namespace r8 = retro8;
 using pixel_t = uint32_t;
 
@@ -55,10 +57,10 @@ extern "C"
   void retro_init()
   {
     screen = new pixel_t[r8::gfx::SCREEN_WIDTH * r8::gfx::SCREEN_HEIGHT];
-    LOGD("Initializing screen buffer of %zu bytes", sizeof(pixel_t)*r8::gfx::SCREEN_WIDTH*r8::gfx::SCREEN_HEIGHT);
+    LIBRETRO_LOG("Initializing screen buffer of %zu bytes", sizeof(pixel_t)*r8::gfx::SCREEN_WIDTH*r8::gfx::SCREEN_HEIGHT);
 
     audioBuffer = new int16_t[SAMPLE_RATE * 2];
-    LOGD("Initializing audio buffer of %zu bytes", sizeof(int16_t) * SAMPLE_RATE * 2);
+    LIBRETRO_LOG("Initializing audio buffer of %zu bytes", sizeof(int16_t) * SAMPLE_RATE * 2);
 
     colorTable.init(ColorMapper());
     machine.font().load();
@@ -126,8 +128,13 @@ extern "C"
 
       const char* bdata = static_cast<const char*>(info->data);
 
-      if (std::memcmp(bdata, ".PNG", 4) == 0)
+      LIBRETRO_LOG("[Retro8] Loading %s", info->path);
+
+
+      if (std::memcmp(bdata, "\x89PNG", 4) == 0)
       {
+        LIBRETRO_LOG("[Retro8] Game is in PNG format, decoding it.");
+        
         std::vector<uint8_t> out;
         unsigned long width, height;
         auto result = Platform::loadPNG(out, width, height, (uint8_t*)bdata, info->size, true);
@@ -147,9 +154,9 @@ extern "C"
       if (machine.code().hasInit())
       {
         //_initFuture = std::async(std::launch::async, []() {
-          LOGD("Cartridge has _init() function, calling it.");
+        LIBRETRO_LOG("[Retro8] Cartridge has _init() function, calling it.");
           machine.code().init();
-          LOGD("_init() function completed execution.");
+          LIBRETRO_LOG("[Retro8] _init() function completed execution.");
         //});
       }
 

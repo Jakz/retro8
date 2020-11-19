@@ -16,6 +16,7 @@ namespace r8 = retro8;
 using pixel_t = uint32_t;
 
 constexpr int SAMPLE_RATE = 44100;
+constexpr int SAMPLES_PER_FRAME = SAMPLE_RATE / 60;
 
 r8::Machine machine;
 r8::io::Loader loader;
@@ -59,8 +60,8 @@ extern "C"
     screen = new pixel_t[r8::gfx::SCREEN_WIDTH * r8::gfx::SCREEN_HEIGHT];
     LIBRETRO_LOG("Initializing screen buffer of %zu bytes", sizeof(pixel_t)*r8::gfx::SCREEN_WIDTH*r8::gfx::SCREEN_HEIGHT);
 
-    audioBuffer = new int16_t[SAMPLE_RATE * 2];
-    LIBRETRO_LOG("Initializing audio buffer of %zu bytes", sizeof(int16_t) * SAMPLE_RATE * 2);
+    audioBuffer = new int16_t[SAMPLES_PER_FRAME * 2];
+    LIBRETRO_LOG("Initializing audio buffer of %zu bytes", sizeof(int16_t) * SAMPLES_PER_FRAME * 2);
 
     colorTable.init(ColorMapper());
     machine.font().load();
@@ -74,11 +75,11 @@ extern "C"
     delete[] audioBuffer;
     //TODO: release all structures bound to Lua etc
   }
-  
+
   void retro_get_system_info(retro_system_info* info)
   {
     std::memset(info, 0, sizeof(info));
-    
+
     info->library_name = "retro-8";
     info->library_version = "0.1b";
     info->need_fullpath = false;
@@ -118,7 +119,7 @@ extern "C"
   unsigned retro_get_region(void) { return 0; }
   void *retro_get_memory_data(unsigned id) { return nullptr; }
   size_t retro_get_memory_size(unsigned id) { return 0; }
-  
+
   bool retro_load_game_special(unsigned game_type, const struct retro_game_info *info, size_t num_info) { return false; }
   bool retro_load_game(const retro_game_info* info)
   {
@@ -134,7 +135,7 @@ extern "C"
       if (std::memcmp(bdata, "\x89PNG", 4) == 0)
       {
         LIBRETRO_LOG("[Retro8] Game is in PNG format, decoding it.");
-        
+
         std::vector<uint8_t> out;
         unsigned long width, height;
         auto result = Platform::loadPNG(out, width, height, (uint8_t*)bdata, info->size, true);
@@ -161,12 +162,12 @@ extern "C"
       }
 
       machine.sound().init();
-      
+
       env.frameCounter = 0;
 
       return true;
     }
-    
+
     return false;
   }
 
@@ -207,8 +208,8 @@ extern "C"
     env.video(screen, r8::gfx::SCREEN_WIDTH, r8::gfx::SCREEN_HEIGHT, r8::gfx::SCREEN_WIDTH * sizeof(pixel_t));
     ++env.frameCounter;
 
-    machine.sound().renderSounds(audioBuffer, SAMPLE_RATE);
-    env.audioBatch(audioBuffer, SAMPLE_RATE);
+    machine.sound().renderSounds(audioBuffer, SAMPLES_PER_FRAME);
+    env.audioBatch(audioBuffer, SAMPLES_PER_FRAME);
 
     /* manage input */
     {

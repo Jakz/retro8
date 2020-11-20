@@ -58,7 +58,7 @@ struct Platform
 
 #define SOUND_ENABLED true
 
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__LIBRETRO__)
 #define LOGD(x , ...) printf(x"\n", __VA_ARGS__)
 #else
 #define LOGD(...)

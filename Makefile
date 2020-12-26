@@ -138,7 +138,7 @@ include Makefile.common
 OBJECTS := $(SOURCES_C:.c=.o) $(SOURCES_CXX:.cpp=.o)
 
 CFLAGS   += -Wall -D__LIBRETRO__ $(fpic) $(INCFLAGS) 
-CXXFLAGS += -Wall -D__LIBRETRO__ $(fpic) $(INCFLAGS)
+CXXFLAGS += -Wall -D__LIBRETRO__ $(fpic) $(INCFLAGS) -std=c++14
 
 all: $(TARGET)
 

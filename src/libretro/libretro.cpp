@@ -16,7 +16,7 @@ namespace r8 = retro8;
 using pixel_t = uint32_t;
 
 constexpr int SAMPLE_RATE = 44100;
-constexpr int SAMPLES_PER_FRAME = SAMPLE_RATE / 60;
+constexpr int SAMPLES_PER_FRAME = SAMPLE_RATE / 15;
 
 r8::Machine machine;
 r8::io::Loader loader;

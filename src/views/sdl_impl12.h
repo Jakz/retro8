@@ -96,9 +96,11 @@ static void scale_NN_AllowOutOfScreen(SDL_Surface *src_surface, SDL_Surface *dst
 template<typename EventHandler, typename Renderer>
 void SDL<EventHandler, Renderer>::blitToScreen(const Surface& surface, const SDL_Rect& rect)
 {
+#if PLATFORM == PLATFORM_FUNKEY
   scale_NN_AllowOutOfScreen(surface.surface, _screen, 256, 256);
-
-  //SDL_BlitSurface(surface.surface, nullptr, _screen, const_cast<SDL_Rect*>(&rect));
+#else
+  SDL_BlitSurface(surface.surface, nullptr, _screen, const_cast<SDL_Rect*>(&rect));
+#endif
 }
 
 template<typename EventHandler, typename Renderer>

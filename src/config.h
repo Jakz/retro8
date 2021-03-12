@@ -39,8 +39,8 @@
     static constexpr auto KEY_RIGHT = SDLK_RIGHT;
 
     static constexpr auto KEY_ACTION1_1 = SDLK_z;
-    static constexpr auto KEY_ACTION2_1 = SDLK_x;
-    static constexpr auto KEY_ACTION1_2 = SDLK_a;
+    static constexpr auto KEY_ACTION1_2 = SDLK_x;
+    static constexpr auto KEY_ACTION2_1 = SDLK_a;
     static constexpr auto KEY_ACTION2_2 = SDLK_s;
 
     static constexpr auto KEY_MUTE = SDLK_m;
@@ -61,8 +61,8 @@
     static constexpr auto KEY_RIGHT = SDLK_RIGHT;
 
     static constexpr auto KEY_ACTION1_1 = SDLK_LCTRL; // A
-    static constexpr auto KEY_ACTION2_1 = SDLK_LALT; // B
-    static constexpr auto KEY_ACTION1_2 = SDLK_SPACE; // Y
+    static constexpr auto KEY_ACTION1_2 = SDLK_LALT; // B
+    static constexpr auto KEY_ACTION2_1 = SDLK_SPACE; // Y
     static constexpr auto KEY_ACTION2_2 = SDLK_LSHIFT; // X
 
     static constexpr auto KEY_MUTE = 0xffff;
@@ -83,8 +83,8 @@
     static constexpr auto KEY_RIGHT = SDLK_r;
 
     static constexpr auto KEY_ACTION1_1 = SDLK_b; // A
-    static constexpr auto KEY_ACTION2_1 = SDLK_a; // B
-    static constexpr auto KEY_ACTION1_2 = SDLK_y; // Y
+    static constexpr auto KEY_ACTION1_2 = SDLK_a; // B
+    static constexpr auto KEY_ACTION2_1 = SDLK_y; // Y
     static constexpr auto KEY_ACTION2_2 = SDLK_x; // X
 
     static constexpr auto KEY_MUTE = 0xffff;

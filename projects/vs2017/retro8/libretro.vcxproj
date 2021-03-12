@@ -58,6 +58,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)../../../src</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>__LIBRETRO__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -71,6 +72,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)../../../src</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>__LIBRETRO__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -120,6 +122,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\common.h" />
+    <ClInclude Include="..\..\..\src\config.h" />
     <ClInclude Include="..\..\..\src\gen\lua_api.h" />
     <ClInclude Include="..\..\..\src\gen\pico_font.h" />
     <ClInclude Include="..\..\..\src\io\loader.h" />

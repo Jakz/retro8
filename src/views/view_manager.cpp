@@ -30,15 +30,17 @@ bool ui::ViewManager::loadData()
   {
     constexpr size_t FONT_WIDTH = 128, FONT_HEIGHT = 80;
 
-    /* create texture for font
-       128x80 1bit per pixel font
-    */
+    /* create texture for font 128x80 1bit per pixel font */
     const SDL_PixelFormat* format = displayFormat();
 
     _font = allocate(FONT_WIDTH, FONT_HEIGHT);
     
     for (size_t i = 0; i < FONT_WIDTH*FONT_HEIGHT; ++i)
       _font.pixel(i) = (retro8::gfx::font_map[i / 8] & (1 << (7 - (i % 8)))) ? 0xffffffff : 0;
+
+#if !defined(SDL12)
+    _font.texture = SDL_CreateTextureFromSurface(renderer(), _font.surface);
+#endif
 
     _font.enableBlending();
     _font.releaseSurface();

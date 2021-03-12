@@ -246,18 +246,13 @@ void GameView::render()
   }
 
   SDL_Rect dest;
-  //Texture* texture = SDL_CreateTextureFromSurface(renderer, machine.screen());
-#ifdef _WIN32
-  dest = { (480 - 384) / 2, (480 - 384) / 2, 384, 384 };
-#else
 
-if (_scaler == Scaler::UNSCALED)
-  dest = { (320 - 128) / 2, (240 - 128) / 2, 128, 128 };
-else if (_scaler == Scaler::SCALED_ASPECT_2x)
-  dest = { (320 - 256) / 2, (240 - 256) / 2, 256, 256 };
-else
-  dest = { 0, 0, 320, 240 };
-#endif
+  if (_scaler == Scaler::UNSCALED)
+    dest = { (SCREEN_WIDTH - 128) / 2, (SCREEN_HEIGHT - 128) / 2, 128, 128 };
+  else if (_scaler == Scaler::SCALED_ASPECT_2x)
+    dest = { (SCREEN_WIDTH - 256) / 2, (SCREEN_HEIGHT - 256) / 2, 256, 256 };
+  else
+    dest = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
 
   manager->blitToScreen(_output, dest);
  
@@ -356,40 +351,36 @@ void GameView::handleKeyboardEvent(const SDL_Event& event)
 {
   switch (event.key.keysym.sym)
   {
-  case SDLK_LEFT:
+  case KEY_LEFT:
     _input.manageKey(0, 0, event.type == SDL_KEYDOWN);
     break;
-  case SDLK_RIGHT:
+  case KEY_RIGHT:
     _input.manageKey(0, 1, event.type == SDL_KEYDOWN);
     break;
-  case SDLK_UP:
+  case KEY_UP:
     _input.manageKey(0, 2, event.type == SDL_KEYDOWN);
     break;
-  case SDLK_DOWN:
+  case KEY_DOWN:
     _input.manageKey(0, 3, event.type == SDL_KEYDOWN);
     break;
 
-  case SDLK_z:
-  case SDLK_LCTRL:
+  case KEY_ACTION1_1:
     _input.manageKey(0, 4, event.type == SDL_KEYDOWN);
     break;
 
-  case SDLK_x:
-  case SDLK_LALT:
+  case KEY_ACTION1_2:
     _input.manageKey(0, 5, event.type == SDL_KEYDOWN);
     break;
 
-  case SDLK_a:
-  case SDLK_SPACE:
+  case KEY_ACTION2_1:
     _input.manageKey(1, 4, event.type == SDL_KEYDOWN);
     break;
 
-  case SDLK_s:
-  case SDLK_LSHIFT:
+  case KEY_ACTION2_2:
     _input.manageKey(1, 5, event.type == SDL_KEYDOWN);
     break;
 
-  case SDLK_m:
+  case KEY_MUTE:
   {
     if (event.type == SDL_KEYDOWN)
     {
@@ -400,29 +391,27 @@ void GameView::handleKeyboardEvent(const SDL_Event& event)
     break;
   }
 
-#if DESKTOP_MODE
-  case SDLK_p:
+  case KEY_PAUSE:
     if (event.type == SDL_KEYDOWN)
       if (_paused)
         pause();
       else
         resume();
     break;
-#else
-  case SDLK_TAB:
+
+  case KEY_NEXT_SCALER:
     if (event.type == SDL_KEYDOWN)
     {
       if (_scaler < Scaler::LAST) _scaler = Scaler(_scaler + 1);
       else _scaler = Scaler::FIRST;
   }
     break;
-#endif
 
-  case SDLK_RETURN:
+  case KEY_MENU:
     manager->openMenu();
     break;
 
-  case SDLK_ESCAPE:
+  case KEY_EXIT:
     if (event.type == SDL_KEYDOWN)
       manager->exit();
     break;

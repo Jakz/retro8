@@ -5,19 +5,19 @@ bool SDL<EventHandler, Renderer>::init()
 {
   if (SDL_Init(SDL_INIT_EVERYTHING))
   {
-    printf("Error on SDL_Init().\n");
+    LOGD("Error on SDL_Init().\n");
     return false;
   }
 
   // SDL_WINDOW_FULLSCREEN
 #if defined(WINDOW_SCALE)
 #if defined(DEBUGGER)
-  _window = SDL_CreateWindow("retro-8", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1024, 480, SDL_WINDOW_OPENGL);
+  _window = SDL_CreateWindow("retro-8", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH*3, SCREEN_WIDTH*2, SDL_WINDOW_OPENGL);
 #else
-  _window = SDL_CreateWindow("retro-8", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_OPENGL);
+  _window = SDL_CreateWindow("retro-8", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH*2, SCREEN_HEIGHT*2, SDL_WINDOW_OPENGL);
 #endif
 #else
-  _window = SDL_CreateWindow("retro-8", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 320, 240, SDL_WINDOW_OPENGL);
+  _window = SDL_CreateWindow("retro-8", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_OPENGL);
 #endif
   _renderer = SDL_CreateRenderer(_window, -1, SDL_RENDERER_ACCELERATED);
 

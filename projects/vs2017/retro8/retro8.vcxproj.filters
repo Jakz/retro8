@@ -162,6 +162,9 @@
     <ClInclude Include="..\..\..\src\views\sdl_impl.h">
       <Filter>src\views</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\config.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\main.cpp">

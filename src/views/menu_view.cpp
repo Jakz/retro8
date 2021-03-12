@@ -89,15 +89,15 @@ MenuView::~MenuView() { }
 
 void MenuView::handleKeyboardEvent(const SDL_Event& event)
 {
-  static constexpr auto ACTION_BUTTON = SDLK_LCTRL;
-  static constexpr auto BACK_BUTTON = SDLK_LALT;
+  static constexpr auto ACTION_BUTTON = KEY_ACTION1_1;
+  static constexpr auto BACK_BUTTON = KEY_ACTION1_2;
 
   if (event.type == SDL_KEYDOWN)
   {
     switch (event.key.keysym.sym)
     {
-    case SDLK_UP: if (selected > menu->begin()) --selected; else selected = menu->end() - 1; break;
-    case SDLK_DOWN: if (selected < menu->end() - 1) ++selected; else selected = menu->begin(); break;
+    case KEY_UP: if (selected > menu->begin()) --selected; else selected = menu->end() - 1; break;
+    case KEY_DOWN: if (selected < menu->end() - 1) ++selected; else selected = menu->begin(); break;
     case ACTION_BUTTON:
     {
       if (selected->lambda)
@@ -148,8 +148,8 @@ void MenuView::reset()
 
 void MenuView::render()
 {
-  constexpr int32_t W = 320;
-  constexpr int32_t H = 240;
+  constexpr int32_t W = SCREEN_WIDTH;
+  constexpr int32_t H = SCREEN_HEIGHT;
 
   _gvm->clear(0, 0, 0);
   _gvm->rect(0, 0, W, H, 20, 20, 40, 255);

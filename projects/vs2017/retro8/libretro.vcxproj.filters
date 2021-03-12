@@ -278,5 +278,8 @@
     <ClInclude Include="..\..\..\src\gen\pico_font.h">
       <Filter>src\gen</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\config.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

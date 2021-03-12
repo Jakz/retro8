@@ -5,16 +5,16 @@ bool SDL<EventHandler, Renderer>::init()
 {
   if (SDL_Init(SDL_INIT_EVERYTHING))
   {
-    printf("Error on SDL_Init().\n");
+    LOGD("Error on SDL_Init().\n");
     return false;
   }
 
   SDL_EnableKeyRepeat(0, 0);
 
 #if defined(WINDOW_SCALE)
-  _screen = SDL_SetVideoMode(640, 480, 32, SDL_HWSURFACE);
+  _screen = SDL_SetVideoMode(SCREEN_WIDTH*2, SCREEN_HEIGHT*2, 32, SDL_HWSURFACE);
   #else
-  _screen = SDL_SetVideoMode(320, 240, 32, SDL_HWSURFACE);
+  _screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 32, SDL_HWSURFACE);
 #endif
 
   _format = _screen->format;

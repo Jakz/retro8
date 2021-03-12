@@ -56,24 +56,4 @@ struct Platform
   static int loadPNG(std::vector<unsigned char>& out_image, unsigned long& image_width, unsigned long& image_height, const unsigned char* in_png, size_t in_size, bool convert_to_rgba32 = true);
 };
 
-#define SOUND_ENABLED true
-
-#if defined(_WIN32) && !defined(__LIBRETRO__)
-#define LOGD(x , ...) printf(x"\n", __VA_ARGS__)
-#else
-#define LOGD(...)
-#endif
-
-#define R8_OPTS_ENABLED true
-#define R8_USE_LODE_PNG true
-
-#ifdef _WIN32
-#define MOUSE_ENABLED true
-#define WINDOW_SCALE 1
-
-#define DESKTOP_MODE true
-#define TEST_MODE false
-#else
-#define MOUSE_ENABLED false
-#define DESKTOP_MODE false
-#endif
+#include "config.h"

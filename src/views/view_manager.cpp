@@ -34,11 +34,8 @@ bool ui::ViewManager::loadData()
     /* create texture for font
        128x80 1bit per pixel font
     */
-    SDL_RendererInfo info;
-    SDL_GetRendererInfo(_renderer, &info);
-    SDL_PixelFormat* format = SDL_AllocFormat(info.texture_formats[0]);
+    const SDL_PixelFormat* format = displayFormat();
     SDL_Surface* fontSurface = SDL_CreateRGBSurface(0, FONT_WIDTH, FONT_HEIGHT, 32, format->Rmask, format->Gmask, format->Bmask, format->Amask);
-    SDL_FreeFormat(format);
 
     auto pixels = static_cast<uint32_t*>(fontSurface->pixels);
     for (size_t i = 0; i < FONT_WIDTH*FONT_HEIGHT; ++i)
@@ -54,7 +51,7 @@ bool ui::ViewManager::loadData()
   return true;
 }
 
-void ui::ViewManager::handleKeyboardEvent(const SDL_Event& event, bool press)
+void ui::ViewManager::handleKeyboardEvent(const SDL_Event& event)
 {
   _view->handleKeyboardEvent(event);
 }
@@ -100,7 +97,7 @@ void ViewManager::text(const std::string& text, int32_t x, int32_t y, SDL_Color 
   {
     SDL_Rect src = SDL_MakeRect(8 * (text[i] % GLYPHS_PER_ROW), 8 * (text[i] / GLYPHS_PER_ROW), 4, 6);
     SDL_Rect dest = SDL_MakeRect(x + 4 * i * scale, y, 4 * scale, 6 * scale);
-    SDL_RenderCopy(_renderer, _font, &src, &dest);
+    blit(_font, src, dest);
   }
 
   SDL_SetTextureColorMod(_font, 255, 255, 255);

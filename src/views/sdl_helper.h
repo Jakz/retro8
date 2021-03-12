@@ -37,6 +37,7 @@ protected:
   EventHandler& eventHandler;
   Renderer& loopRenderer;
 
+  SDL_PixelFormat* _format;
   SDL_Surface* _screen;
   SDL_Window* _window;
   SDL_Renderer* _renderer;
@@ -55,6 +56,8 @@ public:
   {
     setFrameRate(60);
   }
+
+  const SDL_PixelFormat* displayFormat() { return _format; }
 
   void setFrameRate(u32 frameRate)
   {
@@ -118,11 +121,11 @@ void SDL<EventHandler, Renderer>::handleEvents()
       break;
 
     case SDL_KEYDOWN:
-      eventHandler.handleKeyboardEvent(event, true);
-      break;
-
     case SDL_KEYUP:
-      eventHandler.handleKeyboardEvent(event, false);
+#if !defined(SDL12)
+      if (!event.key.repeat)
+#endif
+        eventHandler.handleKeyboardEvent(event);
       break;
 
 #if MOUSE_ENABLED

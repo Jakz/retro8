@@ -51,7 +51,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>D:\dev\sdl\SDL1.2.15\include;$(SolutionDir)../../../src;D:\dev\odreader\projects\vs2017\zlib\include;C:\Users\Jack\Documents\dev\retro-8\projects\vs2017\libs\lua\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\dev\sdl\SDL1.2.15\include;$(SolutionDir)../../../src;D:\dev\odreader\projects\vs2017\zlib\include;D:\dev\retro8\projects\vs2017\libs\lua\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>

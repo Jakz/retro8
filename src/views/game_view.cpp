@@ -127,8 +127,8 @@ r8::gfx::ColorTable colorTable;
 
 struct ColorMapper
 {
-  SDL_PixelFormat* format;
-  ColorMapper(SDL_PixelFormat* format) : format(format) { }
+  const SDL_PixelFormat* format;
+  ColorMapper(const SDL_PixelFormat* format) : format(format) { }
 
   inline r8::gfx::ColorTable::pixel_t operator()(uint8_t r, uint8_t g, uint8_t b) const
   {
@@ -161,20 +161,17 @@ void GameView::render()
 {
   if (!init)
   {
-    SDL_RendererInfo info;
-    SDL_GetRendererInfo(manager->renderer(), &info);
-    //SDL_PixelFormat* format = SDL_AllocFormat(SDL_GetWindowPixelFormat(manager->window()));
-
-    _format = SDL_AllocFormat(info.texture_formats[0]);
-
     LOGD("Initializing color table");
-    colorTable.init(ColorMapper(_format));
+    auto* format = manager->displayFormat();
+    colorTable.init(ColorMapper(manager->displayFormat()));
 
-    printf("Using renderer pixel format: %s\n", SDL_GetPixelFormatName(_format->format));
+#if !defined(SDL12)
+    printf("Using renderer pixel format: %s\n", SDL_GetPixelFormatName(format->format));
+#endif
 
     /* initialize main surface and its texture */
-    _output = SDL_CreateRGBSurface(0, 128, 128, 32, _format->Rmask, _format->Gmask, _format->Bmask, _format->Amask);
-    _outputTexture = SDL_CreateTexture(manager->renderer(), _format->format, SDL_TEXTUREACCESS_STREAMING, 128, 128);
+    _output = SDL_CreateRGBSurface(0, 128, 128, 32, format->Rmask, format->Gmask, format->Bmask, format->Amask);
+    _outputTexture = SDL_CreateTexture(manager->renderer(), format->format, SDL_TEXTUREACCESS_STREAMING, 128, 128);
 
     if (!_output)
     {
@@ -191,7 +188,7 @@ void GameView::render()
 
 
     if (_path.empty())
-      _path = "cartridges/PicoKart.p8";
+      _path = "cartridges/pico-racer.png";
 
     if (r8::io::Loader::isPngCartridge(_path))
     {
@@ -359,82 +356,79 @@ else
 
 void GameView::handleKeyboardEvent(const SDL_Event& event)
 {
-  if (!event.key.repeat)
+  switch (event.key.keysym.sym)
   {
-    switch (event.key.keysym.sym)
+  case SDLK_LEFT:
+    _input.manageKey(0, 0, event.type == SDL_KEYDOWN);
+    break;
+  case SDLK_RIGHT:
+    _input.manageKey(0, 1, event.type == SDL_KEYDOWN);
+    break;
+  case SDLK_UP:
+    _input.manageKey(0, 2, event.type == SDL_KEYDOWN);
+    break;
+  case SDLK_DOWN:
+    _input.manageKey(0, 3, event.type == SDL_KEYDOWN);
+    break;
+
+  case SDLK_z:
+  case SDLK_LCTRL:
+    _input.manageKey(0, 4, event.type == SDL_KEYDOWN);
+    break;
+
+  case SDLK_x:
+  case SDLK_LALT:
+    _input.manageKey(0, 5, event.type == SDL_KEYDOWN);
+    break;
+
+  case SDLK_a:
+  case SDLK_SPACE:
+    _input.manageKey(1, 4, event.type == SDL_KEYDOWN);
+    break;
+
+  case SDLK_s:
+  case SDLK_LSHIFT:
+    _input.manageKey(1, 5, event.type == SDL_KEYDOWN);
+    break;
+
+  case SDLK_m:
+  {
+    if (event.type == SDL_KEYDOWN)
     {
-    case SDLK_LEFT:
-      _input.manageKey(0, 0, event.type == SDL_KEYDOWN);
-      break;
-    case SDLK_RIGHT:
-      _input.manageKey(0, 1, event.type == SDL_KEYDOWN);
-      break;
-    case SDLK_UP:
-      _input.manageKey(0, 2, event.type == SDL_KEYDOWN);
-      break;
-    case SDLK_DOWN:
-      _input.manageKey(0, 3, event.type == SDL_KEYDOWN);
-      break;
-
-    case SDLK_z:
-    case SDLK_LCTRL:
-      _input.manageKey(0, 4, event.type == SDL_KEYDOWN);
-      break;
-
-    case SDLK_x:
-    case SDLK_LALT:
-      _input.manageKey(0, 5, event.type == SDL_KEYDOWN);
-      break;
-
-    case SDLK_a:
-    case SDLK_SPACE:
-      _input.manageKey(1, 4, event.type == SDL_KEYDOWN);
-      break;
-
-    case SDLK_s:
-    case SDLK_LSHIFT:
-      _input.manageKey(1, 5, event.type == SDL_KEYDOWN);
-      break;
-
-    case SDLK_m:
-    {
-      if (event.type == SDL_KEYDOWN)
-      {
-        bool s = machine.sound().isMusicEnabled();
-        machine.sound().toggleMusic(!s);
-        machine.sound().toggleSound(!s);
-      }
-      break;
+      bool s = machine.sound().isMusicEnabled();
+      machine.sound().toggleMusic(!s);
+      machine.sound().toggleSound(!s);
     }
+    break;
+  }
 
 #if DESKTOP_MODE
-    case SDLK_p:
-      if (event.type == SDL_KEYDOWN)
-        if (_paused)
-          pause();
-        else
-          resume();
-      break;
+  case SDLK_p:
+    if (event.type == SDL_KEYDOWN)
+      if (_paused)
+        pause();
+      else
+        resume();
+    break;
 #else
-    case SDLK_TAB:
-      if (event.type == SDL_KEYDOWN)
-      {
-        if (_scaler < Scaler::LAST) _scaler = Scaler(_scaler + 1);
-        else _scaler = Scaler::FIRST;
-    }
-      break;
+  case SDLK_TAB:
+    if (event.type == SDL_KEYDOWN)
+    {
+      if (_scaler < Scaler::LAST) _scaler = Scaler(_scaler + 1);
+      else _scaler = Scaler::FIRST;
+  }
+    break;
 #endif
 
-    case SDLK_RETURN:
-      manager->openMenu();
-      break;
+  case SDLK_RETURN:
+    manager->openMenu();
+    break;
 
-    case SDLK_ESCAPE:
-      if (event.type == SDL_KEYDOWN)
-        manager->exit();
-      break;
-  }
-  }
+  case SDLK_ESCAPE:
+    if (event.type == SDL_KEYDOWN)
+      manager->exit();
+    break;
+}
 }
 
 void GameView::handleMouseEvent(const SDL_Event& event)
@@ -462,7 +456,6 @@ void GameView::resume()
 
 GameView::~GameView()
 {
-  SDL_FreeFormat(_format);
   SDL_FreeSurface(_output);
   SDL_DestroyTexture(_outputTexture);
   //TODO: the _init future is not destroyed

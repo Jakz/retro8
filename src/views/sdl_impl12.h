@@ -9,12 +9,15 @@ bool SDL<EventHandler, Renderer>::init()
     return false;
   }
 
+  SDL_EnableKeyRepeat(0, 0);
+
 #if defined(WINDOW_SCALE)
   _screen = SDL_SetVideoMode(640, 480, 32, SDL_HWSURFACE);
   #else
   _screen = SDL_SetVideoMode(320, 240, 32, SDL_HWSURFACE);
 #endif
 
+  _format = _screen->format;
   SDL_WM_SetCaption("retro-8", nullptr);
 
   return true;

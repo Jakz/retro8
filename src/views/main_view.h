@@ -35,7 +35,6 @@ namespace ui
 
     retro8::input::InputManager _input;
 
-    SDL_PixelFormat* _format;
     SDL_Surface* _output;
     Texture* _outputTexture;
 

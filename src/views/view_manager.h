@@ -41,7 +41,7 @@ namespace ui
 
     bool loadData();
 
-    void handleKeyboardEvent(const SDL_Event& event, bool press);
+    void handleKeyboardEvent(const SDL_Event& event);
     void handleMouseEvent(const SDL_Event& event);
     void render();
 

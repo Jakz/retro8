@@ -21,6 +21,10 @@ bool SDL<EventHandler, Renderer>::init()
 #endif
   _renderer = SDL_CreateRenderer(_window, -1, SDL_RENDERER_ACCELERATED);
 
+  SDL_RendererInfo info;
+  SDL_GetRendererInfo(_renderer, &info);
+  _format = SDL_AllocFormat(info.texture_formats[0]);
+
   return true;
 }
 
@@ -41,6 +45,7 @@ void SDL<EventHandler, Renderer>::loop()
 template<typename EventHandler, typename Renderer>
 void SDL<EventHandler, Renderer>::deinit()
 {
+  SDL_FreeFormat(_format);
   SDL_DestroyRenderer(_renderer);
   SDL_DestroyWindow(_window);
 

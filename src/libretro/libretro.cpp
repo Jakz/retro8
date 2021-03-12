@@ -8,15 +8,17 @@
 #include "vm/machine.h"
 #include "vm/input.h"
 
+#include <cstdarg>
 #include <cstring>
 
-#define LIBRETRO_LOG LOGD
+#define LIBRETRO_LOG(x, ...) env.logger(retro_log_level::RETRO_LOG_INFO, x # __VA_ARGS__)
 
 namespace r8 = retro8;
 using pixel_t = uint32_t;
 
 constexpr int SAMPLE_RATE = 44100;
 constexpr int SAMPLES_PER_FRAME = SAMPLE_RATE / 60;
+constexpr int SOUND_CHANNELS = 2;
 
 r8::Machine machine;
 r8::io::Loader loader;
@@ -26,6 +28,15 @@ r8::gfx::ColorTable colorTable;
 pixel_t* screen;
 int16_t* audioBuffer;
 
+static void fallback_log(enum retro_log_level level, const char *fmt, ...)
+{
+  (void)level;
+  va_list va;
+  va_start(va, fmt);
+  vfprintf(stderr, fmt, va);
+  va_end(va);
+}
+
 struct RetroArchEnv
 {
   retro_video_refresh_t video;
@@ -33,6 +44,7 @@ struct RetroArchEnv
   retro_audio_sample_batch_t audioBatch;
   retro_input_poll_t inputPoll;
   retro_input_state_t inputState;
+  retro_log_printf_t logger = fallback_log;
 
   uint32_t frameCounter;
   uint16_t buttonState;
@@ -58,10 +70,10 @@ extern "C"
   void retro_init()
   {
     screen = new pixel_t[r8::gfx::SCREEN_WIDTH * r8::gfx::SCREEN_HEIGHT];
-    LIBRETRO_LOG("Initializing screen buffer of %zu bytes", sizeof(pixel_t)*r8::gfx::SCREEN_WIDTH*r8::gfx::SCREEN_HEIGHT);
+    env.logger(retro_log_level::RETRO_LOG_INFO, "Initializing screen buffer of %d bytes\n", sizeof(pixel_t)*r8::gfx::SCREEN_WIDTH*r8::gfx::SCREEN_HEIGHT);
 
-    audioBuffer = new int16_t[SAMPLES_PER_FRAME * 2];
-    LIBRETRO_LOG("Initializing audio buffer of %zu bytes", sizeof(int16_t) * SAMPLES_PER_FRAME * 2);
+    audioBuffer = new int16_t[SAMPLE_RATE * 2];
+    env.logger(retro_log_level::RETRO_LOG_INFO, "Initializing audio buffer of %d bytes\n", sizeof(int16_t) * SAMPLE_RATE * 2);
 
     colorTable.init(ColorMapper());
     machine.font().load();
@@ -97,10 +109,14 @@ extern "C"
     info->geometry.aspect_ratio = retro8::gfx::SCREEN_WIDTH / float(retro8::gfx::SCREEN_HEIGHT);
   }
 
-  void retro_set_environment(retro_environment_t env)
+  void retro_set_environment(retro_environment_t e)
   {
     retro_pixel_format pixelFormat = RETRO_PIXEL_FORMAT_XRGB8888;
-    env(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &pixelFormat);
+    e(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &pixelFormat);
+
+    retro_log_callback logger;
+    if (e(RETRO_ENVIRONMENT_GET_LOG_INTERFACE, &logger))
+      env.logger = logger.log;
   }
 
   void retro_set_video_refresh(retro_video_refresh_t callback) { env.video = callback; }
@@ -109,7 +125,7 @@ extern "C"
   void retro_set_input_poll(retro_input_poll_t callback) { env.inputPoll = callback; }
   void retro_set_input_state(retro_input_state_t callback) { env.inputState = callback; }
   void retro_set_controller_port_device(unsigned port, unsigned device) { /* TODO */ }
-
+  
 
   size_t retro_serialize_size(void) { return 0; }
   bool retro_serialize(void *data, size_t size) { return true; }
@@ -129,12 +145,12 @@ extern "C"
 
       const char* bdata = static_cast<const char*>(info->data);
 
-      LIBRETRO_LOG("[Retro8] Loading %s", info->path);
+      env.logger(RETRO_LOG_INFO, "[Retro8] Loading %s\n", info->path);
 
 
       if (std::memcmp(bdata, "\x89PNG", 4) == 0)
       {
-        LIBRETRO_LOG("[Retro8] Game is in PNG format, decoding it.");
+        env.logger(RETRO_LOG_INFO, "[Retro8] Game is in PNG format, decoding it.\n");
 
         std::vector<uint8_t> out;
         unsigned long width, height;
@@ -209,25 +225,36 @@ extern "C"
     ++env.frameCounter;
 
     machine.sound().renderSounds(audioBuffer, SAMPLES_PER_FRAME);
-    env.audioBatch(audioBuffer, SAMPLES_PER_FRAME);
+    
+    /* duplicate channels */
+    auto* audioBuffer2 = audioBuffer + SAMPLE_RATE;
+    for (size_t i = 0; i < SAMPLES_PER_FRAME; ++i)
+    {
+      audioBuffer2[2*i] = audioBuffer[i];
+      audioBuffer2[2*i + 1] = audioBuffer[i];
+    }
+    
+    env.audioBatch(audioBuffer2, SAMPLES_PER_FRAME);
 
     /* manage input */
     {
-      const unsigned player = 0;
-
       struct BtPair {
+        unsigned player;
         int16_t rabt;
         size_t r8bt;
         bool isSet;
       };
 
-      static std::array<BtPair, retro8::BUTTON_COUNT> mapping = { {
-        { RETRO_DEVICE_ID_JOYPAD_LEFT, 0, false },
-        { RETRO_DEVICE_ID_JOYPAD_RIGHT, 1, false },
-        { RETRO_DEVICE_ID_JOYPAD_UP, 2, false },
-        { RETRO_DEVICE_ID_JOYPAD_DOWN, 3, false },
-        { RETRO_DEVICE_ID_JOYPAD_A, 4, false },
-        { RETRO_DEVICE_ID_JOYPAD_B, 5, false },
+      static std::array<BtPair, retro8::BUTTON_COUNT + 2> mapping = { {
+        { 0, RETRO_DEVICE_ID_JOYPAD_LEFT, 0, false },
+        { 0, RETRO_DEVICE_ID_JOYPAD_RIGHT, 1, false },
+        { 0, RETRO_DEVICE_ID_JOYPAD_UP, 2, false },
+        { 0, RETRO_DEVICE_ID_JOYPAD_DOWN, 3, false },
+        { 0, RETRO_DEVICE_ID_JOYPAD_A, 4, false },
+        { 0, RETRO_DEVICE_ID_JOYPAD_B, 5, false },
+        { 1, RETRO_DEVICE_ID_JOYPAD_X, 4, false },
+        { 1, RETRO_DEVICE_ID_JOYPAD_Y, 5, false },
+
       } };
 
 
@@ -236,11 +263,11 @@ extern "C"
       env.inputPoll();
       for (auto& entry : mapping)
       {
-        const bool isSet = env.inputState(player, RETRO_DEVICE_JOYPAD, 0, entry.rabt);
+        const bool isSet = env.inputState(entry.player, RETRO_DEVICE_JOYPAD, 0, entry.rabt);
         const bool wasSet = entry.isSet;
 
         if (wasSet != isSet)
-          input.manageKey(player, entry.r8bt, isSet);
+          input.manageKey(entry.player, entry.r8bt, isSet);
 
         entry.isSet = isSet;
       }

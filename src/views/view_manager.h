@@ -29,7 +29,7 @@ namespace ui
     using view_t = View;
     static const size_t VIEW_COUNT = 1;
 
-    Texture* _font;
+    Surface _font;
 
   private:
     GameView* _gameView;
@@ -47,7 +47,7 @@ namespace ui
 
     void deinit();
 
-    Texture* font() { return _font; }
+    const Surface& font() { return _font; }
 
     //TODO: hacky cast to avoid header inclusion
     GameView* gameView() { return _gameView; }

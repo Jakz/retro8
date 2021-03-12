@@ -140,7 +140,7 @@ void GameView::rasterize()
 {
   auto* data = machine.memory().screenData();
   auto* screenPalette = machine.memory().paletteAt(r8::gfx::SCREEN_PALETTE_INDEX);
-  auto output = static_cast<uint32_t*>(_output->pixels);
+  uint32_t* output = _output.pixels();
 
   for (size_t i = 0; i < r8::gfx::BYTES_PER_SCREEN; ++i)
   {
@@ -170,15 +170,13 @@ void GameView::render()
 #endif
 
     /* initialize main surface and its texture */
-    _output = SDL_CreateRGBSurface(0, 128, 128, 32, format->Rmask, format->Gmask, format->Bmask, format->Amask);
-    _outputTexture = SDL_CreateTexture(manager->renderer(), format->format, SDL_TEXTUREACCESS_STREAMING, 128, 128);
+    _output = manager->allocate(128, 128);
 
     if (!_output)
     {
       printf("Unable to allocate buffer surface: %s\n", SDL_GetError());
     }
 
-    assert(_outputTexture);
     assert(_output);
 
     _frameCounter = 0;
@@ -244,10 +242,10 @@ void GameView::render()
       rasterize();
     }
 
-    SDL_UpdateTexture(_outputTexture, nullptr, _output->pixels, _output->pitch);
+    _output.update();
   }
 
-SDL_Rect dest;
+  SDL_Rect dest;
   //Texture* texture = SDL_CreateTextureFromSurface(renderer, machine.screen());
 #ifdef _WIN32
   dest = { (480 - 384) / 2, (480 - 384) / 2, 384, 384 };
@@ -261,7 +259,7 @@ else
   dest = { 0, 0, 320, 240 };
 #endif
 
-  SDL_RenderCopy(renderer, _outputTexture, nullptr, &dest);
+  manager->blitToScreen(_output, dest);
  
   if (_showFPS)
   {
@@ -456,8 +454,7 @@ void GameView::resume()
 
 GameView::~GameView()
 {
-  SDL_FreeSurface(_output);
-  SDL_DestroyTexture(_outputTexture);
+  _output.release();
   //TODO: the _init future is not destroyed
   sdlAudio.close();
 }

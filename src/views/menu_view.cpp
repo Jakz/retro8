@@ -184,11 +184,15 @@ void MenuView::render()
 
 void MenuView::setPngCartridge(SDL_Surface* cartridge)
 {
+#if !defined(SDL12)
   if (_cartridge)
-    SDL_DestroyTexture(_cartridge);
+    _cartridge.release();
 
   if (cartridge)
-    _cartridge = SDL_CreateTextureFromSurface(_gvm->renderer(), cartridge);
+    _cartridge = Surface(cartridge, SDL_CreateTextureFromSurface(_gvm->renderer(), cartridge));
   else
-    _cartridge = nullptr;   
+    _cartridge = Surface(nullptr);   
+#else
+  _cartridge = nullptr;
+#endif
 }

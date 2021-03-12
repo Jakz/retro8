@@ -35,8 +35,7 @@ namespace ui
 
     retro8::input::InputManager _input;
 
-    SDL_Surface* _output;
-    Texture* _outputTexture;
+    Surface _output;
 
     std::string _path;
 
@@ -74,7 +73,7 @@ namespace ui
   {
   private:
     ViewManager* _gvm;
-    Texture* _cartridge;
+    Surface _cartridge;
 
   public:
     MenuView(ViewManager* manager);

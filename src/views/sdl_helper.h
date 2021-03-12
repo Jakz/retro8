@@ -9,14 +9,64 @@
 #include <cassert>
 
 #if SDL_COMPILEDVERSION > 2000
-using Texture = SDL_Texture;
+
+struct Surface
+{
+  SDL_Surface* surface;
+  SDL_Texture* texture;
+
+  Surface(SDL_Surface* surface) : surface(surface) { }
+  Surface(SDL_Surface* surface, SDL_Texture* texture) : surface(surface), texture(texture) { }
+
+  Surface() : surface(nullptr), texture(nullptr) { }
+
+  operator bool() const { return surface != nullptr; }
+
+  void enableBlending() { assert(texture); SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND); }
+  void releaseSurface() { if (surface) SDL_FreeSurface(surface); surface = nullptr; }
+
+  void release()
+  {
+    releaseSurface();
+    SDL_DestroyTexture(texture);
+    texture = nullptr;
+  }
+
+  void update() { SDL_UpdateTexture(texture, nullptr, surface->pixels, surface->pitch); }
+  inline uint32_t& pixel(size_t index) { return pixels()[index]; }
+  inline uint32_t* pixels() { return static_cast<uint32_t*>(surface->pixels); }
+};
 
 #if _WIN32
-  #define DEBUGGER true
+  #define DEBUGGER false
 #endif
 
 #else
-using Texture = SDL_Surface;
+
+struct Surface
+{
+  SDL_Surface* surface;
+
+  Surface() : surface(nullptr) { }
+  Surface(SDL_Surface* surface) : surface(surface) { }
+
+  operator bool() const { return surface != nullptr; }
+
+  void enableBlending() { assert(surface); SDL_SetAlpha(surface, SDL_SRCALPHA, 0); }
+  void releaseSurface() {  }
+
+  void release()
+  {
+    assert(surface);
+    SDL_FreeSurface(surface);
+    surface = nullptr;
+  }
+
+  void update() { }
+  inline uint32_t& pixel(size_t index) { return pixels()[index]; }
+  inline uint32_t* pixels() { return static_cast<uint32_t*>(surface->pixels); }
+};
+
 #define SDL12
 
 using SDL_Renderer = int;
@@ -57,6 +107,8 @@ public:
     setFrameRate(60);
   }
 
+  Surface allocate(int width, int height);
+
   const SDL_PixelFormat* displayFormat() { return _format; }
 
   void setFrameRate(u32 frameRate)
@@ -76,16 +128,17 @@ public:
 
   void exit() { willQuit = true; }
 
-  void blit(Texture* texture, const SDL_Rect& src, const SDL_Rect& dest);
-  void blit(Texture* texture, const SDL_Rect& src, int dx, int dy);
-  void blit(Texture* texture, int sx, int sy, int w, int h, int dx, int dy);
-  void blit(Texture* texture, int sx, int sy, int w, int h, int dx, int dy, int dw, int dh);
-  void blit(Texture* texture, int dx, int dy);
+  void blit(const Surface& texture, const SDL_Rect& src, const SDL_Rect& dest);
+  void blit(const Surface& texture, const SDL_Rect& src, int dx, int dy);
+  void blit(const Surface& texture, int sx, int sy, int w, int h, int dx, int dy);
+  void blit(const Surface& texture, int sx, int sy, int w, int h, int dx, int dy, int dw, int dh);
+  void blit(const Surface& texture, int dx, int dy);
+  void blitToScreen(const Surface& texture, const SDL_Rect& rect);
 
   void clear(int r, int g, int b);
   void rect(int x, int y, int w, int h, int r, int g, int b, int a);
 
-  void release(Texture* texture);
+  void release(const Surface& texture);
 
   SDL_Window* window() { return _window; }
   SDL_Renderer* renderer() { return _renderer; }

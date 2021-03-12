@@ -13,7 +13,7 @@ using namespace ui;
 
 extern retro8::Machine machine;
 
-ui::ViewManager::ViewManager() : SDL<ui::ViewManager, ui::ViewManager>(*this, *this), _font(nullptr),
+ui::ViewManager::ViewManager() : SDL<ui::ViewManager, ui::ViewManager>(*this, *this), _font(),
 _gameView(new GameView(this)), _menuView(new MenuView(this))
 {
   _view = _gameView;
@@ -21,8 +21,7 @@ _gameView(new GameView(this)), _menuView(new MenuView(this))
 
 void ui::ViewManager::deinit()
 {
-  SDL::release(_font);
-
+  _font.release();
   SDL::deinit();
 }
 
@@ -35,15 +34,14 @@ bool ui::ViewManager::loadData()
        128x80 1bit per pixel font
     */
     const SDL_PixelFormat* format = displayFormat();
-    SDL_Surface* fontSurface = SDL_CreateRGBSurface(0, FONT_WIDTH, FONT_HEIGHT, 32, format->Rmask, format->Gmask, format->Bmask, format->Amask);
 
-    auto pixels = static_cast<uint32_t*>(fontSurface->pixels);
+    _font = allocate(FONT_WIDTH, FONT_HEIGHT);
+    
     for (size_t i = 0; i < FONT_WIDTH*FONT_HEIGHT; ++i)
-      pixels[i] = (retro8::gfx::font_map[i / 8] & (1 << (7 - (i % 8)))) ? 0xffffffff : 0;
+      _font.pixel(i) = (retro8::gfx::font_map[i / 8] & (1 << (7 - (i % 8)))) ? 0xffffffff : 0;
 
-    _font = SDL_CreateTextureFromSurface(_renderer, fontSurface);
-    SDL_SetTextureBlendMode(_font, SDL_BLENDMODE_BLEND);
-    SDL_FreeSurface(fontSurface);
+    _font.enableBlending();
+    _font.releaseSurface();
   }
 
   machine.font().load();
@@ -91,7 +89,9 @@ void ViewManager::text(const std::string& text, int32_t x, int32_t y, SDL_Color 
   else if (align == TextAlign::RIGHT)
     x -= width;
 
-  SDL_SetTextureColorMod(_font, color.r, color.g, color.b);
+#if !defined(SDL12)
+  SDL_SetTextureColorMod(_font.texture, color.r, color.g, color.b);
+#endif
 
   for (size_t i = 0; i < text.length(); ++i)
   {
@@ -100,7 +100,9 @@ void ViewManager::text(const std::string& text, int32_t x, int32_t y, SDL_Color 
     blit(_font, src, dest);
   }
 
-  SDL_SetTextureColorMod(_font, 255, 255, 255);
+#if !defined(SDL12)
+  SDL_SetTextureColorMod(_font.texture, 255, 255, 255);
+#endif
 }
 
 void ViewManager::openMenu()

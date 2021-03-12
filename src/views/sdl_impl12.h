@@ -38,6 +38,12 @@ void SDL<EventHandler, Renderer>::loop()
 }
 
 template<typename EventHandler, typename Renderer>
+void SDL<EventHandler, Renderer>::blitToScreen(const Surface& surface, const SDL_Rect& rect)
+{
+  SDL_BlitSurface(surface.surface, nullptr, _screen, const_cast<SDL_Rect*>(&rect));
+}
+
+template<typename EventHandler, typename Renderer>
 void SDL<EventHandler, Renderer>::deinit()
 {
   SDL_FreeSurface(_screen);
@@ -45,36 +51,43 @@ void SDL<EventHandler, Renderer>::deinit()
 }
 
 template<typename EventHandler, typename Renderer>
-inline void SDL<EventHandler, Renderer>::blit(Texture* texture, int sx, int sy, int w, int h, int dx, int dy, int dw, int dh)
+Surface SDL<EventHandler, Renderer>::allocate(int width, int height)
+{
+  SDL_Surface* surface = SDL_CreateRGBSurface(0, width, height, 32, _format->Rmask, _format->Gmask, _format->Bmask, _format->Amask);
+  return { surface };
+}
+
+template<typename EventHandler, typename Renderer>
+inline void SDL<EventHandler, Renderer>::blit(const Surface& surface, int sx, int sy, int w, int h, int dx, int dy, int dw, int dh)
 {
   SDL_Rect from = { sx, sy, w, h };
   SDL_Rect to = { dx, dy, dw, dh };
-  SDL_BlitSurface(texture, &from, _screen, &to);
+  SDL_BlitSurface(surface.surface, &from, _screen, &to);
 }
 
 template<typename EventHandler, typename Renderer>
-inline void SDL<EventHandler, Renderer>::blit(Texture* texture, const SDL_Rect& from, int dx, int dy)
+inline void SDL<EventHandler, Renderer>::blit(const Surface& surface, const SDL_Rect& from, int dx, int dy)
 {
   SDL_Rect to = { dx, dy, from.w, from.h };
-  SDL_BlitSurface(texture, from, _screen, &to);
+  SDL_BlitSurface(surface.surface, from, _screen, &to);
 }
 
 template<typename EventHandler, typename Renderer>
-inline void SDL<EventHandler, Renderer>::blit(Texture* texture, int sx, int sy, int w, int h, int dx, int dy)
+inline void SDL<EventHandler, Renderer>::blit(const Surface& surface, int sx, int sy, int w, int h, int dx, int dy)
 {
-  blit(texture, { sx, sy, w, h }, dx, dy);
+  blit(surface, { sx, sy, w, h }, dx, dy);
 }
 
 template<typename EventHandler, typename Renderer>
-inline void SDL<EventHandler, Renderer>::blit(Texture* texture, const SDL_Rect& src, const SDL_Rect& dest)
+inline void SDL<EventHandler, Renderer>::blit(const Surface& surface, const SDL_Rect& src, const SDL_Rect& dest)
 {
-  SDL_BlitSurface(texture, const_cast<SDL_Rect*>(&src), _screen, const_cast<SDL_Rect*>(&dest));
+  SDL_BlitSurface(surface.surface, const_cast<SDL_Rect*>(&src), _screen, const_cast<SDL_Rect*>(&dest));
 }
 
 template<typename EventHandler, typename Renderer>
-inline void SDL<EventHandler, Renderer>::blit(Texture* texture, int dx, int dy)
+inline void SDL<EventHandler, Renderer>::blit(const Surface& surface, int dx, int dy)
 {
-  blit(texture, 0, 0, texture->w, texture->h, 0, 0, texture->w, texture->h);
+  blit(surface.surface, 0, 0, surface.surface->w, surface.surface->h, 0, 0, surface.surface->w, surface.surface->h);
 }
 
 template<typename EventHandler, typename Renderer>
@@ -94,9 +107,9 @@ inline void SDL<EventHandler, Renderer>::rect(int x, int y, int w, int h, int r,
 }
 
 template<typename EventHandler, typename Renderer>
-inline void SDL<EventHandler, Renderer>::release(Texture* texture)
+inline void SDL<EventHandler, Renderer>::release(const Surface& surface)
 {
-  SDL_FreeSurface(texture);
+  SDL_FreeSurface(surface.surface);
 }
 
 

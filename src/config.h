@@ -21,15 +21,14 @@
 #define R8_OPTS_ENABLED true
 #define R8_USE_LODE_PNG true
 
-static constexpr int SCREEN_WIDTH = 240;
-static constexpr int SCREEN_HEIGHT = 240;
-
 #if PLATFORM != PLATFORM_LIBRETRO
 
   #include "SDL.h"
   #define LOGD(x , ...) printf(x"\n", ## __VA_ARGS__)
 
   #if PLATFORM == PLATFORM_WIN32
+    static constexpr int SCREEN_WIDTH = 240;
+    static constexpr int SCREEN_HEIGHT = 240;
 
     #undef MOUSE_ENABLED
     #define MOUSE_ENABLED true
@@ -53,6 +52,8 @@ static constexpr int SCREEN_HEIGHT = 240;
     static constexpr auto KEY_EXIT = SDLK_ESCAPE;
 
   #elif PLATFORM == PLATFORM_OPENDINGUX
+    static constexpr int SCREEN_WIDTH = 320;
+    static constexpr int SCREEN_HEIGHT = 240;
 
     static constexpr auto KEY_UP = SDLK_UP;
     static constexpr auto KEY_DOWN = SDLK_DOWN;
@@ -73,6 +74,8 @@ static constexpr int SCREEN_HEIGHT = 240;
     static constexpr auto KEY_EXIT = SDLK_ESCAPE;
 
   #elif PLATFORM == PLATFORM_FUNKEY
+    static constexpr int SCREEN_WIDTH = 240;
+    static constexpr int SCREEN_HEIGHT = 240;
 
     static constexpr auto KEY_UP = SDLK_u;
     static constexpr auto KEY_DOWN = SDLK_d;

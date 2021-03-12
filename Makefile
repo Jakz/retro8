@@ -118,7 +118,7 @@ else ifeq ($(platform), vita)
    CXXFLAGS += -Wl,-q -Wall -O3
 	STATIC_LINKING = 1
 else
-   CC = gcc
+   CC ?= gcc
    TARGET := $(TARGET_NAME)_libretro.dll
    SHARED := -shared -static-libgcc -static-libstdc++ -s -Wl,--version-script=$(CORE_DIR)/link.T -Wl,--no-undefined
 endif
@@ -138,7 +138,7 @@ include Makefile.common
 OBJECTS := $(SOURCES_C:.c=.o) $(SOURCES_CXX:.cpp=.o)
 
 CFLAGS   += -Wall -D__LIBRETRO__ $(fpic) $(INCFLAGS) 
-CXXFLAGS += -Wall -D__LIBRETRO__ $(fpic) $(INCFLAGS)
+CXXFLAGS += -Wall -D__LIBRETRO__ $(fpic) $(INCFLAGS) -std=c++14
 
 all: $(TARGET)
 

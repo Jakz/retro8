@@ -92,7 +92,7 @@ extern "C"
   {
     std::memset(info, 0, sizeof(info));
 
-    info->library_name = "retro-8";
+    info->library_name = "retro-8 (alpha)";
     info->library_version = "0.1b";
     info->need_fullpath = false;
     info->valid_extensions = "p8|png";

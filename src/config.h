@@ -15,12 +15,6 @@
 #define PLATFORM PLATFORM_WIN32
 #endif
 
-#if defined(_WIN32) && !defined(__LIBRETRO__)
-#define LOGD(x , ...) printf(x"\n", __VA_ARGS__)
-#else
-#define LOGD(...)
-#endif
-
 #define MOUSE_ENABLED false
 #define TEST_MODE false
 
@@ -32,8 +26,8 @@ static constexpr int SCREEN_HEIGHT = 240;
 
 #if PLATFORM != PLATFORM_LIBRETRO
 
-#include "SDL.h"
-#define LOGD(x , ...) printf(x"\n", __VA_ARGS__)
+  #include "SDL.h"
+  #define LOGD(x , ...) printf(x"\n", ## __VA_ARGS__)
 
   #if PLATFORM == PLATFORM_WIN32
 
@@ -70,8 +64,8 @@ static constexpr int SCREEN_HEIGHT = 240;
     static constexpr auto KEY_ACTION1_2 = SDLK_SPACE; // Y
     static constexpr auto KEY_ACTION2_2 = SDLK_LSHIFT; // X
 
-    static constexpr auto KEY_MUTE = SDLK_UNKNOWN;
-    static constexpr auto KEY_PAUSE = SDLK_UNKNOWN;
+    static constexpr auto KEY_MUTE = 0xffff;
+    static constexpr auto KEY_PAUSE = 0xffff + 1;
 
     static constexpr auto KEY_NEXT_SCALER = SDLK_TAB; // L
 
@@ -90,13 +84,13 @@ static constexpr int SCREEN_HEIGHT = 240;
     static constexpr auto KEY_ACTION1_2 = SDLK_y; // Y
     static constexpr auto KEY_ACTION2_2 = SDLK_x; // X
 
-    static constexpr auto KEY_MUTE = SDLK_UNKNOWN;
-    static constexpr auto KEY_PAUSE = SDLK_UNKNOWN;
+    static constexpr auto KEY_MUTE = 0xffff;
+    static constexpr auto KEY_PAUSE = 0xffff + 1;
 
     static constexpr auto KEY_NEXT_SCALER = SDLK_h; // L
 
     static constexpr auto KEY_MENU = SDLK_s;
-    static constexpr auto KEY_EXIT = SDLK_UNKNOWN;
+    static constexpr auto KEY_EXIT = 0xffff + 2;
 
   #endif
 

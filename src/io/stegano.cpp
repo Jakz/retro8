@@ -1,6 +1,7 @@
 #include "stegano.h"
 
 #include <cassert>
+#include <algorithm>
 
 using namespace retro8;
 using namespace io;
@@ -79,7 +80,7 @@ private:
 
 public:
   PXADecoder(const uint8_t* data, size_t expected) : data(data), b(0), o(0), expected(expected)
-  {    
+  {
     /* initalize mapping, each value to itself */
     //TODO
     for (size_t i = 0; i < m.size(); ++i)
@@ -104,14 +105,14 @@ public:
         uint8_t index = readBits(4 + unary) + (unaryMask << 4);
 
         code += m[index];
-        moveToFront(index);     
+        moveToFront(index);
       }
       /* copy section */
       else
       {
         /* read offset */
         int32_t offsetBits;
-        
+
         if (readBit())
           offsetBits = readBit() ? 5 : 10;
         else
@@ -119,7 +120,7 @@ public:
 
         auto offset = readBits(offsetBits) + 1;
 
-        /* special hacky case in which bytes are directly emitted without 
+        /* special hacky case in which bytes are directly emitted without
            affecting move-to-front
          */
         if (offsetBits == 10 && offset == 1)
@@ -163,7 +164,7 @@ void Stegano::load20(const PngData& data, Machine& m)
 {
   auto* d = data.data;
   size_t o = RAW_DATA_LENGTH + MAGIC_LENGTH;
-  
+
   size_t decompressedLength = assembleByte(d[o++]) << 8 | assembleByte(d[o++]);
   size_t compressedLength = assembleByte(d[o++]) << 8 | assembleByte(d[o++]);
   compressedLength -= HEADER_20_LENGTH; /* subtract header length */

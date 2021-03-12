@@ -93,12 +93,12 @@ retro8::io::PngData loadPng(const std::string& path)
   size_t length = fl.tellg();
 
   char* bdata = new char[length];
-  
+
   fl.seekg(0, std::ios::beg);
   fl.read(bdata, length);
 
   fl.close();
-  
+
   std::vector<uint8_t> out;
   unsigned long width, height;
   auto result = Platform::loadPNG(out, width, height, (uint8_t*)bdata, length, true);
@@ -204,7 +204,7 @@ void GameView::render()
       loader.loadFile(_path, machine);
       manager->setPngCartridge(nullptr);
     }
-    
+
     machine.memory().backupCartridge();
 
     int32_t fps = machine.code().require60fps() ? 60 : 30;
@@ -255,7 +255,7 @@ void GameView::render()
     dest = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
 
   manager->blitToScreen(_output, dest);
- 
+
   if (_showFPS)
   {
     char buffer[16];
@@ -414,6 +414,9 @@ void GameView::handleKeyboardEvent(const SDL_Event& event)
   case KEY_EXIT:
     if (event.type == SDL_KEYDOWN)
       manager->exit();
+    break;
+
+  default:
     break;
 }
 }

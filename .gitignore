@@ -1,6 +1,7 @@
 *.o
 projects/vs2017/libs/**
 projects/opendingux/**
+projects/funkey/**
 **/.vs/**
 **/Debug/**
 **/Release/**

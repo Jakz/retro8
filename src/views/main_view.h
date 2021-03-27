@@ -67,6 +67,8 @@ namespace ui
 
     void toggleFPS(bool active) { _showFPS = active; }
     bool isFPSShown() { return _showFPS; }
+
+    void flip();
   };
 
   class MenuView : public View

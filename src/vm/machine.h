@@ -29,6 +29,8 @@ namespace retro8
     sfx::APU _sound;
     gfx::Font _font;
     lua::Code _code;
+    void *_flipdata;
+    void (*_flip)(void*) = NULL;
 
   private:
     void circHelper(coord_t xc, coord_t yc, coord_t x, coord_t y, color_t col);
@@ -64,6 +66,9 @@ namespace retro8
     void sspr(coord_t sx, coord_t sy, coord_t sw, coord_t sh, coord_t dx, coord_t dy, coord_t dw, coord_t dh, bool flipX, bool flipY);
 
     void print(const std::string& string, coord_t x, coord_t y, color_t color);
+
+    void setflip(void (*newflip)(void *), void *flipdata);
+    void flip();
 
     State& state() { return _state; }
     Memory& memory() { return _memory; }

@@ -154,7 +154,39 @@ void GameView::rasterize()
   }
 }
 
+void flip_callback(void *gameview){
+  GameView *gv = (GameView*)gameview;
+  gv->flip();
+}
 
+void GameView::flip()
+{
+  // Start with black
+  manager->clear(0, 0, 0);
+
+  // Create pixels to display from machine memory
+  rasterize();
+  _output.update();
+
+  // Write it to the SDL Surface
+  SDL_Rect dest;
+  if (_scaler == Scaler::UNSCALED)
+    dest = { (SCREEN_WIDTH - 128) / 2, (SCREEN_HEIGHT - 128) / 2, 128, 128 };
+  else if (_scaler == Scaler::SCALED_ASPECT_2x)
+    dest = { (SCREEN_WIDTH - 256) / 2, (SCREEN_HEIGHT - 256) / 2, 256, 256 };
+  else
+    dest = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
+  manager->blitToScreen(_output, dest);
+
+  // We aren't returning control to ::loop, so force this to display now
+  auto* renderer = manager->renderer();
+  SDL_RenderPresent(renderer);
+
+  // Wait out the right time between frames
+  // (assumes zero draw time, so this can be improved)
+  int32_t fps = machine.code().require60fps() ? 60 : 30;
+  SDL_Delay(1000.0/fps);
+}
 
 bool init = false;
 void GameView::render()
@@ -181,9 +213,16 @@ void GameView::render()
 
     _frameCounter = 0;
 
+    machine.setflip(flip_callback, (void*)this);
     machine.code().loadAPI();
     _input.setMachine(&machine);
 
+    int32_t fps = machine.code().require60fps() ? 60 : 30;
+    manager->setFrameRate(fps);
+
+    machine.sound().init();
+    sdlAudio.init(&machine.sound());
+    sdlAudio.resume();
 
     if (_path.empty())
       _path = "cartridges/pico-racer.png";
@@ -207,9 +246,6 @@ void GameView::render()
 
     machine.memory().backupCartridge();
 
-    int32_t fps = machine.code().require60fps() ? 60 : 30;
-    manager->setFrameRate(fps);
-
     if (machine.code().hasInit())
     {
       /* init is launched on a different thread because some developers are using busy loops and manual flips */
@@ -219,10 +255,6 @@ void GameView::render()
         LOGD("_init() function completed execution.");
       });
     }
-
-    machine.sound().init();
-    sdlAudio.init(&machine.sound());
-    sdlAudio.resume();
 
     init = true;
   }

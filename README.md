@@ -29,3 +29,41 @@ Fixed arithmetic support is still missing.
 ![](projects/screenshots/screenshot1.png)
 ![](projects/screenshots/screenshot2.png)
 ![](projects/screenshots/screenshot3.png)
+
+## Building
+
+If you want to build a libretro backend:
+
+```
+make
+```
+
+If you want to build a local binary you can run:
+
+```
+cmake .
+make
+```
+
+If you want to cross-compile for OpenDingux:
+
+```
+cmake -DOPENDINGUX=ON .
+make
+```
+
+If you want to compile for retrofw (assuming your compiler is installed per [retrofw instructions](https://github.com/retrofw/retrofw.github.io/wiki/Making-Games)):
+
+```
+CROSS=/opt/mipsel-linux-uclibc/bin/mipsel-buildroot-linux-uclibc- cmake -DRETROFW=ON .
+make
+```
+
+To build an OpenDingux OPK file once your binary is built:
+
+```
+mkdir -p projects/opendingux
+cp -a retro8 projects/opendingux/
+cd projects
+./build_opk_od.sh
+```

@@ -6,6 +6,12 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/projects/cmake")
 
 option(FUNKEY_S "Building for FunKey-S" OFF)
 option(OPENDINGUX "Build on opendingux toolchain" OFF)
+option(RETROFW "Build for retrofw" OFF)
+
+# RETROFW is an OPENDINGUX variant
+if (RETROFW)
+  set(OPENDINGUX ON)
+endif()
 
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "")
   set(CMAKE_BUILD_TYPE "Debug")
@@ -14,18 +20,21 @@ endif()
 if(OPENDINGUX)
   set(CMAKE_CXX_COMPILER "$ENV{CROSS}g++" CACHE PATH "" FORCE)
   set(CMAKE_C_COMPILER "$ENV{CROSS}gcc" CACHE PATH "" FORCE)
-  set(CMAKE_SYSROOT "/opt/gcw0-toolchain/usr/mipsel-gcw0-linux-uclibc/sysroot")
+  if(RETROFW)
+    set(CMAKE_SYSROOT "/opt/mipsel-linux-uclibc/mipsel-buildroot-linux-uclibc/sysroot")
+  else()
+    set(CMAKE_SYSROOT "/opt/gcw0-toolchain/usr/mipsel-gcw0-linux-uclibc/sysroot")
+  endif()
 elseif(FUNKEY_S)
   add_definitions(-DFUNKEY_S)
 endif()
 
-if (FUNKEY_S)
+if (FUNKEY_S OR RETROFW)
   find_package(SDL REQUIRED)
   include_directories(${SDL_INCLUDE_DIR})
 else()
   find_package(SDL2 REQUIRED)
   include_directories(${SDL2_INCLUDE_DIR})
-
 endif()
 
 add_compile_options(-Wno-unused-parameter -Wno-missing-field-initializers

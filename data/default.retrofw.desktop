@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Retro8
+Comment=PICO-8 Emulator
+Exec=retro8 %f
+Icon=icon
+Terminal=false
+Type=Application
+Categories=emulators;
+X-OD-NeedsDownscaling=true
+X-OD-Filter=.png,.p8

@@ -55,7 +55,7 @@ make
 If you want to compile for retrofw (assuming your compiler is installed per [retrofw instructions](https://github.com/retrofw/retrofw.github.io/wiki/Making-Games)):
 
 ```
-CROSS=/opt/mipsel-linux-uclibc/bin/mipsel-buildroot-linux-uclibc- cmake -DOPENDINGUX=ON -DFUNKEY_S=ON -DRETROFW=ON .
+CROSS=/opt/mipsel-linux-uclibc/bin/mipsel-buildroot-linux-uclibc- cmake -DRETROFW=ON .
 make
 ```
 

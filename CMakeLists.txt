@@ -6,7 +6,12 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/projects/cmake")
 
 option(FUNKEY_S "Building for FunKey-S" OFF)
 option(OPENDINGUX "Build on opendingux toolchain" OFF)
-option(RETROFW "Build for retrofw (also needs FUNKEY_S and OPENDINGUX)" OFF)
+option(RETROFW "Build for retrofw" OFF)
+
+# RETROFW is an OPENDINGUX variant
+if (RETROFW)
+  set(OPENDINGUX ON)
+endif()
 
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "")
   set(CMAKE_BUILD_TYPE "Debug")
@@ -24,7 +29,7 @@ elseif(FUNKEY_S)
   add_definitions(-DFUNKEY_S)
 endif()
 
-if (FUNKEY_S)
+if (FUNKEY_S OR RETROFW)
   find_package(SDL REQUIRED)
   include_directories(${SDL_INCLUDE_DIR})
 else()

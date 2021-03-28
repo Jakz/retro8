@@ -179,8 +179,7 @@ void GameView::flip()
   manager->blitToScreen(_output, dest);
 
   // We aren't returning control to ::loop, so force this to display now
-  auto* renderer = manager->renderer();
-  SDL_RenderPresent(renderer);
+  manager->flip();
 
   // Wait out the right time between frames
   // (assumes zero draw time, so this can be improved)

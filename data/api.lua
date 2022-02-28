@@ -24,7 +24,7 @@ end
 
 function foreach(c, f)
   if c ~= nil then
-    for key, value in ipairs(c) do
+    for value in all(c) do
       f(value)
     end
   end

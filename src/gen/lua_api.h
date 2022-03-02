@@ -25,7 +25,7 @@ const char* lua_api_string =
 "\n"
 "function foreach(c, f)\n"
 "  if c ~= nil then\n"
-"    for key, value in ipairs(c) do\n"
+"    for value in all(c) do\n"
 "      f(value)\n"
 "    end\n"
 "  end\n"

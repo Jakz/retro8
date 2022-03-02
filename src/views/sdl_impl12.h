@@ -25,6 +25,12 @@ bool SDL<EventHandler, Renderer>::init()
 }
 
 template<typename EventHandler, typename Renderer>
+void SDL<EventHandler, Renderer>::flip()
+{
+  SDL_Flip(_screen);
+}
+
+template<typename EventHandler, typename Renderer>
 void SDL<EventHandler, Renderer>::loop()
 {
   while (!willQuit)

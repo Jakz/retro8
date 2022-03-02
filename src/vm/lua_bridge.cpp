@@ -975,10 +975,7 @@ namespace platform
 
   int flip(lua_State* L)
   {
-    //TODO: this call should syncronize to 30fps, at the moment it just
-    // returns producing a lot of flips in non synchronized code (eg. _init() busy loop)
-    //TODO: flip is handled by backend so we should find a way to set the callback that should be called
-
+    machine.flip();
     return 0;
   }
 
@@ -1161,12 +1158,28 @@ void Code::initFromSource(const std::string& code)
   if (error)
     printError("lua_pcall on init");
 
+  lua_getglobal(L, "_init");
 
+  if (lua_isfunction(L, -1))
+  {
+    _init = lua_topointer(L, -1);
+    lua_pop(L, 1);
+  }
+
+  fetchGlobals();
+}
+
+void Code::fetchGlobals()
+{
   lua_getglobal(L, "_update");
   if (lua_isfunction(L, -1))
   {
     _update = lua_topointer(L, -1);
     lua_pop(L, 1);
+  }
+  else
+  {
+    _update = NULL;
   }
 
   lua_getglobal(L, "_update60");
@@ -1176,6 +1189,10 @@ void Code::initFromSource(const std::string& code)
     _update60 = lua_topointer(L, -1);
     lua_pop(L, 1);
   }
+  else
+  {
+    _update60 = NULL;
+  }
 
   lua_getglobal(L, "_draw");
 
@@ -1184,13 +1201,9 @@ void Code::initFromSource(const std::string& code)
     _draw = lua_topointer(L, -1);
     lua_pop(L, 1);
   }
-
-  lua_getglobal(L, "_init");
-
-  if (lua_isfunction(L, -1))
+  else
   {
-    _init = lua_topointer(L, -1);
-    lua_pop(L, 1);
+    _draw = NULL;
   }
 }
 
@@ -1205,6 +1218,7 @@ void Code::callFunction(const char* name, int ret)
 
 void Code::update()
 {
+  fetchGlobals();
   if (_update60)
     callFunction("_update60");
   else if (_update)
@@ -1213,6 +1227,7 @@ void Code::update()
 
 void Code::draw()
 {
+  fetchGlobals();
   if (_draw)
     callFunction("_draw");
 }

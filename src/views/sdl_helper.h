@@ -124,6 +124,7 @@ public:
   void capFPS();
 
   void loop();
+  void flip();
   void handleEvents();
 
   void exit() { willQuit = true; }

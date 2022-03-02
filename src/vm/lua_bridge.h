@@ -25,6 +25,8 @@ namespace lua
     const void* _update60;
     const void* _draw;
 
+    void fetchGlobals();
+
   public:
     Code() : L(nullptr) { }
     ~Code();

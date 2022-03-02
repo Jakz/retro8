@@ -29,6 +29,12 @@ bool SDL<EventHandler, Renderer>::init()
 }
 
 template<typename EventHandler, typename Renderer>
+void SDL<EventHandler, Renderer>::flip()
+{
+  SDL_RenderPresent(_renderer);
+}
+
+template<typename EventHandler, typename Renderer>
 void SDL<EventHandler, Renderer>::loop()
 {
   while (!willQuit)

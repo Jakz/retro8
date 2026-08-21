@@ -168,6 +168,50 @@ TEST_CASE("PICO-8 API compatibility")
   }
 }
 
+TEST_CASE("PICO-8 boot graphics state")
+{
+  Machine& testMachine = machine;
+
+  SECTION("default print color is visible after cls")
+  {
+    testMachine.font().load();
+    testMachine.code().initFromSource("cls() print('x')");
+
+    bool hasVisiblePixel = false;
+    for (int y = 0; y < 128; ++y)
+      for (int x = 0; x < 128; ++x)
+        hasVisiblePixel = hasVisiblePixel || testMachine.pget(x, y) != color_t::BLACK;
+
+    REQUIRE(hasVisiblePixel);
+  }
+}
+
+TEST_CASE("PICO-8 lifecycle callbacks")
+{
+  Machine& testMachine = machine;
+
+  SECTION("_init can install update and draw callbacks")
+  {
+    testMachine.font().load();
+    testMachine.code().initFromSource("function _init() _update=function() pset(0,0,8) end _draw=function() pset(1,0,6) end end");
+
+    REQUIRE(testMachine.code().hasInit());
+    REQUIRE_FALSE(testMachine.code().hasUpdate());
+    REQUIRE_FALSE(testMachine.code().hasDraw());
+
+    testMachine.code().init();
+
+    REQUIRE(testMachine.code().hasUpdate());
+    REQUIRE(testMachine.code().hasDraw());
+
+    testMachine.code().update();
+    testMachine.code().draw();
+
+    REQUIRE(testMachine.pget(0, 0) == color_t::RED);
+    REQUIRE(testMachine.pget(1, 0) == color_t::LIGHT_GREY);
+  }
+}
+
 TEST_CASE("lua language modifications")
 {
   lua_State* L = luaL_newstate();

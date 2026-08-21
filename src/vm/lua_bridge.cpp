@@ -1180,36 +1180,46 @@ void Code::initFromSource(const std::string& code)
     printError("lua_pcall on init");
 
 
+  refreshCallbacks();
+}
+
+void Code::refreshCallbacks()
+{
+  _init = nullptr;
+  _update = nullptr;
+  _update60 = nullptr;
+  _draw = nullptr;
+
   lua_getglobal(L, "_update");
   if (lua_isfunction(L, -1))
   {
     _update = lua_topointer(L, -1);
-    lua_pop(L, 1);
   }
+  lua_pop(L, 1);
 
   lua_getglobal(L, "_update60");
 
   if (lua_isfunction(L, -1))
   {
     _update60 = lua_topointer(L, -1);
-    lua_pop(L, 1);
   }
+  lua_pop(L, 1);
 
   lua_getglobal(L, "_draw");
 
   if (lua_isfunction(L, -1))
   {
     _draw = lua_topointer(L, -1);
-    lua_pop(L, 1);
   }
+  lua_pop(L, 1);
 
   lua_getglobal(L, "_init");
 
   if (lua_isfunction(L, -1))
   {
     _init = lua_topointer(L, -1);
-    lua_pop(L, 1);
   }
+  lua_pop(L, 1);
 }
 
 void Code::callFunction(const char* name, int ret)
@@ -1238,5 +1248,8 @@ void Code::draw()
 void Code::init()
 {
   if (_init)
+  {
     callFunction("_init");
+    refreshCallbacks();
+  }
 }

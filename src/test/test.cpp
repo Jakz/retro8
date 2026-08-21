@@ -3,6 +3,7 @@
 #if TEST_MODE
 
 #define CATCH_CONFIG_RUNNER
+#define CATCH_CONFIG_NO_POSIX_SIGNALS
 #include "catch.hpp"
 
 #include "vm/machine.h"
@@ -20,7 +21,6 @@ Machine& m = machine;
 
 TEST_CASE("cursor([x,] [y,] [col])")
 {
-  Machine& m = machine;
   auto* cursor = m.memory().cursor();
 
   SECTION("cursor starts at 0,0")
@@ -131,6 +131,41 @@ TEST_CASE("bitwise")
   m.code().initFromSource("function _test() " + code + " end");
   m.code().callFunction("_test", 1);
   REQUIRE(lua_tonumber(m.code().state(), -1) == expected);
+}
+
+TEST_CASE("PICO-8 API compatibility")
+{
+  Machine& testMachine = machine;
+  testMachine.code().loadAPI();
+
+  SECTION("tonum parses decimal strings")
+  {
+    testMachine.code().initFromSource("function _test() return tonum('123'), tonum('-4.5'), tonum('nope') end");
+    testMachine.code().callFunction("_test", 3);
+    REQUIRE(lua_tonumber(testMachine.code().state(), -3) == 123);
+    REQUIRE(lua_tonumber(testMachine.code().state(), -2) == -4.5);
+    REQUIRE(lua_isnil(testMachine.code().state(), -1));
+  }
+
+  SECTION("all tolerates deleting the current item")
+  {
+    testMachine.code().initFromSource("function _test() local t={1,2,3}; local out={}; for v in all(t) do add(out,v); if v==1 then del(t,v) end end return #out,out[1],out[2],out[3] end");
+    testMachine.code().callFunction("_test", 4);
+    REQUIRE(lua_tonumber(testMachine.code().state(), -4) == 3);
+    REQUIRE(lua_tonumber(testMachine.code().state(), -3) == 1);
+    REQUIRE(lua_tonumber(testMachine.code().state(), -2) == 2);
+    REQUIRE(lua_tonumber(testMachine.code().state(), -1) == 3);
+  }
+
+  SECTION("coroutine helpers preserve arguments and yielded values")
+  {
+    testMachine.code().initFromSource("function _test() local co=cocreate(function(a) local b=yield(a+1); return b+2 end); local ok,a=coresume(co,4); local ok2,b=coresume(co,8); return ok,a,ok2,b end");
+    testMachine.code().callFunction("_test", 4);
+    REQUIRE(lua_toboolean(testMachine.code().state(), -4));
+    REQUIRE(lua_tonumber(testMachine.code().state(), -3) == 5);
+    REQUIRE(lua_toboolean(testMachine.code().state(), -2));
+    REQUIRE(lua_tonumber(testMachine.code().state(), -1) == 10);
+  }
 }
 
 TEST_CASE("lua language modifications")

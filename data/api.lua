@@ -61,6 +61,15 @@ function del(t, v)
   end
 end
 
+function deli(t, i)
+  if t ~= nil then
+    i = i or #t
+    if i >= 1 and i <= #t then
+      return table.remove(t, i)
+    end
+  end
+end
+
 function cocreate(f)
   return coroutine.create(f)
 end

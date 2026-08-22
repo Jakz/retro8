@@ -157,6 +157,36 @@ TEST_CASE("PICO-8 API compatibility")
     REQUIRE(lua_tonumber(testMachine.code().state(), -1) == 3);
   }
 
+  SECTION("deli removes entries by index")
+  {
+    testMachine.code().initFromSource("function _test() local t={10,20,30}; return deli(t,2),#t,t[1],t[2] end");
+    testMachine.code().callFunction("_test", 4);
+    REQUIRE(lua_tonumber(testMachine.code().state(), -4) == 20);
+    REQUIRE(lua_tonumber(testMachine.code().state(), -3) == 2);
+    REQUIRE(lua_tonumber(testMachine.code().state(), -2) == 10);
+    REQUIRE(lua_tonumber(testMachine.code().state(), -1) == 30);
+  }
+
+  SECTION("deli defaults to removing the last entry")
+  {
+    testMachine.code().initFromSource("function _test() local t={10,20,30}; return deli(t),#t,t[1],t[2] end");
+    testMachine.code().callFunction("_test", 4);
+    REQUIRE(lua_tonumber(testMachine.code().state(), -4) == 30);
+    REQUIRE(lua_tonumber(testMachine.code().state(), -3) == 2);
+    REQUIRE(lua_tonumber(testMachine.code().state(), -2) == 10);
+    REQUIRE(lua_tonumber(testMachine.code().state(), -1) == 20);
+  }
+
+  SECTION("deli leaves tables unchanged for invalid indices")
+  {
+    testMachine.code().initFromSource("function _test() local t={10,20}; return deli(t,0),#t,t[1],t[2] end");
+    testMachine.code().callFunction("_test", 4);
+    REQUIRE(lua_isnil(testMachine.code().state(), -4));
+    REQUIRE(lua_tonumber(testMachine.code().state(), -3) == 2);
+    REQUIRE(lua_tonumber(testMachine.code().state(), -2) == 10);
+    REQUIRE(lua_tonumber(testMachine.code().state(), -1) == 20);
+  }
+
   SECTION("coroutine helpers preserve arguments and yielded values")
   {
     testMachine.code().initFromSource("function _test() local co=cocreate(function(a) local b=yield(a+1); return b+2 end); local ok,a=coresume(co,4); local ok2,b=coresume(co,8); return ok,a,ok2,b end");

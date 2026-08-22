@@ -132,6 +132,32 @@ int circfill(lua_State* L)
   return 0;
 }
 
+int oval(lua_State* L)
+{
+  int x0 = lua_tonumber(L, 1);
+  int y0 = lua_tonumber(L, 2);
+  int x1 = lua_tonumber(L, 3);
+  int y1 = lua_tonumber(L, 4);
+  int c = lua_gettop(L) >= 5 ? lua_tonumber(L, 5) : machine.memory().penColor()->low();
+
+  machine.oval(x0, y0, x1, y1, static_cast<color_t>(c));
+
+  return 0;
+}
+
+int ovalfill(lua_State* L)
+{
+  int x0 = lua_tonumber(L, 1);
+  int y0 = lua_tonumber(L, 2);
+  int x1 = lua_tonumber(L, 3);
+  int y1 = lua_tonumber(L, 4);
+  int c = lua_gettop(L) >= 5 ? lua_tonumber(L, 5) : machine.memory().penColor()->low();
+
+  machine.ovalfill(x0, y0, x1, y1, static_cast<color_t>(c));
+
+  return 0;
+}
+
 int cls(lua_State* L)
 {
   int c = lua_gettop(L) == 1 ? lua_tonumber(L, -1) : 0;
@@ -1042,6 +1068,8 @@ void lua::registerFunctions(lua_State* L)
   lua_register(L, "rectfill", rectfill);
   lua_register(L, "circ", circ);
   lua_register(L, "circfill", circfill);
+  lua_register(L, "oval", oval);
+  lua_register(L, "ovalfill", ovalfill);
   lua_register(L, "clip", draw::clip);
   lua_register(L, "cls", cls);
   lua_register(L, "spr", spr);

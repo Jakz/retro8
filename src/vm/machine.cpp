@@ -200,6 +200,59 @@ void Machine::circfill(coord_t xc, coord_t yc, amount_t r, color_t color)
   }
 }
 
+static bool pointInOval(coord_t x0, coord_t y0, coord_t x1, coord_t y1, coord_t x, coord_t y)
+{
+  if (x < x0 || x > x1 || y < y0 || y > y1)
+    return false;
+
+  const int64_t w = x1 - x0;
+  const int64_t h = y1 - y0;
+
+  if (w == 0 && h == 0)
+    return x == x0 && y == y0;
+  if (w == 0)
+    return x == x0;
+  if (h == 0)
+    return y == y0;
+
+  const int64_t dx = 2 * x - x0 - x1;
+  const int64_t dy = 2 * y - y0 - y1;
+  const int64_t ww = w * w;
+  const int64_t hh = h * h;
+
+  return dx * dx * hh + dy * dy * ww <= ww * hh;
+}
+
+void Machine::oval(coord_t x0, coord_t y0, coord_t x1, coord_t y1, color_t color)
+{
+  if (x0 > x1) std::swap(x0, x1);
+  if (y0 > y1) std::swap(y0, y1);
+
+  for (coord_t y = y0; y <= y1; ++y)
+    for (coord_t x = x0; x <= x1; ++x)
+    {
+      if (!pointInOval(x0, y0, x1, y1, x, y))
+        continue;
+
+      if (!pointInOval(x0, y0, x1, y1, x - 1, y) ||
+          !pointInOval(x0, y0, x1, y1, x + 1, y) ||
+          !pointInOval(x0, y0, x1, y1, x, y - 1) ||
+          !pointInOval(x0, y0, x1, y1, x, y + 1))
+        pset(x, y, color);
+    }
+}
+
+void Machine::ovalfill(coord_t x0, coord_t y0, coord_t x1, coord_t y1, color_t color)
+{
+  if (x0 > x1) std::swap(x0, x1);
+  if (y0 > y1) std::swap(y0, y1);
+
+  for (coord_t y = y0; y <= y1; ++y)
+    for (coord_t x = x0; x <= x1; ++x)
+      if (pointInOval(x0, y0, x1, y1, x, y))
+        pset(x, y, color);
+}
+
 void Machine::spr(index_t idx, coord_t x, coord_t y)
 {
   const gfx::sprite_t* sprite = _memory.spriteAt(idx);

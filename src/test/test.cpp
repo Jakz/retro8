@@ -166,6 +166,18 @@ TEST_CASE("PICO-8 API compatibility")
     REQUIRE(lua_toboolean(testMachine.code().state(), -2));
     REQUIRE(lua_tonumber(testMachine.code().state(), -1) == 10);
   }
+
+  SECTION("oval drawing primitives are exposed")
+  {
+    testMachine.cls(color_t::BLACK);
+    testMachine.code().initFromSource("function _test() ovalfill(2,2,8,6,8) oval(12,2,18,6,11) end");
+    testMachine.code().callFunction("_test", 0);
+
+    REQUIRE(testMachine.pget(5, 4) == color_t::RED);
+    REQUIRE(testMachine.pget(2, 2) == color_t::BLACK);
+    REQUIRE(testMachine.pget(15, 2) == color_t::GREEN);
+    REQUIRE(testMachine.pget(15, 4) == color_t::BLACK);
+  }
 }
 
 TEST_CASE("PICO-8 boot graphics state")

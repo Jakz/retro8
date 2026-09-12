@@ -16,7 +16,10 @@
 #endif
 
 #define MOUSE_ENABLED false
+
+#ifndef TEST_MODE
 #define TEST_MODE false
+#endif
 
 #define R8_OPTS_ENABLED true
 #define R8_USE_LODE_PNG true

@@ -7,6 +7,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/projects/cmake")
 option(FUNKEY_S "Building for FunKey-S" OFF)
 option(OPENDINGUX "Build on opendingux toolchain" OFF)
 option(RETROFW "Build for retrofw" OFF)
+option(TEST_MODE "Build test runner" OFF)
 
 # RETROFW is an OPENDINGUX variant
 if (RETROFW)
@@ -60,10 +61,19 @@ file(GLOB SOURCES_VIEWS "${SRC_ROOT}/views/*.cpp")
 file(GLOB SOURCES_IO "${SRC_ROOT}/io/*.cpp")
 file(GLOB SOURCES_VM "${SRC_ROOT}/vm/*.cpp")
 file(GLOB SOURCES_LUA "${SRC_ROOT}/lua/*.c")
+file(GLOB SOURCES_TEST "${SRC_ROOT}/test/*.cpp")
 
 set(SOURCES ${SOURCES_ROOT} ${SOURCES_VIEWS} ${SOURCES_IO} ${SOURCES_VM} ${SOURCES_LUA})
 
+if(TEST_MODE)
+  list(APPEND SOURCES ${SOURCES_TEST})
+endif()
+
 add_executable(retro8 ${SOURCES})
+
+if(TEST_MODE)
+  target_compile_definitions(retro8 PRIVATE TEST_MODE=true)
+endif()
 
 if (SDL_FOUND)
   target_link_libraries(retro8 ${SDL_LIBRARY})

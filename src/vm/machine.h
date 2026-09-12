@@ -55,6 +55,8 @@ namespace retro8
     void rectfill(coord_t x0, coord_t y0, coord_t x1, coord_t y1, color_t color);
     void circ(coord_t x, coord_t y, amount_t r, color_t color);
     void circfill(coord_t x, coord_t y, amount_t r, color_t color);
+    void oval(coord_t x0, coord_t y0, coord_t x1, coord_t y1, color_t color);
+    void ovalfill(coord_t x0, coord_t y0, coord_t x1, coord_t y1, color_t color);
 
     void pal(color_t c0, color_t c1, palette_index_t index);
 

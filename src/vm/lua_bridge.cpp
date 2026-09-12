@@ -9,6 +9,7 @@
 #include <fstream>
 #include <cstring>
 #include <cmath>
+#include <cstdlib>
 
 #pragma warning(push)
 #pragma warning(disable: 4244)
@@ -127,6 +128,32 @@ int circfill(lua_State* L)
   int c = lua_gettop(L) >= 4 ? lua_tonumber(L, 4) : machine.memory().penColor()->low();
 
   machine.circfill(x, y, r, color_t(c));
+
+  return 0;
+}
+
+int oval(lua_State* L)
+{
+  int x0 = lua_tonumber(L, 1);
+  int y0 = lua_tonumber(L, 2);
+  int x1 = lua_tonumber(L, 3);
+  int y1 = lua_tonumber(L, 4);
+  int c = lua_gettop(L) >= 5 ? lua_tonumber(L, 5) : machine.memory().penColor()->low();
+
+  machine.oval(x0, y0, x1, y1, static_cast<color_t>(c));
+
+  return 0;
+}
+
+int ovalfill(lua_State* L)
+{
+  int x0 = lua_tonumber(L, 1);
+  int y0 = lua_tonumber(L, 2);
+  int x1 = lua_tonumber(L, 3);
+  int y1 = lua_tonumber(L, 4);
+  int c = lua_gettop(L) >= 5 ? lua_tonumber(L, 5) : machine.memory().penColor()->low();
+
+  machine.ovalfill(x0, y0, x1, y1, static_cast<color_t>(c));
 
   return 0;
 }
@@ -351,7 +378,7 @@ int cursor(lua_State* L)
 
     if (lua_gettop(L) == 3)
     {
-      retro8::color_t color = static_cast<retro8::color_t>((int)lua_tonumber(L, 2));
+      retro8::color_t color = static_cast<retro8::color_t>((int)lua_tonumber(L, 3));
       machine.memory().penColor()->low(color);
     }
   }
@@ -435,8 +462,8 @@ namespace sprites
     coord_t dy = lua_tonumber(L, 6);
     coord_t dw = lua_to_or_default(L, number, 7, sw);
     coord_t dh = lua_to_or_default(L, number, 8, sh);
-    bool flipX = lua_to_or_default(L, boolean, 8, false);
-    bool flipY = lua_to_or_default(L, boolean, 8, false);
+    bool flipX = lua_to_or_default(L, boolean, 9, false);
+    bool flipY = lua_to_or_default(L, boolean, 10, false);
 
     machine.sspr(sx, sy, sw, sh, dx, dy, dw, dh, flipX, flipY);
 
@@ -696,7 +723,7 @@ namespace sound
     sfx::sound_index_t index = lua_tonumber(L, 1);
     sfx::channel_index_t channel = lua_to_or_default(L, number, 2, -1);
     int32_t start = lua_to_or_default(L, number, 3, 0);
-    int32_t end = lua_to_or_default(L, number, 3, machine.memory().sound(index)->length());
+    int32_t end = lua_to_or_default(L, number, 4, machine.memory().sound(index)->length());
 
     machine.sound().play(index, channel, start, end);
 
@@ -709,14 +736,14 @@ namespace string
   int sub(lua_State* L)
   {
     const std::string v = lua_tostring(L, 1);
-    size_t s = lua_tonumber(L, 2);
-    size_t e = lua_to_or_default(L, number, 3, -1);
+    int32_t s = lua_tonumber(L, 2);
+    int32_t e = lua_to_or_default(L, number, 3, -1);
 
-    size_t len = v.length();
+    int32_t len = static_cast<int32_t>(v.length());
     if (s < 0)
-      s = len - s + 1;
+      s = len + s + 1;
     if (e < 0)
-      e = len - e + 1;
+      e = len + e + 1;
 
     // TODO: intended behavior? picotetris calls it with swapped indices
     if (e < s || s > len)
@@ -726,7 +753,7 @@ namespace string
       if (s == 0)
         s = 1;
 
-      lua_pushstring(L, v.substr(s - 1, e - s + 1).c_str());
+      lua_pushstring(L, v.substr(static_cast<size_t>(s - 1), static_cast<size_t>(e - s + 1)).c_str());
     }
 
 
@@ -735,21 +762,27 @@ namespace string
 
   int tostr(lua_State* L)
   {
-    //TODO implement
-
-    static char buffer[20];
+    static char buffer[32];
 
     switch (lua_type(L, 1))
     {
     case LUA_TBOOLEAN: lua_pushstring(L, lua_toboolean(L, 1) ? "true" : "false"); break;
     case LUA_TNUMBER:
     {
-      snprintf(buffer, 20, "% 4.4f", lua_tonumber(L, 1));
+      snprintf(buffer, sizeof(buffer), "%.4f", lua_tonumber(L, 1));
+      char* end = buffer + strlen(buffer) - 1;
+      while (end > buffer && *end == '0')
+        *end-- = '\0';
+      if (end > buffer && *end == '.')
+        *end = '\0';
       lua_pushstring(L, buffer);
       break;
     }
     case LUA_TSTRING: lua_pushstring(L, lua_tostring(L, 1)); break;
-    default: lua_pushstring(L, "foo");
+    case LUA_TNIL: lua_pushstring(L, "[nil]"); break;
+    default:
+      luaL_tolstring(L, 1, nullptr);
+      break;
     }
 
     return 1;
@@ -757,10 +790,19 @@ namespace string
 
   int tonum(lua_State* L)
   {
-    //TODO implement
     const char* string = lua_tostring(L, 1);
+    if (!string)
+    {
+      lua_pushnil(L);
+      return 1;
+    }
 
-    lua_pushnumber(L, 0);
+    char* end = nullptr;
+    double value = std::strtod(string, &end);
+    if (end == string)
+      lua_pushnil(L);
+    else
+      lua_pushnumber(L, value);
 
     return 1;
   }
@@ -871,8 +913,8 @@ namespace platform
     assert(lua_gettop(L) <= 3);
     
     address_t dest = lua_to_or_default(L, number, 1, 0);
-    address_t src = lua_to_or_default(L, number, 1, 0);
-    int32_t length = lua_to_or_default(L, number, 1, address::CART_DATA_LENGTH);
+    address_t src = lua_to_or_default(L, number, 2, 0);
+    int32_t length = lua_to_or_default(L, number, 3, address::CART_DATA_LENGTH);
     
     std::memcpy(machine.memory().base() + dest, machine.memory().backup() + src, length);
 
@@ -1026,6 +1068,8 @@ void lua::registerFunctions(lua_State* L)
   lua_register(L, "rectfill", rectfill);
   lua_register(L, "circ", circ);
   lua_register(L, "circfill", circfill);
+  lua_register(L, "oval", oval);
+  lua_register(L, "ovalfill", ovalfill);
   lua_register(L, "clip", draw::clip);
   lua_register(L, "cls", cls);
   lua_register(L, "spr", spr);
@@ -1141,7 +1185,9 @@ void Code::printError(const char* where)
       std::cout << message << std::endl;
     }
   }
+#if !TEST_MODE
   getchar();
+#endif
 }
 
 void Code::initFromSource(const std::string& code)
@@ -1162,36 +1208,46 @@ void Code::initFromSource(const std::string& code)
     printError("lua_pcall on init");
 
 
+  refreshCallbacks();
+}
+
+void Code::refreshCallbacks()
+{
+  _init = nullptr;
+  _update = nullptr;
+  _update60 = nullptr;
+  _draw = nullptr;
+
   lua_getglobal(L, "_update");
   if (lua_isfunction(L, -1))
   {
     _update = lua_topointer(L, -1);
-    lua_pop(L, 1);
   }
+  lua_pop(L, 1);
 
   lua_getglobal(L, "_update60");
 
   if (lua_isfunction(L, -1))
   {
     _update60 = lua_topointer(L, -1);
-    lua_pop(L, 1);
   }
+  lua_pop(L, 1);
 
   lua_getglobal(L, "_draw");
 
   if (lua_isfunction(L, -1))
   {
     _draw = lua_topointer(L, -1);
-    lua_pop(L, 1);
   }
+  lua_pop(L, 1);
 
   lua_getglobal(L, "_init");
 
   if (lua_isfunction(L, -1))
   {
     _init = lua_topointer(L, -1);
-    lua_pop(L, 1);
   }
+  lua_pop(L, 1);
 }
 
 void Code::callFunction(const char* name, int ret)
@@ -1220,5 +1276,8 @@ void Code::draw()
 void Code::init()
 {
   if (_init)
+  {
     callFunction("_init");
+    refreshCallbacks();
+  }
 }

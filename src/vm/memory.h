@@ -53,6 +53,7 @@ namespace retro8
       memset(memory, 0, 1024 * 32);
       paletteAt(gfx::DRAW_PALETTE_INDEX)->reset();
       paletteAt(gfx::SCREEN_PALETTE_INDEX)->reset();
+      penColor()->low(color_t::LIGHT_GREY);
       clipRect()->reset();
       cursor()->reset();
     }

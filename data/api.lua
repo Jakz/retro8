@@ -1,23 +1,31 @@
 function all(t)
-  if t ~= nil then
-    local nt = {}
-    local ni = 1
-    for _,v in pairs(t) do
-      nt[ni] = v
-      ni = ni + 1
-    end
-    for k,v in pairs(nt) do
+  if t == nil then
+    return function() end
+  end
+
+  local i = 0
+  local last_i = 0
+  local last = nil
+
+  return function()
+    if last ~= nil and t[last_i] ~= last then
+      i = last_i - 1
     end
 
-    local i = 0
-    return function() i = i + 1; return nt[i] end
+    i = i + 1
+    last_i = i
+    last = t[i]
+    return last
   end
-  return function() end
 end
 
-function add(t, v)
+function add(t, v, i)
   if t ~= nil then
-    t[#t+1] = v
+    if i == nil then
+      t[#t+1] = v
+    else
+      table.insert(t, i, v)
+    end
     return v
   end
 end
@@ -39,21 +47,25 @@ function count(t)
   if t ~= nil then
     return #t
   end
+  return 0
 end
 
 function del(t, v)
   if t ~= nil then
-    local found = false
     for i = 1, #t do
       if t[i] == v then
-        found = true
-      end
-      if found then
-        t[i] = t[i+1]
+        table.remove(t, i)
+        return v
       end
     end
-    if found then
-      return v
+  end
+end
+
+function deli(t, i)
+  if t ~= nil then
+    i = i or #t
+    if i >= 1 and i <= #t then
+      return table.remove(t, i)
     end
   end
 end
@@ -62,13 +74,12 @@ function cocreate(f)
   return coroutine.create(f)
 end
 
-function yield()
-  coroutine.yield()
+function yield(...)
+  return coroutine.yield(...)
 end
 
--- TODO: missing vararg
-function coresume(f)
-  return coroutine.resume(f)
+function coresume(f, ...)
+  return coroutine.resume(f, ...)
 end
 
 function costatus(f)
